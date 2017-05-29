@@ -84,3 +84,4 @@ def t2r( tmat ):
         return numpy.delete(tmp, (3), axis=1)
     else:
         raise ValueError(' Value must be a rotation matrix ')
+    
