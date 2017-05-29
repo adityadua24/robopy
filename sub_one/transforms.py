@@ -59,7 +59,8 @@ def trotz(t, units="rad"):
 #---------------------------------------------------------------------------------------#
 def r2t( rmat ):
     """ r2t, convert rotation matrix to a homogeneous transform """
-    dim = np.ndarray.shape(rmat)
+    assert isinstance(tmat, np.matrix)
+    dim = rmat.shape
     if dim(0) != dim(1):
         raise ValueError(' Matrix Must be square ')
     elif dim(0) == 2:
@@ -68,5 +69,20 @@ def r2t( rmat ):
     elif dim(0) == 3:  
         tmp = np.r_[rmat, np.zeros((1,3))]
         return np.c_[ tmp, np.array([[0],[0],[0],[1]]) ]
+    else:
+        raise ValueError(' Value must be a rotation matrix ')
+#---------------------------------------------------------------------------------------#
+def t2r( tmat ):
+    """ t2r, convert a given homogeneous transform to a rotation matrix """
+    assert isinstance(tmat, np.matrix)
+    dim = tmat.shape
+    if dim(0) != dim(1):
+        raise ValueError(' Matrix Must be square ')
+    elif dim(0) == 3:
+        tmp = np.delete(tmat, (2), axis=0)
+        return np.delete(tmp, (2), axis=1)
+    elif dim(0) == 4:  
+        tmp = np.delete(tmat, (3), axis=0)
+        return np.delete(tmp, (3), axis=1)
     else:
         raise ValueError(' Value must be a rotation matrix ')
