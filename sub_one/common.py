@@ -29,3 +29,12 @@ def ishomog(tr, dim, rtest=''):
     else:
         raise ValueError('Invalid data type passed to common.ishomog()')
     return flag
+
+def isvec(v, l = 3):
+    '''
+    ISVEC Test if vector
+    '''
+    d = v.shape
+    h = d.size == 2 and min(v.shape) == 1 and v.size == l
+
+    return h
