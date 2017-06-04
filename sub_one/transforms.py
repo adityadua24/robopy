@@ -12,7 +12,7 @@ def rotx(t, unit="rad"):
         t = t * math.pi / 180
     ct = math.cos(t)
     st = math.sin(t)
-    return np.matrix('1 0 0; 0 ct -st; 0 st ct')
+    return np.matrix([[1, 0, 0], [0, ct, -st], [0, st, ct]])
 
 
 # ---------------------------------------------------------------------------------------#
@@ -24,7 +24,7 @@ def roty(t, unit="rad"):
         t = t * math.pi / 180
     ct = math.cos(t)
     st = math.sin(t)
-    return np.matrix('ct 0 st; 0 1 0; -st 0 ct')
+    return np.matrix([[ct, 0, st], [0, 1, 0], [-st, 0, ct]])
 
 
 # ---------------------------------------------------------------------------------------#
@@ -36,7 +36,7 @@ def rotz(t, unit="rad"):
         t = t * math.pi / 180
     ct = math.cos(t)
     st = math.sin(t)
-    return np.matrix('ct -st 0; st ct 0; 0 0 1')
+    return np.matrix([[ct, -st, 0], [st, ct, 0], [0, 0, 1]])
 
 
 # ---------------------------------------------------------------------------------------#
@@ -101,10 +101,3 @@ def t2r(tmat):
         return np.delete(tmp, (3), axis=1)
     else:
         raise ValueError(' Value must be a rotation matrix ')
-
-
-if __name__ == "__main__":
-    """
-    If the script is run as main,
-    initialise a test suite and run it
-    """
