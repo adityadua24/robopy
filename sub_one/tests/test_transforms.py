@@ -23,8 +23,20 @@ class TestRotx(unittest.TestCase):
 
     def test_validData_boundaryCondition_0_rad(self):
         expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-        # self.assertAlmostEqual(expected_mat, transforms.rotx(0))
-        npt.assert_almost_equal(expected_mat, transforms.rotx(0))
+        received_mat = transforms.rotx(0)
+        caught = False
+        expected_mat_str = ""
+        received_mat_str = ""
+        output_str = ""
+        try:
+            npt.assert_almost_equal(received_mat, expected_mat)
+        except AssertionError:
+            expected_mat_str = np.array2string(np.asarray(expected_mat))
+            received_mat_str = np.array2string(np.asarray(received_mat))
+            output_str = str("Expected Output:-\n" + expected_mat_str + "\n" + "Received Output:\n" + received_mat_str)
+            caught = True
+        if caught:
+            self.fail(output_str)
 
     def test_validData_boundaryCondition_2pi_rad(self):
         self.assertTrue(True)
@@ -45,6 +57,7 @@ class TestRotx(unittest.TestCase):
         self.assertTrue(True)
 
     def test_invalidData_arg1_bool(self):
+        # self.assertRaises(AssertionError, npt.assert_almost_equal, received_mat, expected_mat)
         self.assertTrue(True)
 
     def test_invalidData_arg2_string_mismatch(self):
