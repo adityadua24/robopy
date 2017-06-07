@@ -1,6 +1,8 @@
 """ Contains all of the transforms that will be used within the toolbox"""
 import math
 import numpy as np
+from sub_one.tests import test_transforms
+import unittest
 
 
 # ---------------------------------------------------------------------------------------#
@@ -8,8 +10,12 @@ def rotx(t, unit="rad"):
     """ rotx(THETA) is an SO(3) rotation matrix (3x3) representing a 
         rotation  of THETA radians about the x-axis
         rotx(THETA, "deg") represents a rotation of THETA degrees about the x-axis"""
-    if unit == "deg":
+    if unit == "rad":
+        pass
+    elif unit == "deg":
         t = t * math.pi / 180
+    else:
+        raise ValueError("Unit value must be 'rad' or 'deg' only")
     ct = math.cos(t)
     st = math.sin(t)
     return np.matrix([[1, 0, 0], [0, ct, -st], [0, st, ct]])
@@ -20,8 +26,12 @@ def roty(t, unit="rad"):
     """ roty(THETA) is an SO(3) rotation matrix (3x3) representing a
         rotation of THETA radians about the y-axis
         roty(THETA, "deg") represents a rotation of THETA degrees about the y-axis"""
-    if unit == "deg":
+    if unit == "rad":
+        pass
+    elif unit == "deg":
         t = t * math.pi / 180
+    else:
+        raise ValueError("Unit value must be 'rad' or 'deg' only")
     ct = math.cos(t)
     st = math.sin(t)
     return np.matrix([[ct, 0, st], [0, 1, 0], [-st, 0, ct]])
@@ -32,8 +42,12 @@ def rotz(t, unit="rad"):
     """ rotz(THETA) is an SO(3) rotation matrix (3x3) representing a 
         rotation of THETA radians about the z-axis
         rotz(THETA, "deg") represents a rotation of THETA degrees about the z-axis"""
-    if unit == "deg":
+    if unit == "rad":
+        pass
+    elif unit == "deg":
         t = t * math.pi / 180
+    else:
+        raise ValueError("Unit value must be 'rad' or 'deg' only")
     ct = math.cos(t)
     st = math.sin(t)
     return np.matrix([[ct, -st, 0], [st, ct, 0], [0, 0, 1]])
@@ -101,3 +115,21 @@ def t2r(tmat):
         return np.delete(tmp, (3), axis=1)
     else:
         raise ValueError(' Value must be a rotation matrix ')
+
+
+if __name__ == '__main__':
+    # When run as main, initialise test cases in test_classes_to_tun and runs them
+    # Refer
+    # https://stackoverflow.com/questions/5360833/how-to-run-multiple-classes-in-single-test-suite-in-python-unit-testing
+    test_classes_to_run = [test_transforms.TestRotx]
+
+    loader = unittest.TestLoader()
+
+    suits_list = []
+    for test_class in test_classes_to_run:
+        suits_list.append(loader.loadTestsFromTestCase(test_class))
+
+    big_suite = unittest.TestSuite(suits_list)
+
+    runner = unittest.TextTestRunner(verbosity=2)
+    results = runner.run(big_suite)

@@ -21,7 +21,7 @@ def ishomog(tr, dim, rtest=''):
         # if rtest = 'valid'
         if flag and rtest == 'valid':
             flag = is_valid(tr[0])  # As in matlab code only first matrix is passed for validity test
-            # TODO-Do we need to test all matrices in list for validity of rotation submatrix
+            # TODO-Do we need to test all matrices in list for validity of rotation submatrix -- Yes
     elif isinstance(tr, np.matrix):
         if tr.shape[0] == dim[0] and tr.shape[1] == dim[0]:
             if flag and rtest == 'valid':
