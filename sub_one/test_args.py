@@ -23,5 +23,12 @@ def is_mat_list(list_matrices):
 def valid_pose(pose):
     return True
 
+
 def super_pose_appenditem(object, item):
     return True
+
+
+def super_pose_multiply(object, other):
+    assert type(object) is type(other)
+    assert valid_pose(object)
+    assert valid_pose(other)

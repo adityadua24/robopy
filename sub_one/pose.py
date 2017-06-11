@@ -1,14 +1,17 @@
 import numpy as np
-from sub_one.super_pose import SuperPose
 import math
+from sub_one.super_pose import SuperPose
 
 
 class SO2(SuperPose):
 
     def __init__(self, t=None, unit='rad'):
         self._list = []
+        self._unit = unit
         if t is None:
             self._list.append(np.asmatrix(np.eye(2, 2)))
+        elif [] == t:
+            pass
         elif isinstance(t, SO2):
             pass
         elif isinstance(t, np.matrix):

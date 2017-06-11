@@ -6,7 +6,6 @@ from abc import ABC, abstractmethod
 
 
 class SuperPose(ABC):
-
     @property
     @abstractmethod
     def data(self):
@@ -24,15 +23,11 @@ class SuperPose(ABC):
         return len(self._list)
 
     def append(self, item):
-        pass
+        test_args.super_pose_appenditem(self, item)
 
     def __mul__(self, other):
-        assert type(self) is type(other)
-        assert test_args.valid_pose(self)
-        assert test_args.valid_pose(other)
+        test_args.super_pose_multiply(self, other)
         newPose = type(self)()
         for each_self_pose in self:
             for each_other_pose in other:
                 pass
-
-
