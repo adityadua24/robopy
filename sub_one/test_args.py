@@ -18,3 +18,10 @@ def is_mat_list(list_matrices):
     else:
         flag = False
     return flag
+
+
+def valid_pose(pose):
+    return True
+
+def super_pose_appenditem(object, item):
+    return True
