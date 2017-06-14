@@ -1,6 +1,6 @@
 import unittest
 from math import pi
-from .. import transforms
+from sub_one import transforms
 import numpy as np
 import numpy.testing as npt
 

@@ -88,12 +88,12 @@ def r2t(rmat):
     """ r2t, convert rotation matrix to a homogeneous transform """
     assert isinstance(rmat, np.matrix)
     dim = rmat.shape
-    if dim(0) != dim(1):
+    if dim[0] != dim[1]:
         raise ValueError(' Matrix Must be square ')
-    elif dim(0) == 2:
+    elif dim[0] == 2:
         tmp = np.r_[rmat, np.zeros((1, 2))]
         return np.c_[tmp, np.array([[0], [0], [1]])]
-    elif dim(0) == 3:
+    elif dim[0] == 3:
         tmp = np.r_[rmat, np.zeros((1, 3))]
         return np.c_[tmp, np.array([[0], [0], [0], [1]])]
     else:
@@ -105,12 +105,12 @@ def t2r(tmat):
     """ t2r, convert a given homogeneous transform to a rotation matrix """
     assert isinstance(tmat, np.matrix)
     dim = tmat.shape
-    if dim(0) != dim(1):
+    if dim[0] != dim[1]:
         raise ValueError(' Matrix Must be square ')
-    elif dim(0) == 3:
+    elif dim[0] == 3:
         tmp = np.delete(tmat, (2), axis=0)
         return np.delete(tmp, (2), axis=1)
-    elif dim(0) == 4:
+    elif dim[0] == 4:
         tmp = np.delete(tmat, (3), axis=0)
         return np.delete(tmp, (3), axis=1)
     else:
