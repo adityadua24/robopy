@@ -21,18 +21,22 @@ class SuperPose(ABC):
         else:
             return 'No matrix found'
 
+    @property
     def length(self):
         return len(self._list)
 
     def append(self, item):
         test_args.super_pose_appenditem(self, item)
-        self._list.append(item)
+        if type(item) is np.matrix:
+            self._list.append(item)
+        else:
+            for each_matrix in item:
+                self._list.append(each_matrix)
 
     def __mul__(self, other):
         test_args.super_pose_multiply_check(self, other)
         new_pose = type(self)([])
-        for each_self_pose in self:
-            for each_other_pose in other:
-                mat = each_self_pose * each_other_pose
-                new_pose.append(mat)
+        for i in range(self.length):
+            mat = self[i] * other[i]
+            new_pose.append(mat)
         return new_pose

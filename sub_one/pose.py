@@ -22,7 +22,9 @@ class SO2(SuperPose):
             self._list.append(np.matrix([[math.cos(args_in), -math.sin(args_in)],
                                          [math.sin(args_in), math.cos(args_in)]]))
         elif isinstance(args_in, SO2):
-            pass #TODO -- IMPLEMENT THIS
+            test_args.so2_valid(args_in)
+            for each_matrix in args_in:
+                self._list.append(each_matrix)
         elif isinstance(args_in, np.matrix):
             self._list.append(args_in)
         elif isinstance(args_in, list):
@@ -38,7 +40,7 @@ class SO2(SuperPose):
 
     @property
     def data(self):
-        return self._data
+        return self._list
 
     def __add__(self, other):
         # assert isinstance(other, SO2)
