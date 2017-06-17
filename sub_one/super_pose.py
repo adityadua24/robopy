@@ -36,7 +36,14 @@ class SuperPose(ABC):
     def __mul__(self, other):
         test_args.super_pose_multiply_check(self, other)
         new_pose = type(self)([])
-        for i in range(self.length):
-            mat = self[i] * other[i]
-            new_pose.append(mat)
-        return new_pose
+        if self.length == other.length:
+            for i in range(self.length):
+                mat = self[i] * other[i]
+                new_pose.append(mat)
+            return new_pose
+        else:
+            for each_self_matrix in self:
+                for each_other_matrix in other:
+                    mat = each_self_matrix * each_other_matrix
+                    new_pose.append(mat)
+            return new_pose

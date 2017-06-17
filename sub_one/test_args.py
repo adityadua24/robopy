@@ -52,7 +52,9 @@ def super_pose_multiply_check(object, other):
     valid_pose(object)
     valid_pose(other)
     assert (type(object) is type(other))
-    assert object.length == other.length
+    assert (object.length == other.length) \
+           or (object.length == 1 and other.length > 1) \
+           or (object.length > 1 and other.length == 1)
 
 
 # ----------------- POSE.SO2 CHECKS -------------------------
