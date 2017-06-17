@@ -31,15 +31,15 @@ def unit_check(unit):
 
 # ------------------------------------------------------
 # ------------  SUPER POSE CHECKS-----------------------
-def valid_pose(object):
+def valid_pose(obj):
     # TODO -- Check if its a valid pose object
-    assert isinstance(object, super_pose.SuperPose)
+    assert isinstance(obj, super_pose.SuperPose)
 
 
-def super_pose_appenditem(object, item):
-    valid_pose(object)
+def super_pose_appenditem(obj, item):
+    valid_pose(obj)
     if isinstance(item, super_pose.SuperPose):
-        assert type(object) is type(item)
+        assert type(obj) is type(item)
     elif isinstance(item, np.matrix):
         # TODO valid matrix check ?
         pass
@@ -48,13 +48,25 @@ def super_pose_appenditem(object, item):
                              'Data types allowed: numpy matrix and super_pose.SuperPose')
 
 
-def super_pose_multiply_check(object, other):
-    valid_pose(object)
+def super_pose_multiply_check(obj, other):
+    valid_pose(obj)
     valid_pose(other)
-    assert (type(object) is type(other))
-    assert (object.length == other.length) \
-           or (object.length == 1 and other.length > 1) \
-           or (object.length > 1 and other.length == 1)
+    assert type(obj) is type(other)
+    assert (obj.length == other.length) \
+           or (obj.length == 1 and other.length > 1) \
+           or (obj.length > 1 and other.length == 1)
+
+
+def super_pose_add_sub_check(obj, other):
+    valid_pose(obj)
+    valid_pose(other)
+    assert type(obj) is type(other)
+    assert obj.length == 1 and other.length == 1
+    # TODO Allow pose list ?
+
+
+def super_pose_subclass_check(obj, other):
+    pass
 
 
 # ----------------- POSE.SO2 CHECKS -------------------------
@@ -63,9 +75,9 @@ def so2_angle_list_check(ang_list):
         assert isinstance(each, int) or isinstance(each, float)
 
 
-def so2_valid(object):
+def so2_valid(obj):
     # TODO Valid SO2 object
-    assert type(object) is pose.SO2
+    assert type(obj) is pose.SO2
 
 
 def so2_input_types_check(args_in):
