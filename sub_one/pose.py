@@ -2,6 +2,7 @@ import numpy as np
 import math
 from sub_one.super_pose import SuperPose
 import sub_one.test_args as test_args
+from sub_one import transforms
 
 
 # -----------------------------------------------------------------------------------------
@@ -40,6 +41,39 @@ class SO2(SuperPose):
         else:
             pass
 
+    @property
+    def angle(self):
+        angles = []
+        for each_matrix in self:
+            angles.append(math.atan2(each_matrix[1, 0], each_matrix[0, 0]))
+        if len(angles) == 1:
+            return angles[0]
+        elif len(angles) > 1:
+            return angles
+
+    @property
+    def det(self):
+        det_list = []
+        for each_matrix in self:
+            det_list.append(np.linalg.det(each_matrix))
+        if len(det_list) == 1:
+            return det_list[0]
+        elif len(det_list) > 1:
+            return det_list
+
+    def SE2(self):
+        for each_matrix in self:
+            transforms.r2t(each_matrix)
+
+    def inv(self):
+        inv_list = []
+        for each_matrix in self:
+            inv_list.append(np.matrix.transpose(each_matrix))
+        if len(inv_list) == 1:
+            return inv_list[0]
+        elif len(inv_list) > 1:
+            return inv_list
+
 
 # --------------------------------------------------------------------------------
 class SO3(SuperPose):
@@ -51,6 +85,8 @@ class SO3(SuperPose):
 class SE2(SuperPose):
     # ---------------------------------------------------------------------------------
     pass
+
+
 # ------------------------------------------------------------------------------------
 
 
@@ -58,4 +94,5 @@ class SE2(SuperPose):
 class SE3(SuperPose):
     # ---------------------------------------------------------------------------------
     pass
+
 # ------------------------------------------------------------------------------------
