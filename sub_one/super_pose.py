@@ -24,6 +24,10 @@ class SuperPose(ABC):
         else:
             return False
 
+    @property
+    def shape(self):
+        return self._list[0].shape
+
     # TODO issym, simplify, ?
 
     def is_equal(self, other):
@@ -44,49 +48,64 @@ class SuperPose(ABC):
                 self._list.append(each_matrix)
 
     def __mul__(self, other):
-        # TODO Should support pose * vector
         test_args.super_pose_multiply_check(self, other)
-        new_pose = type(self)([])
-        if self.length == other.length:
-            for i in range(self.length):
-                mat = self[i] * other[i]
-                new_pose.append(mat)
-            return new_pose
-        else:
-            for each_self_matrix in self:
-                for each_other_matrix in other:
-                    mat = each_self_matrix * each_other_matrix
+        if isinstance(other, SuperPose):
+            new_pose = type(self)([])
+            if self.length == other.length:
+                for i in range(self.length):
+                    mat = self.data[i] * other.data[i]
                     new_pose.append(mat)
+                return new_pose
+            else:
+                for each_self_matrix in self:
+                    for each_other_matrix in other:
+                        mat = each_self_matrix * each_other_matrix
+                        new_pose.append(mat)
             return new_pose
+        elif isinstance(other, np.matrix):
+            mat = []
+            for each_matrix in self:
+                mat.append(each_matrix * other)
+            if len(mat) == 1:
+                return mat[0]
+            elif len(mat) > 1:
+                return mat
 
     def __add__(self, other):
         test_args.super_pose_add_sub_check(self, other)
         mat = []
         for i in range(self.length):
-            mat.append(self[i] + other[i])
-        return mat
+            mat.append(self.data[i] + other.data[i])
+        if self.length == 1:
+            return mat[0]
+        elif self.length > 1:
+            return mat
 
     def __sub__(self, other):
         test_args.super_pose_add_sub_check(self, other)
         mat = []
         for i in range(self.length):
-            mat.append(self[i] - other[i])
-        return mat
+            mat.append(self.data[i] - other.data[i])
+        if self.length == 1:
+            return mat[0]
+        elif self.length > 1:
+            return mat
 
     def __getitem__(self, item):
-        # TODO return same class type object including data
-        return self._list[item]
+        new_pose = type(self)([])
+        new_pose.append(self._list[item])
+        return new_pose
 
     def __iter__(self):
         return (each for each in self._list)
 
     def __repr__(self):
         if len(self._list) >= 1:
-            str = '-------------------------------\n'
+            str = '-----------------------------------------\n'
             for each in self._list:
                 array = np.asarray(each)
                 str = str + np.array2string(array) \
-                      + '\n-------------------------------\n'
+                      + '\n-----------------------------------------\n'
             return str
         else:
             return 'No matrix found'

@@ -51,12 +51,14 @@ def super_pose_appenditem(obj, item):
 
 
 def super_pose_multiply_check(obj, other):
-    valid_pose(obj)
-    valid_pose(other)
-    assert type(obj) is type(other)
-    assert (obj.length == other.length) \
-           or (obj.length == 1 and other.length > 1) \
-           or (obj.length > 1 and other.length == 1)
+    if isinstance(other, super_pose.SuperPose):
+        assert type(obj) is type(other)
+        assert (obj.length == other.length) \
+               or (obj.length == 1 and other.length > 1) \
+               or (obj.length > 1 and other.length == 1)
+    elif isinstance(other, np.matrix):
+        assert other.shape[1] == 1  # Should be vector
+        assert obj.shape[1] == other.shape[0]  # Inner Dimensions must match
 
 
 def super_pose_add_sub_check(obj, other):
