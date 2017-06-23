@@ -1,3 +1,5 @@
+# Author - Aditya Dua - 1 June, 2017
+
 """test_args module contains test for input arguments.
 It checks if input argument passed by user is valid or not.
 If any invalid data is found,
@@ -76,7 +78,7 @@ def so2_angle_list_check(ang_list):
 
 
 def so2_valid(obj):
-    # TODO Valid SO2 object
+    # TODO det == 1 and dims = 2x2 Valid SO2 object
     assert type(obj) is pose.SO2
 
 

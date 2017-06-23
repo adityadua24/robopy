@@ -1,3 +1,5 @@
+# Author - Aditya Dua - 13 June, 2017
+
 import numpy as np
 import math
 import sub_one.test_args as test_args
@@ -42,6 +44,7 @@ class SuperPose(ABC):
                 self._list.append(each_matrix)
 
     def __mul__(self, other):
+        # TODO Should support pose * vector
         test_args.super_pose_multiply_check(self, other)
         new_pose = type(self)([])
         if self.length == other.length:
@@ -71,6 +74,7 @@ class SuperPose(ABC):
         return mat
 
     def __getitem__(self, item):
+        # TODO return same class type object including data
         return self._list[item]
 
     def __iter__(self):

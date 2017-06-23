@@ -1,3 +1,6 @@
+# Author - Aditya Dua - 13 June, 2017
+# Pose module has class implementations of SO2, SO3, SE2 and SE3 type matrices
+
 import numpy as np
 import math
 from sub_one.super_pose import SuperPose
@@ -29,6 +32,9 @@ class SO2(SuperPose):
             for each_matrix in args_in:
                 self._list.append(each_matrix)
         elif isinstance(args_in, np.matrix):
+            # TODO
+            # test_args.so2_input_matrix(args_in)
+            # 2x2 and det == 1
             self._list.append(args_in)
         elif isinstance(args_in, list):
             test_args.so2_angle_list_check(args_in)
