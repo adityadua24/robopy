@@ -2,7 +2,7 @@
 
 import unittest
 from math import pi
-from sub_one import transforms
+from .. import transforms
 import numpy as np
 import numpy.testing as npt
 

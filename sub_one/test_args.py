@@ -5,8 +5,8 @@ It checks if input argument passed by user is valid or not.
 If any invalid data is found,
 the called function in test_args returns false"""
 import numpy as np
-from sub_one import pose
-from sub_one import super_pose
+from . import pose
+from . import super_pose
 
 
 def is_mat_list(list_matrices):
@@ -106,7 +106,7 @@ def so2_input_types_check(args_in):
 # ----------------- POSE.SO2 CHECKS ----------------------------
 # ----------------- POSE.SE2 CHECKS ----------------------------
 
-def se2_inputs_check():
+def se2_inputs_check(x, y, z, rot, theta):
     pass
 
 # ----------------- POSE.SE2 CHECKS ----------------------------

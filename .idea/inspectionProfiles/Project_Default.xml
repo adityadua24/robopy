@@ -8,5 +8,12 @@
         </list>
       </option>
     </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="sub_one.super_pose.SuperPose._list" />
+        </list>
+      </option>
+    </inspection_tool>
   </profile>
 </component>

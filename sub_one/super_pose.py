@@ -1,17 +1,16 @@
 # Author - Aditya Dua - 13 June, 2017
 
 import numpy as np
-import math
-import sub_one.test_args as test_args
+from . import test_args
 from abc import ABC, abstractmethod
 import numpy.testing as npt
-from sub_one import pose
+from . import pose
 
 
 class SuperPose(ABC):
     @property
     def length(self):
-        return len(self._list)
+        return len(self.data)
 
     @property
     def data(self):
@@ -26,7 +25,7 @@ class SuperPose(ABC):
 
     @property
     def shape(self):
-        return self._list[0].shape
+        return self.data[0].shape
 
     # TODO issym, simplify, ?
 

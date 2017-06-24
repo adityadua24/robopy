@@ -3,9 +3,9 @@
 
 import numpy as np
 import math
-from sub_one.super_pose import SuperPose
-import sub_one.test_args as test_args
-from sub_one import transforms
+from . import test_args
+from . import transforms
+from .super_pose import SuperPose
 
 
 # -----------------------------------------------------------------------------------------

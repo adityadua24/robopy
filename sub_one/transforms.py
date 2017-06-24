@@ -3,9 +3,9 @@
 """ Contains all of the transforms that will be used within the toolbox"""
 import math
 import numpy as np
-from sub_one.tests import test_transforms
+from . import test_args
+from .tests import test_transforms
 import unittest
-from sub_one.test_args import unit_check
 
 
 # ---------------------------------------------------------------------------------------#
@@ -13,7 +13,7 @@ def rotx(t, unit="rad"):
     """ rotx(THETA) is an SO(3) rotation matrix (3x3) representing a 
         rotation  of THETA radians about the x-axis
         rotx(THETA, "deg") represents a rotation of THETA degrees about the x-axis"""
-    unit_check(unit)
+    test_args.unit_check(unit)
     if unit == "deg":
         t = t * math.pi / 180
     ct = math.cos(t)
@@ -26,7 +26,7 @@ def roty(t, unit="rad"):
     """ roty(THETA) is an SO(3) rotation matrix (3x3) representing a
         rotation of THETA radians about the y-axis
         roty(THETA, "deg") represents a rotation of THETA degrees about the y-axis"""
-    unit_check(unit)
+    test_args.unit_check(unit)
     if unit == "deg":
         t = t * math.pi / 180
     ct = math.cos(t)
@@ -39,7 +39,7 @@ def rotz(t, unit="rad"):
     """ rotz(THETA) is an SO(3) rotation matrix (3x3) representing a 
         rotation of THETA radians about the z-axis
         rotz(THETA, "deg") represents a rotation of THETA degrees about the z-axis"""
-    unit_check(unit)
+    test_args.unit_check(unit)
     if unit == "deg":
         t = t * math.pi / 180
     ct = math.cos(t)
@@ -52,7 +52,7 @@ def trotx(t, unit="rad"):
     """ T = trotx(THETA) is a homogeneous transformation (4x4) representing a rotation 
         of THETA radians about the x-axis.
         T = trotx(THETA, 'deg') as above but THETA is in degrees """
-    unit_check(unit)
+    test_args.unit_check(unit)
     if unit == "deg":
         t = t * math.pi / 180
     tm = rotx(t, unit)
@@ -65,7 +65,7 @@ def troty(t, unit="rad"):
     """ T = troty(THETA) is a homogeneous transformation (4x4) representing a rotation 
         of THETA radians about the y-axis.
         T = troty(THETA, 'deg') as above but THETA is in degrees """
-    unit_check(unit)
+    test_args.unit_check(unit)
     if unit == "deg":
         t = t * math.pi / 180
     tm = roty(t, unit)
@@ -78,7 +78,7 @@ def trotz(t, unit="rad"):
     """ T = trotz(THETA) is a homogeneous transformation (4x4) representing a rotation 
         of THETA radians about the z-axis.
         T = trotz(THETA, 'deg') as above but THETA is in degrees """
-    unit_check(unit)
+    test_args.unit_check(unit)
     if unit == "deg":
         t = t * math.pi / 180
     tm = rotz(t, unit)
@@ -122,7 +122,7 @@ def t2r(tmat):
 
 # ---------------------------------------------------------------------------------------#
 def rot2(t, unit='deg'):
-    unit_check(unit)
+    test_args.unit_check(unit)
     if unit == "deg":
         t = t * math.pi / 180
     ct = math.cos(t)
