@@ -100,7 +100,8 @@ def so2_input_types_check(args_in):
            or isinstance(args_in, list) \
            or isinstance(args_in, int) \
            or isinstance(args_in, float) \
-           or isinstance(args_in, pose.SO2)
+           or isinstance(args_in, pose.SO2) \
+           or args_in is None
 
 
 # ----------------- POSE.SO2 CHECKS ----------------------------

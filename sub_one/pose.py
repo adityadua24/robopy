@@ -94,12 +94,24 @@ class SE2(SuperPose):
         test_args.unit_check(unit)
         test_args.se2_inputs_check(x, y, z, rot, theta)
         self._list = []
+        self._unit = unit
+        if unit == 'deg' and theta is not None:
+            theta = math.pi / 180
         if x is not None and y is not None and theta is None and rot is None:
-            pass
+            self._transl = (x, y)
+            self._list.append(np.matrix([[1, 0, x], [0, 1, y], [0, 0, 1]]))
         elif x is not None and y is not None and theta is not None and rot is None:
-            pass
+            self._transl = (x, y)
+            mat = transforms.rot2(theta)
+            mat = np.r_[mat, np.matrix([0, 0])]
+            mat = np.c_[mat, np.matrix([[0], [0], [1]])]
+            self._list.append(mat)
         elif x is not None and y is not None and theta is None and rot is not None:
-            pass
+            self._transl(x, y)
+            for each_matrix in rot:
+                each_matrix = np.r_[each_matrix, np.matrix([0, 0])]
+                each_matrix = np.c_[each_matrix, np.matrix([[0], [0], [1]])]
+                self._list.append(each_matrix)
         elif x is None and y is None and theta is not None and rot is None:
             pass
         elif x is None and y is None and theta is None and rot is not None:
