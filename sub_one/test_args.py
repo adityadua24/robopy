@@ -31,6 +31,12 @@ def unit_check(unit):
         raise AssertionError("Invalid unit value passed. Must be 'rad' or 'deg' only.")
 
 
+def is_vector(item):
+    assert isinstance(item, np.matrix)
+    assert (item.shape[0] == 1 and item.shape[1] > 1) \
+           or (item.shape[0] > 1 and item.shape[1] == 1)
+
+
 # ------------------------------------------------------
 # ------------  SUPER POSE CHECKS-----------------------
 def valid_pose(obj):
@@ -59,6 +65,11 @@ def super_pose_multiply_check(obj, other):
     elif isinstance(other, np.matrix):
         assert other.shape[1] == 1  # Should be vector
         assert obj.shape[1] == other.shape[0]  # Inner Dimensions must match
+
+
+def super_pose_divide_check(obj, other):
+    assert type(obj) is type(other)
+    assert obj.length == other.length or obj.length == 1 or other.length == 1
 
 
 def super_pose_add_sub_check(obj, other):

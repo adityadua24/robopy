@@ -34,7 +34,7 @@ class SuperPose(ABC):
         if (type(self) is type(other)) and (self.length == other.length):
             for i in range(self.length):
                 try:
-                    npt.assert_almost_equal(self[i], other[i])
+                    npt.assert_almost_equal(self.data[i], other.data[i])
                 except AssertionError:
                     return False
             return True
@@ -71,14 +71,28 @@ class SuperPose(ABC):
             elif len(mat) > 1:
                 return mat
 
+    def __truediv__(self, other):
+        test_args.super_pose_divide_check(self, other)
+        new_pose = type(self)([])
+        if self.length == other.length:
+            for i in range(self.length):
+                new_pose.append(self.data[i] * np.linalg.inv(other.data[i]))
+        elif self.length == 1:
+            for i in range(other.length):
+                new_pose.append(np.linalg.inv(self.data[0]) * other.data[i])
+        elif other.length == 1:
+            for i in range(self.length):
+                new_pose.append(self.data[i] * np.linalg.inv(other.data[0]))
+        return new_pose
+
     def __add__(self, other):
         test_args.super_pose_add_sub_check(self, other)
         mat = []
         for i in range(self.length):
             mat.append(self.data[i] + other.data[i])
-        if self.length == 1:
+        if len(mat) == 1:
             return mat[0]
-        elif self.length > 1:
+        elif len(mat) > 1:
             return mat
 
     def __sub__(self, other):
@@ -86,9 +100,9 @@ class SuperPose(ABC):
         mat = []
         for i in range(self.length):
             mat.append(self.data[i] - other.data[i])
-        if self.length == 1:
+        if len(mat) == 1:
             return mat[0]
-        elif self.length > 1:
+        elif len(mat) > 1:
             return mat
 
     def __getitem__(self, item):
@@ -100,7 +114,7 @@ class SuperPose(ABC):
         return (each for each in self._list)
 
     def __repr__(self):
-        if len(self._list) >= 1:
+        if len(self.data) >= 1:
             str = '-----------------------------------------\n'
             for each in self._list:
                 array = np.asarray(each)
