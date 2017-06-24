@@ -102,5 +102,13 @@ def so2_input_types_check(args_in):
            or isinstance(args_in, float) \
            or isinstance(args_in, pose.SO2)
 
+
 # ----------------- POSE.SO2 CHECKS ----------------------------
+# ----------------- POSE.SE2 CHECKS ----------------------------
+
+def se2_inputs_check():
+    pass
+
+# ----------------- POSE.SE2 CHECKS ----------------------------
+
 # ----------------- SUPER POSE CHECKS ---------------------------

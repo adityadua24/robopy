@@ -47,6 +47,14 @@ class SuperPose(ABC):
             for each_matrix in item:
                 self._list.append(each_matrix)
 
+    def tr_2_rt(self):
+        assert isinstance(self, pose.SE2) or isinstance(self, pose.SE3)
+
+    def t_2_r(self):
+        assert isinstance(self, pose.SE2) or isinstance(self, pose.SE3)
+        for each_matrix in self:
+            pass  # TODO
+
     def __mul__(self, other):
         test_args.super_pose_multiply_check(self, other)
         if isinstance(other, SuperPose):

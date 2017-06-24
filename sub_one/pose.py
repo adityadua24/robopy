@@ -90,7 +90,22 @@ class SO3(SuperPose):
 # ---------------------------------------------------------------------------------
 class SE2(SuperPose):
     # ---------------------------------------------------------------------------------
-    pass
+    def __init__(self, x=None, y=None, z=None, rot=None, theta=None, unit='rad'):
+        test_args.unit_check(unit)
+        test_args.se2_inputs_check(x, y, z, rot, theta)
+        self._list = []
+        if x is not None and y is not None and theta is None and rot is None:
+            pass
+        elif x is not None and y is not None and theta is not None and rot is None:
+            pass
+        elif x is not None and y is not None and theta is None and rot is not None:
+            pass
+        elif x is None and y is None and theta is not None and rot is None:
+            pass
+        elif x is None and y is None and theta is None and rot is not None:
+            pass
+        else:
+            raise AttributeError("Valid Scenarios")
 
 
 # ------------------------------------------------------------------------------------
