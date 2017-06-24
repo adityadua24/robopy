@@ -104,6 +104,8 @@ class SE2(SuperPose):
             pass
         elif x is None and y is None and theta is None and rot is not None:
             pass
+        elif x in None and y is None and theta is None and rot is None:
+            self._list.append(np.asmatrix(np.eye(3, 3)))
         else:
             raise AttributeError("Valid Scenarios")
 
