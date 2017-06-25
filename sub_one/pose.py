@@ -33,7 +33,7 @@ class SO2(SuperPose):
                 self._list.append(each_matrix)
         elif isinstance(args_in, np.matrix):
             # TODO
-            # test_args.so2_input_matrix(args_in)
+            test_args.so2_input_matrix(args_in)
             # 2x2 and det == 1
             self._list.append(args_in)
         elif isinstance(args_in, list):
@@ -90,40 +90,52 @@ class SO3(SuperPose):
 # ---------------------------------------------------------------------------------
 class SE2(SuperPose):
     # ---------------------------------------------------------------------------------
-    def __init__(self, x=None, y=None, z=None, rot=None, theta=None, unit='rad'):
+    def __init__(self, x=None, y=None, z=None, rot=None, theta=0, so2=None, se2=None, unit='rad'):
         test_args.unit_check(unit)
         test_args.se2_inputs_check(x, y, z, rot, theta)
         self._list = []
         self._unit = unit
-        if unit == 'deg' and theta is not None:
-            theta = math.pi / 180
-        if x is not None and y is not None and theta is None and rot is None:
-            self._transl = (x, y)
-            self._list.append(np.matrix([[1, 0, x], [0, 1, y], [0, 0, 1]]))
-        elif x is not None and y is not None and theta is not None and rot is None:
+        if unit == 'deg':
+            theta = theta * math.pi / 180
+        if x is not None and y is not None and rot is None and se2 is None and so2 is None:
             self._transl = (x, y)
             mat = transforms.rot2(theta)
-            mat = np.r_[mat, np.matrix([0, 0])]
-            mat = np.c_[mat, np.matrix([[0], [0], [1]])]
+            mat = SE2.form_trans_matrix(mat, self._transl)
             self._list.append(mat)
-        elif x is not None and y is not None and theta is None and rot is not None:
+        elif x is not None and y is not None and rot is not None and se2 is None and so2 is None:
             self._transl(x, y)
-            for each_matrix in rot:
-                each_matrix = np.r_[each_matrix, np.matrix([0, 0])]
-                each_matrix = np.c_[each_matrix, np.matrix([[0], [0], [1]])]
+            mat = SE2.form_trans_matrix(rot, self._transl)
+            self._list.append(mat)
+        elif x is None and y is None and rot is not None and se2 is None and so2 is None:
+            self._transl = (0, 0)
+            mat = SE2.form_trans_matrix(rot, self._transl)
+            self._list.append(mat)
+        elif x is None and y is None and rot is None and se2 is not None and so2 is None:
+            for each_matrix in se2:
                 self._list.append(each_matrix)
-        elif x is None and y is None and theta is not None and rot is None:
-            pass
-        elif x is None and y is None and theta is None and rot is not None:
-            pass
-        elif x in None and y is None and theta is None and rot is None:
+        elif x is None and y is None and rot is None and se2 is None and so2 is not None:
+            self._transl = (0, 0)
+            for each_matrix in so2:
+                mat = SE2.form_trans_matrix(each_matrix, self._transl)
+                self._list.append(mat)
+        elif x in None and y is None and rot is None and se2 is None and so2 is None:
             self._list.append(np.asmatrix(np.eye(3, 3)))
         else:
-            raise AttributeError("Valid Scenarios")
+            raise AttributeError("Invalid instantiation. Valid scenarios:-"
+                                 "SE2(x, y)"
+                                 "SE2(x, y, rot)"
+                                 "SE2(se2)"
+                                 "SE2(so2)"
+                                 "SE2(rot)")
+
+    @staticmethod
+    def form_trans_matrix(rot, transl):
+        rot = np.r_[rot, np.matrix([0, 0])]
+        rot = np.c_[rot, np.matrix([[transl[0]], [transl[1]], [1]])]
+        return rot
 
 
 # ------------------------------------------------------------------------------------
-
 
 # ---------------------------------------------------------------------------------
 class SE3(SuperPose):

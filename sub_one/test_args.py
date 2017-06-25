@@ -95,6 +95,10 @@ def so2_valid(obj):
     assert type(obj) is pose.SO2
 
 
+def so2_input_matrix(args_in):
+    det = np.linalg.det(args_in)
+
+
 def so2_input_types_check(args_in):
     assert isinstance(args_in, np.matrix) \
            or isinstance(args_in, list) \
