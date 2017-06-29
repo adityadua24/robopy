@@ -57,7 +57,7 @@ class SuperPose(ABC):
     def __mul__(self, other):
         test_args.super_pose_multiply_check(self, other)
         if isinstance(other, SuperPose):
-            new_pose = type(self)([])
+            new_pose = type(self)([])  # Creates empty poses with no data
             if self.length == other.length:
                 for i in range(self.length):
                     mat = self.data[i] * other.data[i]
@@ -80,7 +80,7 @@ class SuperPose(ABC):
 
     def __truediv__(self, other):
         test_args.super_pose_divide_check(self, other)
-        new_pose = type(self)([])
+        new_pose = type(self)([])  # Creates empty poses with no data
         if self.length == other.length:
             for i in range(self.length):
                 new_pose.append(self.data[i] * np.linalg.inv(other.data[i]))

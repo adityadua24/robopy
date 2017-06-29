@@ -121,7 +121,7 @@ def t2r(tmat):
 
 
 # ---------------------------------------------------------------------------------------#
-def rot2(t, unit='deg'):
+def rot2(t, unit='rad'):
     test_args.unit_check(unit)
     if unit == "deg":
         t = t * math.pi / 180

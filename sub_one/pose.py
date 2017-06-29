@@ -42,8 +42,7 @@ class SO2(SuperPose):
                 for each_angle in args_in:
                     angles_deg.append(each_angle * math.pi / 180)
             for each_angle in angles_deg:
-                self._list.append(np.matrix([[math.cos(each_angle), -math.sin(each_angle)],
-                                             [math.sin(each_angle), math.cos(each_angle)]]))
+                self._list.append(transforms.rot2(each_angle))
         else:
             pass
 
@@ -90,10 +89,11 @@ class SO3(SuperPose):
 # ---------------------------------------------------------------------------------
 class SE2(SuperPose):
     # ---------------------------------------------------------------------------------
-    def __init__(self, x=None, y=None, z=None, rot=None, theta=0, so2=None, se2=None, unit='rad'):
+    def __init__(self, unit='rad', x=None, y=None, rot=None, theta=0, so2=None, se2=None):
         test_args.unit_check(unit)
-        test_args.se2_inputs_check(x, y, z, rot, theta)
+        test_args.se2_inputs_check(x, y, rot, theta, so2, se2)
         self._list = []
+        self._transl = (0, 0)
         self._unit = unit
         if unit == 'deg':
             theta = theta * math.pi / 180
@@ -118,14 +118,15 @@ class SE2(SuperPose):
             for each_matrix in so2:
                 mat = SE2.form_trans_matrix(each_matrix, self._transl)
                 self._list.append(mat)
-        elif x in None and y is None and rot is None and se2 is None and so2 is None:
+        elif x is None and y is None and rot is None and se2 is None and so2 is None:
             self._list.append(np.asmatrix(np.eye(3, 3)))
         else:
-            raise AttributeError("Invalid instantiation. Valid scenarios:-"
-                                 "SE2(x, y)"
-                                 "SE2(x, y, rot)"
-                                 "SE2(se2)"
-                                 "SE2(so2)"
+            raise AttributeError("\nINVALID instantiation. Valid scenarios:-\n"
+                                 "SE2(x, y)\n"
+                                 "SE2(x, y, rot)\n"
+                                 "SE2(x, y, theta)\n"
+                                 "SE2(se2)\n"
+                                 "SE2(so2)\n"
                                  "SE2(rot)")
 
     @staticmethod
@@ -133,6 +134,14 @@ class SE2(SuperPose):
         rot = np.r_[rot, np.matrix([0, 0])]
         rot = np.c_[rot, np.matrix([[transl[0]], [transl[1]], [1]])]
         return rot
+
+    @property  # transl_vec is dependent on this !
+    def transl(self):
+        return self._transl
+
+    @property
+    def transl_vec(self):
+        return np.matrix([[self.transl[0], self.transl[1]]])
 
 
 # ------------------------------------------------------------------------------------

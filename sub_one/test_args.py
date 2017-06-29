@@ -111,7 +111,7 @@ def so2_input_types_check(args_in):
 # ----------------- POSE.SO2 CHECKS ----------------------------
 # ----------------- POSE.SE2 CHECKS ----------------------------
 
-def se2_inputs_check(x, y, z, rot, theta):
+def se2_inputs_check(x, y, rot, theta, so2, se2):
     pass
 
 # ----------------- POSE.SE2 CHECKS ----------------------------
