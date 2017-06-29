@@ -87,7 +87,7 @@ class SO3(SuperPose):
 
 
 # ---------------------------------------------------------------------------------
-class SE2(SuperPose):
+class SE2(SO2):
     # ---------------------------------------------------------------------------------
     def __init__(self, unit='rad', x=None, y=None, rot=None, theta=0, so2=None, se2=None):
         test_args.unit_check(unit)
