@@ -141,7 +141,11 @@ class SE2(SuperPose):
 
     @property
     def transl_vec(self):
-        return np.matrix([[self.transl[0], self.transl[1]]])
+        return np.matrix([[self.transl[0]], [self.transl[1]]])
+
+    def SE3(self):
+        # TODO
+        pass
 
 
 # ------------------------------------------------------------------------------------
