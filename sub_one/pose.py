@@ -12,7 +12,7 @@ from .super_pose import SuperPose
 class SO2(SuperPose):
     # --------------------------------------------------------------------------------------
 
-    def __init__(self, args_in=None, unit='rad'):
+    def __init__(self, args_in=None, unit='rad', null=False):
 
         test_args.unit_check(unit)
         test_args.so2_input_types_check(args_in)
@@ -20,7 +20,9 @@ class SO2(SuperPose):
         self._list = []
         angles_deg = []
 
-        if args_in is None:
+        if null:  # Usually only internally used to create empty objects
+            pass
+        elif args_in is None:
             self._list.append(np.asmatrix(np.eye(2, 2)))
         elif isinstance(args_in, int) or isinstance(args_in, float):
             if unit == 'deg':
@@ -89,21 +91,25 @@ class SO3(SuperPose):
 # ---------------------------------------------------------------------------------
 class SE2(SO2):
     # ---------------------------------------------------------------------------------
-    def __init__(self, unit='rad', x=None, y=None, rot=None, theta=0, so2=None, se2=None):
+    def __init__(self, theta=0, unit='rad', x=None, y=None, rot=None, so2=None, se2=None, null=False):
         test_args.unit_check(unit)
         test_args.se2_inputs_check(x, y, rot, theta, so2, se2)
         self._list = []
         self._transl = (0, 0)
         self._unit = unit
+
         if unit == 'deg':
             theta = theta * math.pi / 180
-        if x is not None and y is not None and rot is None and se2 is None and so2 is None:
+
+        if null:
+            pass
+        elif x is not None and y is not None and rot is None and se2 is None and so2 is None:
             self._transl = (x, y)
             mat = transforms.rot2(theta)
             mat = SE2.form_trans_matrix(mat, self._transl)
             self._list.append(mat)
         elif x is not None and y is not None and rot is not None and se2 is None and so2 is None:
-            self._transl(x, y)
+            self._transl = (x, y)
             mat = SE2.form_trans_matrix(rot, self._transl)
             self._list.append(mat)
         elif x is None and y is None and rot is not None and se2 is None and so2 is None:
@@ -138,6 +144,11 @@ class SE2(SO2):
     @property  # transl_vec is dependent on this !
     def transl(self):
         return self._transl
+
+    @transl.setter
+    def transl(self, value):
+        assert isinstance(value, tuple) and len(value) == 2
+        self._transl = value
 
     @property
     def transl_vec(self):
