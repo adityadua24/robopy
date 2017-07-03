@@ -6,6 +6,7 @@ import math
 from . import test_args
 from . import transforms
 from .super_pose import SuperPose
+from random import randint
 
 
 # -----------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@ class SO2(SuperPose):
         self._list = []
         angles_deg = []
 
-        if null:  # Usually only internally used to create empty objects
+        if null:  # Only internally used to create empty objects
             pass
         elif args_in is None:
             self._list.append(np.asmatrix(np.eye(2, 2)))
@@ -34,10 +35,8 @@ class SO2(SuperPose):
             for each_matrix in args_in:
                 self._list.append(each_matrix)
         elif isinstance(args_in, np.matrix):
-            # TODO
-            test_args.so2_input_matrix(args_in)
-            # 2x2 and det == 1
-            self._list.append(args_in)
+            if SO2.is_valid(args_in):
+                self._list.append(args_in)
         elif isinstance(args_in, list):
             test_args.so2_angle_list_check(args_in)
             if unit == "deg":
@@ -46,7 +45,14 @@ class SO2(SuperPose):
             for each_angle in angles_deg:
                 self._list.append(transforms.rot2(each_angle))
         else:
-            pass
+            raise AttributeError("\nINVALID instantiation. Valid scenarios:-\n"
+                                 "SO2(angle)\n"
+                                 "SO2(list of angles)\n"
+                                 "SO2(angle, unit)\n"
+                                 "SO2(list of angles, unit)\n"
+                                 "SO2()\n"
+                                 "SO2(so2)\n"
+                                 "SO2(np.matrix)\n")
 
     @property
     def angle(self):
@@ -67,6 +73,70 @@ class SO2(SuperPose):
             return det_list[0]
         elif len(det_list) > 1:
             return det_list
+
+    """Checks if a np.matrix is a valid SO2 pose."""
+
+    @staticmethod
+    def is_valid(obj):
+        if type(obj) is np.matrix \
+                and obj.shape == (2, 2) \
+                and abs(np.linalg.det(obj) - 1) < np.spacing(1):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def check(obj):
+        if type(obj) is SO2:
+            err = None
+            try:
+                test_args.so2_valid(obj)
+            except AssertionError as err:
+                pass
+            if err is None:
+                return SO2(obj)
+            else:
+                raise ValueError('INVALID SO2 object.')
+        elif type(obj) is SE2:
+            err = None
+            try:
+                test_args.se2_valid(obj)
+            except AssertionError as err:
+                pass
+            if err is None:
+                return SE2(obj)
+            else:
+                raise ValueError('INVALID SE2 object')
+        elif type(obj) is np.matrix and obj.shape == (2, 2):
+            if SO2.is_valid(obj):
+                return SO2(obj)
+            else:
+                raise ValueError('INVALID 2x2 np.matrix')
+        elif type(obj) is np.matrix and obj.shape == (3, 3):
+            if SE2.is_valid(obj):
+                return SE2(obj)
+            else:
+                raise ValueError('INVALID 3x3 np.matrix')
+        else:
+            raise ValueError("\nINVALID argument.\n"
+                             "check(obj) accepts valid:\n"
+                             "- SO2\n"
+                             "- SE2\n"
+                             "- np.matrix (2, 2)\n"
+                             "- np.matrix (3, 3)\n")
+
+    @staticmethod
+    def rand():
+        return SO2(randint(0, 360), 'deg')
+
+    @staticmethod
+    def exp():
+        # TODO
+        pass
+
+    @property
+    def det(self):
+        return np.linalg.det(self._list[0])
 
     def SE2(self):
         for each_matrix in self:
@@ -153,6 +223,12 @@ class SE2(SO2):
     @property
     def transl_vec(self):
         return np.matrix([[self.transl[0]], [self.transl[1]]])
+
+    @staticmethod
+    def is_valid(obj):
+        # TODO
+        # Check if obj is 3x3 matrix and det is 1
+        pass
 
     def SE3(self):
         # TODO

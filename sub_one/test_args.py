@@ -91,8 +91,10 @@ def so2_angle_list_check(ang_list):
 
 
 def so2_valid(obj):
-    # TODO det == 1 and dims = 2x2 Valid SO2 object
     assert type(obj) is pose.SO2
+    for each in obj:
+        assert each.shape == (2, 2)
+        assert abs(np.linalg.det(each) - 1) < np.spacing(1)
 
 
 def so2_input_matrix(args_in):
@@ -112,6 +114,11 @@ def so2_input_types_check(args_in):
 # ----------------- POSE.SE2 CHECKS ----------------------------
 
 def se2_inputs_check(x, y, rot, theta, so2, se2):
+    pass
+
+
+def se2_valid(obj):
+    # TODO
     pass
 
 # ----------------- POSE.SE2 CHECKS ----------------------------
