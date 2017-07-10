@@ -10,11 +10,14 @@ from . import pose
 class SuperPose(ABC):
     @property
     def length(self):
-        return len(self.data)
+        return len(self._list)
 
     @property
     def data(self):
-        return self._list
+        if len(self._list) == 1:
+            return self._list[0]
+        elif len(self._list) > 1:
+            return self._list
 
     @property
     def isSE(self):
@@ -25,7 +28,7 @@ class SuperPose(ABC):
 
     @property
     def shape(self):
-        return self.data[0].shape
+        return self._list[0].shape
 
     # TODO issym, simplify, ?
 
@@ -80,7 +83,7 @@ class SuperPose(ABC):
 
     def __truediv__(self, other):
         test_args.super_pose_divide_check(self, other)
-        new_pose = type(self)([])  # Creates empty poses with no data
+        new_pose = type(self)(null=True)  # Creates empty poses with no data
         if self.length == other.length:
             for i in range(self.length):
                 new_pose.append(self.data[i] * np.linalg.inv(other.data[i]))
@@ -113,7 +116,7 @@ class SuperPose(ABC):
             return mat
 
     def __getitem__(self, item):
-        new_pose = type(self)([])
+        new_pose = type(self)(null=True)
         new_pose.append(self._list[item])
         return new_pose
 
