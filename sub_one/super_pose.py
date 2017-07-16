@@ -14,9 +14,6 @@ class SuperPose(ABC):
 
     @property
     def data(self):
-        if len(self._list) == 1:
-            return self._list[0]
-        elif len(self._list) > 1:
             return self._list
 
     @property
@@ -27,7 +24,7 @@ class SuperPose(ABC):
             return False
 
     @property
-    def shape(self):
+    def dim(self):
         return self._list[0].shape
 
     # TODO issym, simplify, ?
@@ -57,6 +54,33 @@ class SuperPose(ABC):
         for each_matrix in self:
             pass  # TODO
 
+    def isrot(self):
+        return (self.dim == (3, 3)) and (not self.isSE)
+
+    def isrot2(self):
+        return (self.dim == (2, 2)) and (not self.isSE)
+
+    def ishomog(self):
+        return self.dim == (4, 4) and self.isSE
+
+    def ishomog2(self):
+        return self.dim == (3, 3) and self.isSE
+
+    def render(self):
+        pass
+
+    def trprint(self):
+        pass  # TODO
+
+    def trplot(self):
+        pass  # TODO
+
+    def trplot2(self):
+        pass  # TODO
+
+    def tranimate(self):
+        pass  # TODO
+
     def __mul__(self, other):
         test_args.super_pose_multiply_check(self, other)
         if isinstance(other, SuperPose):
@@ -76,6 +100,7 @@ class SuperPose(ABC):
             mat = []
             for each_matrix in self:
                 mat.append(each_matrix * other)
+            #TODO Return np.matrix or pose object ?
             if len(mat) == 1:
                 return mat[0]
             elif len(mat) > 1:
@@ -100,6 +125,7 @@ class SuperPose(ABC):
         mat = []
         for i in range(self.length):
             mat.append(self.data[i] + other.data[i])
+        #TODO Return np.matrix or pose object ?
         if len(mat) == 1:
             return mat[0]
         elif len(mat) > 1:
@@ -110,6 +136,7 @@ class SuperPose(ABC):
         mat = []
         for i in range(self.length):
             mat.append(self.data[i] - other.data[i])
+        #TODO Return np.matrix or pose object ?
         if len(mat) == 1:
             return mat[0]
         elif len(mat) > 1:
@@ -130,6 +157,6 @@ class SuperPose(ABC):
                 array = np.asarray(each)
                 str = str + np.array2string(array) \
                       + '\n-----------------------------------------\n'
-            return str
+            return str.rstrip("\n")
         else:
             return 'No matrix found'

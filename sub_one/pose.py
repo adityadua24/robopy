@@ -6,7 +6,7 @@ import math
 from . import test_args
 from . import transforms
 from .super_pose import SuperPose
-from random import randint
+from random import uniform
 
 
 # -----------------------------------------------------------------------------------------
@@ -53,6 +53,10 @@ class SO2(SuperPose):
                                  "SO2()\n"
                                  "SO2(so2)\n"
                                  "SO2(np.matrix)\n")
+        # Round all matrices to 15 decimal places
+        # Removes eps values
+        for i in range(len(self._list)):
+            self._list[i] = np.asmatrix(self._list[i].round(15))
 
     @property
     def angle(self):
@@ -84,6 +88,12 @@ class SO2(SuperPose):
             return True
         else:
             return False
+
+    @staticmethod
+    def form_trans_matrix(rot, transl):
+        rot = np.r_[rot, np.matrix([0, 0])]
+        rot = np.c_[rot, np.matrix([[transl[0]], [transl[1]], [1]])]
+        return rot
 
     @staticmethod
     def check(obj):
@@ -127,7 +137,7 @@ class SO2(SuperPose):
 
     @staticmethod
     def rand():
-        return SO2(randint(0, 360), 'deg')
+        return SO2(uniform(0, 360), 'deg')
 
     @staticmethod
     def exp():
@@ -136,11 +146,24 @@ class SO2(SuperPose):
 
     @property
     def det(self):
-        return np.linalg.det(self._list[0])
+        """Returns a list containing determinants of all matrices in a SO2 object"""
+        val = []
+        for i in range(len(self._list)):
+            val.append(np.linalg.det(self._list[i]))
+        return val
+
+    def t_matrix(self):
+        """Returns a list of transformation matrices"""
+        mat = []
+        for each_matrix in self:
+            mat.append(SO2.form_trans_matrix(each_matrix, (0, 0)))
+        return mat
 
     def SE2(self):
+        se2_pose = SE2(null=True)  # Creates empty poses with no data
         for each_matrix in self:
-            transforms.r2t(each_matrix)
+            se2_pose.append(transforms.r2t(each_matrix))
+        return se2_pose
 
     def inv(self):
         inv_list = []
@@ -188,32 +211,32 @@ class SE2(SO2):
                     else:
                         angle = theta
                     mat = transforms.rot2(angle)
-                    mat = SE2.form_trans_matrix(mat, (x[i], y[i]))
+                    mat = SO2.form_trans_matrix(mat, (x[i], y[i]))
                     self._list.append(mat)
             else:
                 self._transl.append((x, y))
                 mat = transforms.rot2(theta)
-                mat = SE2.form_trans_matrix(mat, (x, y))
+                mat = SO2.form_trans_matrix(mat, (x, y))
                 self._list.append(mat)
         elif x is not None and y is not None and rot is not None and se2 is None and so2 is None:
             if isinstance(x, list) and isinstance(y, list) and isinstance(rot, list):
                 for i in range(len(x)):
                     self._transl.append((x[i], y[i]))
-                    mat = SE2.form_trans_matrix(rot[i], (x[i], y[i]))
+                    mat = SO2.form_trans_matrix(rot[i], (x[i], y[i]))
                     self._list.append(mat)
             else:
                 self._transl.append((x, y))
-                mat = SE2.form_trans_matrix(rot, (x, y))
+                mat = SO2.form_trans_matrix(rot, (x, y))
                 self._list.append(mat)
         elif x is None and y is None and rot is not None and se2 is None and so2 is None:
             if isinstance(rot, list):
                 for i in range(len(rot)):
                     self._transl.append((0, 0))
-                    mat = SE2.form_trans_matrix(rot[i], (0, 0))
+                    mat = SO2.form_trans_matrix(rot[i], (0, 0))
                     self._list.append(mat)
             else:
                 self._transl.append((0, 0))
-                mat = SE2.form_trans_matrix(rot, (0, 0))
+                mat = SO2.form_trans_matrix(rot, (0, 0))
                 self._list.append(mat)
         elif x is None and y is None and rot is None and se2 is not None and so2 is None:
             self._transl = se2.transl
@@ -223,16 +246,16 @@ class SE2(SO2):
             for i in range(so2.length):
                 self._transl.append((0, 0))
             for each_matrix in so2:
-                mat = SE2.form_trans_matrix(each_matrix, (0, 0))
+                mat = SO2.form_trans_matrix(each_matrix, (0, 0))
                 self._list.append(mat)
         elif x is None and y is None and rot is None and se2 is None and so2 is None and isinstance(theta, list):
             for i in range(len(theta)):
                 mat = transforms.rot2(theta[i])
-                mat = SE2.form_trans_matrix(mat, (0, 0))
+                mat = SO2.form_trans_matrix(mat, (0, 0))
                 self._list.append(mat)
         elif x is None and y is None and rot is None and se2 is None and so2 is None and theta != 0:
             mat = transforms.rot2(theta)
-            mat = SE2.form_trans_matrix(mat, (0, 0))
+            mat = SO2.form_trans_matrix(mat, (0, 0))
             self._list.append(mat)
         elif x is None and y is None and rot is None and se2 is None and so2 is None and theta == 0:
             self._list.append(np.asmatrix(np.eye(3, 3)))
@@ -246,12 +269,10 @@ class SE2(SO2):
                                  "SE2(so2)\n"
                                  "SE2(theta)"
                                  "SE2(rot)")
-
-    @staticmethod
-    def form_trans_matrix(rot, transl):
-        rot = np.r_[rot, np.matrix([0, 0])]
-        rot = np.c_[rot, np.matrix([[transl[0]], [transl[1]], [1]])]
-        return rot
+        # Round all matrices to 15 decimal places
+        # Removes eps values
+        for i in range(len(self._list)):
+            self._list[i] = np.asmatrix(self._list[i].round(15))
 
     @property  # transl_vec is dependent on this !
     def transl(self):
