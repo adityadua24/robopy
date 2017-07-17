@@ -110,6 +110,12 @@ def so2_input_types_check(args_in):
            or args_in is None
 
 
+def so2_interp_check(obj1, obj2, s):
+    assert type(obj2) is pose.SO2
+    assert 0 <= s <= 1
+    assert obj1.length == obj2.length  # TODO Intended behaviour ?
+
+
 # ----------------- POSE.SO2 CHECKS ----------------------------
 # ----------------- POSE.SE2 CHECKS ----------------------------
 

@@ -14,7 +14,7 @@ class SuperPose(ABC):
 
     @property
     def data(self):
-            return self._list
+        return self._list
 
     @property
     def isSE(self):
@@ -27,7 +27,7 @@ class SuperPose(ABC):
     def dim(self):
         return self._list[0].shape
 
-    # TODO issym, simplify, ?
+    # TODO !! issym, simplify
 
     def is_equal(self, other):
         if (type(self) is type(other)) and (self.length == other.length):
@@ -100,7 +100,7 @@ class SuperPose(ABC):
             mat = []
             for each_matrix in self:
                 mat.append(each_matrix * other)
-            #TODO Return np.matrix or pose object ?
+            # TODO !! Return np.matrix or pose object ?
             if len(mat) == 1:
                 return mat[0]
             elif len(mat) > 1:
@@ -125,7 +125,7 @@ class SuperPose(ABC):
         mat = []
         for i in range(self.length):
             mat.append(self.data[i] + other.data[i])
-        #TODO Return np.matrix or pose object ?
+        # TODO !! Return np.matrix or pose object ?
         if len(mat) == 1:
             return mat[0]
         elif len(mat) > 1:
@@ -136,7 +136,7 @@ class SuperPose(ABC):
         mat = []
         for i in range(self.length):
             mat.append(self.data[i] - other.data[i])
-        #TODO Return np.matrix or pose object ?
+        # TODO !! Return np.matrix or pose object ?
         if len(mat) == 1:
             return mat[0]
         elif len(mat) > 1:
@@ -157,6 +157,6 @@ class SuperPose(ABC):
                 array = np.asarray(each)
                 str = str + np.array2string(array) \
                       + '\n-----------------------------------------\n'
-            return str.rstrip("\n")
+            return str.rstrip("\n")  # Remove trailing newline character
         else:
             return 'No matrix found'

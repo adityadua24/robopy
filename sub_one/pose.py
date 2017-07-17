@@ -7,6 +7,7 @@ from . import test_args
 from . import transforms
 from .super_pose import SuperPose
 from random import uniform
+from scipy import linalg
 
 
 # -----------------------------------------------------------------------------------------
@@ -21,7 +22,7 @@ class SO2(SuperPose):
         self._list = []
         angles_deg = []
 
-        if null:  # Only internally used to create empty objects
+        if null:  # Usually only internally used to create empty objects
             pass
         elif args_in is None:
             self._list.append(np.asmatrix(np.eye(2, 2)))
@@ -58,30 +59,9 @@ class SO2(SuperPose):
         for i in range(len(self._list)):
             self._list[i] = np.asmatrix(self._list[i].round(15))
 
-    @property
-    def angle(self):
-        angles = []
-        for each_matrix in self:
-            angles.append(math.atan2(each_matrix[1, 0], each_matrix[0, 0]))
-        if len(angles) == 1:
-            return angles[0]
-        elif len(angles) > 1:
-            return angles
-
-    @property
-    def det(self):
-        det_list = []
-        for each_matrix in self:
-            det_list.append(np.linalg.det(each_matrix))
-        if len(det_list) == 1:
-            return det_list[0]
-        elif len(det_list) > 1:
-            return det_list
-
-    """Checks if a np.matrix is a valid SO2 pose."""
-
     @staticmethod
     def is_valid(obj):
+        """Checks if a np.matrix is a valid SO2 pose."""
         if type(obj) is np.matrix \
                 and obj.shape == (2, 2) \
                 and abs(np.linalg.det(obj) - 1) < np.spacing(1):
@@ -141,8 +121,29 @@ class SO2(SuperPose):
 
     @staticmethod
     def exp():
-        # TODO
+        # TODO !! How to ?
         pass
+
+    @property
+    def angle(self):
+        """Returns angle of SO2 object matrices in unit radians"""
+        angles = []
+        for each_matrix in self:
+            angles.append(math.atan2(each_matrix[1, 0], each_matrix[0, 0]))
+        # TODO !! Return list be default ?
+        if len(angles) == 1:
+            return angles[0]
+        elif len(angles) > 1:
+            return angles
+
+    @property  # TODO Remove if useless
+    def unit(self):
+        return self._unit
+
+    @unit.setter  # TODO Remove if useless
+    def unit(self, val):
+        assert val == 'deg' or val == 'rad'
+        self._unit = val
 
     @property
     def det(self):
@@ -160,19 +161,46 @@ class SO2(SuperPose):
         return mat
 
     def SE2(self):
+        """Returns SE2 object with same rotational component as SO2 and a zero translation component"""
         se2_pose = SE2(null=True)  # Creates empty poses with no data
         for each_matrix in self:
             se2_pose.append(transforms.r2t(each_matrix))
         return se2_pose
 
     def inv(self):
-        inv_list = []
+        """Returns inverse SO2 object"""
+        new_pose = SO2(null=True)
         for each_matrix in self:
-            inv_list.append(np.matrix.transpose(each_matrix))
-        if len(inv_list) == 1:
-            return inv_list[0]
-        elif len(inv_list) > 1:
-            return inv_list
+            new_pose.append(np.matrix.transpose(each_matrix))
+        return new_pose
+
+    def eig(self):
+        # TODO !! How to ?
+        pass
+
+    def log(self):
+        # TODO !! How to ?
+        pass
+
+    def interp(self, other, s):
+        """Returns the interpolated SO2 object"""
+        # TODO Refactor "angle" to "theta" everywhere
+        test_args.so2_interp_check(self, other, s)
+        if type(self.angle) is list:
+            angle_diff = []
+            for i in range(len(self._list)):
+                angle_diff.append(self.angle[i] + s * (other.angle[i] - self.angle[i]))
+            return SO2(angle_diff)
+        else:
+            angle_diff = self.angle + s * (other.angle - self.angle)
+            return SO2(angle_diff)
+
+    def new(self):
+        """Returns a deep copy of SO2 object"""
+        new_pose = SO2(null=True)
+        for each_matrix in self:
+            new_pose.append(each_matrix)
+        return new_pose
 
 
 # --------------------------------------------------------------------------------
@@ -253,10 +281,12 @@ class SE2(SO2):
                 mat = transforms.rot2(theta[i])
                 mat = SO2.form_trans_matrix(mat, (0, 0))
                 self._list.append(mat)
+                self._transl.append((0, 0))
         elif x is None and y is None and rot is None and se2 is None and so2 is None and theta != 0:
             mat = transforms.rot2(theta)
             mat = SO2.form_trans_matrix(mat, (0, 0))
             self._list.append(mat)
+            self._transl.append((0, 0))
         elif x is None and y is None and rot is None and se2 is None and so2 is None and theta == 0:
             self._list.append(np.asmatrix(np.eye(3, 3)))
             self._transl.append((0, 0))
@@ -278,14 +308,18 @@ class SE2(SO2):
     def transl(self):
         return self._transl
 
-    @transl.setter
-    def transl(self, value):
-        assert isinstance(value, tuple) and len(value) == 2
-        self._transl = value
+    # @transl.setter
+    # def transl(self, value):
+    #     assert isinstance(value, tuple) and len(value) == 2
+    #     self._transl = value
 
     @property
     def transl_vec(self):
-        return np.matrix([[self.transl[0]], [self.transl[1]]])
+        """Returns list of translation vectors of SE2 object"""
+        mat = []
+        for each in self.transl:
+            mat.append(np.matrix([[each[0]], [each[1]]]))
+        return mat
 
     @staticmethod
     def is_valid(obj):
@@ -295,6 +329,48 @@ class SE2(SO2):
 
     def SE3(self):
         # TODO
+        pass
+
+    def t_matrix(self):
+        """Returns list of translation matrices of SE2 object"""
+        return self._list
+
+    def inv(self):
+        """Returns an inverse SE2 object of same length"""
+        new_transl = []
+        new_rot = []
+        for i in range(len(self._list)):
+            # Get rotation matrix. Transpose it. Then append in new_rot
+            rot_transposed = np.matrix.transpose(transforms.t2r(self._list[i]))
+            new_rot.append(rot_transposed)
+            transl_mat = -rot_transposed * self.transl_vec[i]
+            new_transl.append(transl_mat)
+
+        new_x = []
+        new_y = []
+        for each in new_transl:  # Get all x and y translations from list of new translation vectors
+            new_x.append(each[0, 0])
+            new_y.append(each[1, 0])
+
+        return SE2(x=new_x, y=new_y, rot=new_rot)
+
+    def xyt(self, unit='rad'):
+        """Return list of 3x1 dimension vectors containing x, y translation components and theta"""
+        test_args.unit_check(unit)
+        val = []
+        assert len(self._transl) == len(self.angle)
+        for i in range(len(self._list)):
+            x = self._transl[i][0]
+            y = self._transl[i][1]
+            theta = 0
+            if unit == 'deg':
+                theta = self.angle[i] * 180 / math.pi
+            elif unit == 'rad':
+                theta = self.angle[i]
+            val.append(np.matrix([[x], [y], [theta]]))
+        return val
+
+    def log(self):
         pass
 
 
