@@ -1,4 +1,5 @@
-# Author - Aditya Dua - 10 June, 2017
+# Created by: Aditya Dua
+# 10 June, 2017
 
 import unittest
 from math import pi

@@ -1,4 +1,5 @@
-# Author - Aditya Dua - 13 June, 2017
+# Created by: Aditya Dua
+# 13 June, 2017
 # Pose module has class implementations of SO2, SO3, SE2 and SE3 type matrices
 
 import numpy as np

@@ -1,4 +1,5 @@
-# Author - Aditya Dua, Josh Carrigg Hudson - 1 June, 2017
+# Created by: Josh Carrigg Hudson, Aditya Dua
+# 1 June, 2017
 
 """ Contains all of the transforms that will be used within the toolbox"""
 import math

@@ -1,4 +1,5 @@
-# Author - Aditya Dua - 13 June, 2017
+# Created by: Aditya Dua
+# 13 June, 2017
 
 import numpy as np
 from . import test_args

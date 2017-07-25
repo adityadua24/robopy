@@ -1,4 +1,5 @@
-# Author - Aditya Dua - 13 June, 2017
+# Created by: Aditya Dua
+# 13 June, 2017
 
 """Common Module contains code shared by robotics and machine vision toolboxes"""
 import numpy as np

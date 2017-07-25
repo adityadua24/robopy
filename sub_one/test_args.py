@@ -1,4 +1,5 @@
-# Author - Aditya Dua - 1 June, 2017
+# Created by: Aditya Dua
+# 1 June, 2017
 
 """test_args module contains test for input arguments.
 It checks if input argument passed by user is valid or not.
