@@ -17,6 +17,13 @@ class SuperPose(ABC):
         return self._list
 
     @property
+    def mat(self):
+        if len(self._list) == 1:
+            return self._list[0]
+        elif len(self._list) > 1:
+            return self._list[1]
+
+    @property
     def isSE(self):
         if isinstance(self, pose.SE2) or isinstance(self, pose.SE3):
             return True
