@@ -7,7 +7,7 @@ import numpy as np
 import numpy.testing as npt
 
 
-def matrix_mismatch_string_builder(exp_mat, rec_mat):
+def matrix_mismatch_string_builder(rec_mat, exp_mat):
     expected_mat_str = np.array2string(np.asarray(exp_mat))
     received_mat_str = np.array2string(np.asarray(rec_mat))
     output_str = str("\n----------------------\n"
