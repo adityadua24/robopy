@@ -8,7 +8,6 @@ from . import test_args
 from . import transforms
 from .super_pose import SuperPose
 from random import uniform
-from scipy import linalg
 
 
 # -----------------------------------------------------------------------------------------
