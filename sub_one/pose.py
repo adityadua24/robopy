@@ -378,6 +378,11 @@ class SO3(SuperPose):
         self._list = []
         pass
 
+    # TODO
+    # Constructors
+    # SO3.eig(e) ?
+    #
+
 
 # ---------------------------------------------------------------------------------
 class SE3(SO3):

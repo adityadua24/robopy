@@ -54,8 +54,6 @@ def trotx(t, unit="rad"):
         of THETA radians about the x-axis.
         T = trotx(THETA, 'deg') as above but THETA is in degrees """
     test_args.unit_check(unit)
-    if unit == "deg":
-        t = t * math.pi / 180
     tm = rotx(t, unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     return np.c_[tm, np.array([[0], [0], [0], [1]])]
@@ -67,8 +65,6 @@ def troty(t, unit="rad"):
         of THETA radians about the y-axis.
         T = troty(THETA, 'deg') as above but THETA is in degrees """
     test_args.unit_check(unit)
-    if unit == "deg":
-        t = t * math.pi / 180
     tm = roty(t, unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     return np.c_[tm, np.array([[0], [0], [0], [1]])]
@@ -80,8 +76,6 @@ def trotz(t, unit="rad"):
         of THETA radians about the z-axis.
         T = trotz(THETA, 'deg') as above but THETA is in degrees """
     test_args.unit_check(unit)
-    if unit == "deg":
-        t = t * math.pi / 180
     tm = rotz(t, unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     return np.c_[tm, np.array([[0], [0], [0], [1]])]

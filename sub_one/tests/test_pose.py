@@ -21,8 +21,16 @@ class TestSO3(unittest.TestCase):
             self.fail(output_str)
 
     def test_pose_so3_constructor_rot_matrix(self):
-        pass
+        obj1 = pose.SO3()
+        obj2 = pose.SO3(obj1)
 
+        for i in range(obj2.length):
+            if not np.array_equal(obj1.data[i], obj2.data[i]):
+                output_str = matrix_mismatch_string_builder(obj2.data[i], obj1.data[i])
+                self.fail(output_str)
+
+    def test_pose_so3_constructor_se3(self):
+        self.fail("Missing implementation")
 
 if __name__ == '__main__':
     unittest.main()
