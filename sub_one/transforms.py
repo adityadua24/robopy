@@ -106,11 +106,11 @@ def t2r(tmat):
     if dim[0] != dim[1]:
         raise ValueError(' Matrix Must be square ')
     elif dim[0] == 3:
-        tmp = np.delete(tmat, (2), axis=0)
-        return np.delete(tmp, (2), axis=1)
+        tmp = np.delete(tmat, [2], axis=0)
+        return np.delete(tmp, [2], axis=1)
     elif dim[0] == 4:
-        tmp = np.delete(tmat, (3), axis=0)
-        return np.delete(tmp, (3), axis=1)
+        tmp = np.delete(tmat, [3], axis=0)
+        return np.delete(tmp, [3], axis=1)
     else:
         raise ValueError('Value must be a rotation matrix ')
 
