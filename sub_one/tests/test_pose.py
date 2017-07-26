@@ -9,6 +9,7 @@ from .. import pose
 from .common import matrix_mismatch_string_builder
 from .common import matrices_equal
 from .. import transforms as tr
+from random import uniform
 
 
 class TestSO3(unittest.TestCase):
@@ -36,7 +37,7 @@ class TestSO3(unittest.TestCase):
                 self.fail(output_str)
 
     def test_pose_so3_constructor_rot_matrix(self):
-        rot = tr.rotx(45, 'deg')
+        rot = tr.rotx(uniform(0, 360), 'deg')
         obj = pose.SO3(rot)
         if not np.array_equal(rot, obj.data[0]):
             output_str = matrix_mismatch_string_builder(obj.data[0], rot)
@@ -59,7 +60,9 @@ class TestSO3(unittest.TestCase):
                 self.fail(output_str)
 
     def test_pose_so3_constructor_rx(self):
-        pass
+        theta = uniform(0, 360)
+        rotx = tr.rotx(theta, unit='deg')
+        obj = pose.SO3(rx=theta, unit='deg')
 
 
 if __name__ == '__main__':
