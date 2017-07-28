@@ -286,13 +286,13 @@ class SE2(SO2):
             self._transl.append((0, 0))
         else:
             raise AttributeError("\nINVALID instantiation. Valid scenarios:-\n"
-                                 "SE2(x, y)\n"
-                                 "SE2(x, y, rot)\n"
-                                 "SE2(x, y, theta)\n"
-                                 "SE2(se2)\n"
-                                 "SE2(so2)\n"
-                                 "SE2(theta)"
-                                 "SE2(rot)")
+                                 "- SE2(x, y)\n"
+                                 "- SE2(x, y, rot)\n"
+                                 "- SE2(x, y, theta)\n"
+                                 "- SE2(se2)\n"
+                                 "- SE2(so2)\n"
+                                 "- SE2(theta)\n"
+                                 "- SE2(rot)\n")
         # Round all matrices to 15 decimal places
         # Removes eps values
         for i in range(len(self._list)):
@@ -373,14 +373,52 @@ class SE2(SO2):
 # --------------------------------------------------------------------------------
 class SO3(SuperPose):
     # -------------------------------------------------------------------------------
-    def __init__(self):
-        self._list = []
-        pass
+    def __init__(self, args_in=None, null=False):
+        """
+        Initialises SO3 object.
+        :param args_in: Can be None or of type: Rotation numpy matrix, se3 object, so3 object or a list of these data types
+        :param null: Creates empty objects with no matrices. Mostly for internal use only.
+        """
+        test_args.so3_constructor_args_check(args_in)
+        # TODO make sure all list elements are of same data type. !!! Throw TypeError if not
 
-    # TODO
+        self._list = []
+
+        if args_in is None and null is True:
+            pass
+        elif args_in is None and null is False:
+            self._list.append(np.asmatrix(np.eye(3, 3)))
+        elif type(args_in) is list:
+            if type(args_in[0]) is SE3:  # If first element is se3 - all are.
+                pass
+            elif type(args_in[0]) is SO3:
+                pass
+            elif type(args_in[0]) is np.matrix:
+                pass
+        elif type(args_in) is SE3:
+            for each in args_in:
+                each = np.delete(each, [3], axis=0)
+                each = np.delete(each, [3], axis=1)
+                self._list.append(each)
+        elif type(args_in) is SO3:
+            for each in args_in:
+                self._list.append(each)
+        else:
+            raise AttributeError("\n INVALID instantiation. Valid scenarios:\n"
+                                 "- SO3()\n"
+                                 "- SO3(np.matrix_3x3)\n"
+                                 "- SO3([np.matrix, np.matrix, np.matrix])\n"
+                                 "- SO3(se3)\n"
+                                 "- SO3([se3, se3, se3])\n"
+                                 "- SO3(so3)\n"
+                                 "- SO3([so3, so3, so3])\n")
+        # Round all matrices to 15 decimal places
+        # Removes eps values
+        for i in range(len(self._list)):
+            self._list[i] = np.asmatrix(self._list[i].round(15))
     # Constructors
     # SO3.eig(e) ?
-    #
+    # TODO
 
 
 # ---------------------------------------------------------------------------------

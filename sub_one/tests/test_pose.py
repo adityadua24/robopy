@@ -26,7 +26,7 @@ class TestSO3(unittest.TestCase):
     def test_pose_so3_constructor_so3_object_length(self):
         obj1 = pose.SO3()  # TODO
         obj2 = pose.SO3(obj1)
-        self.assertEquals(obj1.length, obj2.length)
+        self.assertEqual(obj1.length, obj2.length)
 
     def test_pose_so3_constructor_so3_object_data(self):
         obj1 = pose.SO3()  # TODO
@@ -36,6 +36,9 @@ class TestSO3(unittest.TestCase):
                 output_str = matrix_mismatch_string_builder(obj2.data[i], obj1.data[i])
                 self.fail(output_str)
 
+    def test_pose_so3_constructor_so3_list(self):
+        self.fail("Yet to be implemented")
+
     def test_pose_so3_constructor_rot_matrix(self):
         rot = tr.rotx(uniform(0, 360), 'deg')
         obj = pose.SO3(rot)
@@ -43,10 +46,13 @@ class TestSO3(unittest.TestCase):
             output_str = matrix_mismatch_string_builder(obj.data[0], rot)
             self.fail(output_str)
 
+    def test_pose_so3_constructor_rot_matrix_list(self):
+        self.fail("Yet to be implemented")
+
     def test_pose_so3_constructor_se3_length(self):
         objse3 = pose.SE3()
         objso3 = pose.SO3(objse3)
-        self.assertEquals(objse3.length, objso3.length)
+        self.assertEqual(objse3.length, objso3.length)
 
     def test_pose_so3_constructor_se3_data(self):
         objse3 = pose.SE3()
@@ -59,11 +65,76 @@ class TestSO3(unittest.TestCase):
                 output_str = matrix_mismatch_string_builder(objso3.data[i], rot_mats[i])
                 self.fail(output_str)
 
+    def test_pose_so3_constructor_se3_list(self):
+        self.fail("Not yet implemented")
+
     def test_pose_so3_constructor_rx(self):
         theta = uniform(0, 360)
         rotx = tr.rotx(theta, unit='deg')
-        obj = pose.SO3(rx=theta, unit='deg')
+        self.fail("Not implemented yet")
 
+    def test_pose_so3_constructor_ry(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_constructor_rz(self):
+        self.fail("Not implemented yet ")
+
+    def test_pose_so3_constructor_rand(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_constructor_eul(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_constructor_oa(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_constructor_rpy(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_constructor_angvec(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_property_zero(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_property_isSE(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_property_isSym(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_det(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_eig(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_log(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_inv(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_interp(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_simplify(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_static_check(self):  # TODO Check is necessary
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_static_rx(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_static_ry(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_static_rz(self):
+        self.fail("Not implemented yet")
+
+    def test_pose_so3_static_rpy(self):
+        self.fail("Not implemented yet")
 
 if __name__ == '__main__':
     unittest.main()

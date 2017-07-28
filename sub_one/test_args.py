@@ -120,7 +120,7 @@ def so2_interp_check(obj1, obj2, s):
 # ----------------- POSE.SO2 CHECKS ----------------------------
 # ----------------- POSE.SE2 CHECKS ----------------------------
 
-def se2_inputs_check(x, y, rot, theta, so2, se2):
+def se2_constructor_args_check(x, y, rot, theta, so2, se2):
     pass
 
 
@@ -128,6 +128,15 @@ def se2_valid(obj):
     # TODO
     pass
 
+
 # ----------------- POSE.SE2 CHECKS ----------------------------
+
+# ----------------- POSE.SO3 CHECKS ----------------------------
+
+def so3_constructor_args_check(args_in):
+    pass
+
+# ----------------- POSE.SO3 CHECKS ----------------------------
+
 
 # ----------------- SUPER POSE CHECKS ---------------------------
