@@ -42,12 +42,19 @@ class TestSO3(unittest.TestCase):
     def test_pose_so3_constructor_rot_matrix(self):
         rot = tr.rotx(uniform(0, 360), 'deg')
         obj = pose.SO3(rot)
-        if not np.array_equal(rot, obj.data[0]):
+        if not matrices_equal(rot, obj.data[0]):
             output_str = matrix_mismatch_string_builder(obj.data[0], rot)
             self.fail(output_str)
 
     def test_pose_so3_constructor_rot_matrix_list(self):
-        self.fail("Yet to be implemented")
+        rot_list = []
+        for i in range(5):
+            rot_list.append(tr.rotx(uniform(0, 360), unit='deg'))
+        obj = pose.SO3(rot_list)
+        for i in range(obj.length):
+            if not matrices_equal(obj.data[i], rot_list[i]):
+                output_str = matrix_mismatch_string_builder(obj.data[i], rot_list[i])
+                self.fail(output_str)
 
     def test_pose_so3_constructor_se3_length(self):
         objse3 = pose.SE3()

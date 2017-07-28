@@ -394,7 +394,8 @@ class SO3(SuperPose):
             elif type(args_in[0]) is SO3:
                 pass
             elif type(args_in[0]) is np.matrix:
-                pass
+                for each in args_in:
+                    self._list.append(each)
         elif type(args_in) is SE3:
             for each in args_in:
                 each = np.delete(each, [3], axis=0)
@@ -403,6 +404,8 @@ class SO3(SuperPose):
         elif type(args_in) is SO3:
             for each in args_in:
                 self._list.append(each)
+        elif type(args_in) is np.matrix:
+            self._list.append(args_in)
         else:
             raise AttributeError("\n INVALID instantiation. Valid scenarios:\n"
                                  "- SO3()\n"
