@@ -78,13 +78,26 @@ class TestSO3(unittest.TestCase):
     def test_pose_so3_constructor_rx(self):
         theta = uniform(0, 360)
         rotx = tr.rotx(theta, unit='deg')
-        self.fail("Not implemented yet")
+        obj = pose.SO3.Rx(theta, unit='deg')
+        if not matrices_equal(obj.data[0], rotx):
+            output_str = matrix_mismatch_string_builder(obj.data[0], rotx)
+            self.fail(output_str)
 
     def test_pose_so3_constructor_ry(self):
-        self.fail("Not implemented yet")
+        theta = uniform(0, 360)
+        roty = tr.roty(theta, unit='deg')
+        obj = pose.SO3.Ry(theta, unit='deg')
+        if not matrices_equal(obj.data[0], roty):
+            output_str = matrix_mismatch_string_builder(obj.data[0], roty)
+            self.fail(output_str)
 
     def test_pose_so3_constructor_rz(self):
-        self.fail("Not implemented yet ")
+        theta = uniform(0, 360)
+        rotz = tr.rotz(theta, unit='deg')
+        obj = pose.SO3.Rz(theta, unit='deg')
+        if not matrices_equal(obj.data[0], rotz):
+            output_str = matrix_mismatch_string_builder(obj.data[0], rotz)
+            self.fail(output_str)
 
     def test_pose_so3_constructor_rand(self):
         self.fail("Not implemented yet")

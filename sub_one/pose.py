@@ -423,6 +423,36 @@ class SO3(SuperPose):
     # SO3.eig(e) ?
     # TODO
 
+    @classmethod
+    def Rx(cls, theta=0, unit="rad"):
+        obj = cls(null=True)
+        test_args.unit_check(unit)
+        if unit == 'deg':
+            theta = theta * math.pi / 180
+
+        obj._list.append(transforms.rotx(theta))
+        return obj
+
+    @classmethod
+    def Ry(cls, theta=0, unit="rad"):
+        obj = cls(null=True)
+        test_args.unit_check(unit)
+        if unit == 'deg':
+            theta = theta * math.pi / 180
+
+        obj._list.append(transforms.roty(theta))
+        return obj
+
+    @classmethod
+    def Rz(cls, theta=0, unit="rad"):
+        obj = cls(null=True)
+        test_args.unit_check(unit)
+        if unit == 'deg':
+            theta = theta * math.pi / 180
+
+        obj._list.append(transforms.rotz(theta))
+        return obj
+
 
 # ---------------------------------------------------------------------------------
 class SE3(SO3):
