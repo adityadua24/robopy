@@ -100,6 +100,8 @@ class TestSO3(unittest.TestCase):
             self.fail(output_str)
 
     def test_pose_so3_constructor_rand(self):
+        obj1 = pose.SO3.rand()
+        obj2 = pose.SO3.rand()
         self.fail("Not implemented yet")
 
     def test_pose_so3_constructor_eul(self):
@@ -118,7 +120,9 @@ class TestSO3(unittest.TestCase):
         self.fail("Not implemented yet")
 
     def test_pose_so3_property_isSE(self):
-        self.fail("Not implemented yet")
+        obj = pose.SO3()
+        if obj.isSE:
+            self.fail("Is not a SE object.")
 
     def test_pose_so3_property_isSym(self):
         self.fail("Not implemented yet")

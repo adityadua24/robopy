@@ -453,6 +453,11 @@ class SO3(SuperPose):
         obj._list.append(transforms.rotz(theta))
         return obj
 
+    @classmethod
+    def rand(cls):
+        obj = cls(null=True)
+
+
 
 # ---------------------------------------------------------------------------------
 class SE3(SO3):
