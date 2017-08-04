@@ -11,21 +11,37 @@ from . import pose
 class SuperPose(ABC):
     @property
     def length(self):
+        """
+        Property to return number of matrices in pose object
+        :return: int
+        """
         return len(self._list)
 
     @property
     def data(self):
+        """
+        Always returns a list containing the matrices of the pose object.
+        :return: A list of matrices.
+        """
         return self._list
 
     @property
     def mat(self):
+        """
+        Property to return the matrices of pose object.
+        :return: Returns np.matrix type if only one matrix is present. Else returns a list of np.matrix.
+        """
         if len(self._list) == 1:
             return self._list[0]
         elif len(self._list) > 1:
-            return self._list[1]
+            return self._list
 
     @property
     def isSE(self):
+        """
+        Checks if object is of type SE2 or SE3 or none of them.
+        :return: bool
+        """
         if isinstance(self, pose.SE2) or isinstance(self, pose.SE3):
             return True
         else:
@@ -33,6 +49,11 @@ class SuperPose(ABC):
 
     @property
     def dim(self):
+        """
+        Returns dimensions of first matrix in pose object.
+        Assumed that all matrices have same dimension.
+        :return: tuple
+        """
         return self._list[0].shape
 
     # TODO !! issym, simplify

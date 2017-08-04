@@ -7,7 +7,7 @@ import math
 from . import test_args
 from . import transforms
 from .super_pose import SuperPose
-from random import uniform
+from random import uniform, randint
 
 
 # -----------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ class SE2(SO2):
     # ---------------------------------------------------------------------------------
     def __init__(self, theta=None, unit='rad', x=None, y=None, rot=None, so2=None, se2=None, null=False):
         test_args.unit_check(unit)
-        test_args.se2_inputs_check(x, y, rot, theta, so2, se2)
+        test_args.se2_constructor_args_check(x, y, rot, theta, so2, se2)
         self._list = []
         self._transl = []
         self._unit = unit
@@ -456,7 +456,18 @@ class SO3(SuperPose):
     @classmethod
     def rand(cls):
         obj = cls(null=True)
+        ran = randint(1, 3)
+        if ran == 1:
+            mat = transforms.rotx(uniform(0, 360), unit='deg')
+            obj._list.append(mat)
+        elif ran == 2:
+            mat = transforms.roty(uniform(0, 360), unit='deg')
+            obj._list.append(mat)
+        elif ran == 3:
+            mat = transforms.rotz(uniform(0, 360), unit='deg')
+            obj._list.append(mat)
 
+        return obj
 
 
 # ---------------------------------------------------------------------------------

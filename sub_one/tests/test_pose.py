@@ -102,7 +102,8 @@ class TestSO3(unittest.TestCase):
     def test_pose_so3_constructor_rand(self):
         obj1 = pose.SO3.rand()
         obj2 = pose.SO3.rand()
-        self.fail("Not implemented yet")
+        if matrices_equal(obj1.data[0], obj2.data[0]):
+            self.fail("SO3.rand() show produces random poses.")
 
     def test_pose_so3_constructor_eul(self):
         self.fail("Not implemented yet")
