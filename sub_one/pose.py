@@ -10,6 +10,7 @@ from .super_pose import SuperPose
 from random import uniform, randint
 
 
+# TODO Implement argument checking for all poses
 # -----------------------------------------------------------------------------------------
 class SO2(SuperPose):
     # --------------------------------------------------------------------------------------
@@ -419,28 +420,37 @@ class SO3(SuperPose):
         # Removes eps values
         for i in range(len(self._list)):
             self._list[i] = np.asmatrix(self._list[i].round(15))
+
     # Constructors
     # SO3.eig(e) ?
     # TODO
 
     @classmethod
     def Rx(cls, theta=0, unit="rad"):
-        obj = cls(null=True)
         test_args.unit_check(unit)
         if unit == 'deg':
-            theta = theta * math.pi / 180
-
-        obj._list.append(transforms.rotx(theta))
+            if type(theta) is float or type(theta) is int:
+                theta = theta * math.pi / 180
+                rot = transforms.rotx(theta)
+                obj = cls(args_in=rot)
+            elif type(theta) is list:
+                theta = [(each * math.pi / 180) for each in theta]
+                rot = [transforms.rotx(each) for each in theta]
+                obj = cls(args_in=rot)
         return obj
 
     @classmethod
     def Ry(cls, theta=0, unit="rad"):
-        obj = cls(null=True)
         test_args.unit_check(unit)
         if unit == 'deg':
-            theta = theta * math.pi / 180
-
-        obj._list.append(transforms.roty(theta))
+            if type(theta) is float or type(theta) is int:
+                theta = theta * math.pi / 180
+                rot = transforms.roty(theta)
+                obj = cls(args_in=rot)
+            elif type(theta) is list:
+                theta = [(each * math.pi / 180) for each in theta]
+                rot = [transforms.roty(each) for each in theta]
+                obj = cls(args_in=rot)
         return obj
 
     @classmethod
@@ -448,9 +458,14 @@ class SO3(SuperPose):
         obj = cls(null=True)
         test_args.unit_check(unit)
         if unit == 'deg':
-            theta = theta * math.pi / 180
-
-        obj._list.append(transforms.rotz(theta))
+            if type(theta) is float or type(theta) is int:
+                theta = theta * math.pi / 180
+                rot = transforms.rotz(theta)
+                obj = cls(args_in=rot)
+            elif type(theta) is list:
+                theta = [(each * math.pi / 180) for each in theta]
+                rot = [transforms.rotz(each) for each in theta]
+                obj = cls(args_in=rot)
         return obj
 
     @classmethod
@@ -466,6 +481,42 @@ class SO3(SuperPose):
         elif ran == 3:
             mat = transforms.rotz(uniform(0, 360), unit='deg')
             obj._list.append(mat)
+
+        return obj
+
+    @classmethod
+    def eul(cls, theta=[], unit="rad"):
+        if unit == 'deg':
+            theta = [(each * math.pi / 180) for each in theta]
+        z1_rot = transforms.rotz(theta[0])
+        y_rot = transforms.roty(theta[1])
+        z2_rot = transforms.rotz(theta[2])
+        zyz = z1_rot * y_rot * z2_rot
+        obj = cls(args_in=zyz)
+        return obj
+
+    @classmethod
+    def rpy(cls, theta=[], order='zyx', unit='rad'):  # TODO: Gives wrong output. Fix it.
+        if unit == 'deg':
+            theta = [(each * math.pi / 180) for each in theta]
+        if order == 'xyz' or order == 'arm':
+            x_rot = transforms.rotx(theta[2])
+            y_rot = transforms.roty(theta[1])
+            z_rot = transforms.rotz(theta[0])
+            xyz = x_rot * y_rot * z_rot
+            obj = cls(args_in=xyz)
+        elif order == 'zyx' or order == 'vehicle':
+            z_rot = transforms.rotz(theta[2])
+            y_rot = transforms.roty(theta[1])
+            x_rot = transforms.rotx(theta[0])
+            zyx = z_rot * y_rot * x_rot
+            obj = cls(args_in=zyx)
+        elif order == 'yxz' or order == 'camera':
+            x_rot = transforms.rotx(theta[2])
+            y_rot = transforms.roty(theta[1])
+            z_rot = transforms.rotz(theta[0])
+            yxz = y_rot * x_rot * z_rot
+            obj = cls(args_in=yxz)
 
         return obj
 

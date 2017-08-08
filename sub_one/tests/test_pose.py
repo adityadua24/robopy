@@ -133,7 +133,8 @@ class TestSO3(unittest.TestCase):
             self.fail("SO3.rand() show produces random poses.")
 
     def test_pose_so3_constructor_eul(self):
-        self.fail("Not implemented yet")
+        # obj = pose.SO3.eul([uniform(0, 360), uniform(0, 360), uniform(0, 360)], unit='deg')
+        self.fail("Test not defined")
 
     def test_pose_so3_constructor_oa(self):
         self.fail("Not implemented yet")
