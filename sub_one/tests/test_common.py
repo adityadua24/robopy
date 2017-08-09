@@ -21,10 +21,10 @@ def matrix_mismatch_string_builder(rec_mat, exp_mat):
     return output_str
 
 
-def matrices_equal(rec_mat, exp_mat):
+def matrices_equal(rec_mat, exp_mat, decimal=10):
     equal = True
     try:
-        npt.assert_almost_equal(rec_mat, exp_mat, decimal=10)
+        npt.assert_almost_equal(rec_mat, exp_mat, decimal=decimal)
     except AssertionError:
         equal = False
     return equal

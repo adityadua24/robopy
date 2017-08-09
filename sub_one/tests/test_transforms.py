@@ -22,7 +22,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         received_mat = transforms.rotx(0)
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -30,7 +30,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
         received_mat = transforms.rotx(pi / 2)
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -38,7 +38,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
         received_mat = transforms.rotx(pi)
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -46,7 +46,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
         received_mat = transforms.rotx(3 * pi / 2)
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -54,7 +54,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         received_mat = transforms.rotx(2 * pi)
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -62,7 +62,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         received_mat = transforms.rotx(0, unit='deg')
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -70,7 +70,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         received_mat = transforms.rotx(360, unit='deg')
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -78,7 +78,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
         received_mat = transforms.rotx(90, unit='deg')
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -86,7 +86,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
         received_mat = transforms.rotx(180, unit='deg')
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -94,7 +94,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
         received_mat = transforms.rotx(270, unit='deg')
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 
@@ -102,7 +102,7 @@ class TestRotx(unittest.TestCase):
         expected_mat = np.matrix([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
         received_mat = transforms.rotx(450, unit='deg')
 
-        if not matrices_equal(received_mat, expected_mat):
+        if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(expected_mat, received_mat)
             self.fail(output_str)
 

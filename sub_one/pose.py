@@ -431,7 +431,7 @@ class SO3(SuperPose):
         if unit == 'deg':
             if type(theta) is float or type(theta) is int:
                 theta = theta * math.pi / 180
-                rot = transforms.transforms.rotx(theta)
+                rot = transforms.rotx(theta)
                 obj = cls(args_in=rot)
             elif type(theta) is list:
                 theta = [(each * math.pi / 180) for each in theta]
@@ -445,7 +445,7 @@ class SO3(SuperPose):
         if unit == 'deg':
             if type(theta) is float or type(theta) is int:
                 theta = theta * math.pi / 180
-                rot = transforms.transforms.roty(theta)
+                rot = transforms.roty(theta)
                 obj = cls(args_in=rot)
             elif type(theta) is list:
                 theta = [(each * math.pi / 180) for each in theta]
