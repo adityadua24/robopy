@@ -4,10 +4,10 @@
 
 import numpy as np
 import math
-from . import test_args
-from . import transforms
+from . import check_args
 from .super_pose import SuperPose
 from random import uniform, randint
+from . import transforms
 
 
 # TODO Implement argument checking for all poses
@@ -17,8 +17,8 @@ class SO2(SuperPose):
 
     def __init__(self, args_in=None, unit='rad', null=False):
 
-        test_args.unit_check(unit)
-        test_args.so2_input_types_check(args_in)
+        check_args.unit_check(unit)
+        check_args.so2_input_types_check(args_in)
         self._unit = unit
         self._list = []
         angles_deg = []
@@ -33,14 +33,14 @@ class SO2(SuperPose):
             self._list.append(np.matrix([[math.cos(args_in), -math.sin(args_in)],
                                          [math.sin(args_in), math.cos(args_in)]]))
         elif isinstance(args_in, SO2):
-            test_args.so2_valid(args_in)
+            check_args.so2_valid(args_in)
             for each_matrix in args_in:
                 self._list.append(each_matrix)
         elif isinstance(args_in, np.matrix):
             if SO2.is_valid(args_in):
                 self._list.append(args_in)
         elif isinstance(args_in, list):
-            test_args.so2_angle_list_check(args_in)
+            check_args.so2_angle_list_check(args_in)
             if unit == "deg":
                 for each_angle in args_in:
                     angles_deg.append(each_angle * math.pi / 180)
@@ -81,7 +81,7 @@ class SO2(SuperPose):
         if type(obj) is SO2:
             err = None
             try:
-                test_args.so2_valid(obj)
+                check_args.so2_valid(obj)
             except AssertionError as err:
                 pass
             if err is None:
@@ -91,7 +91,7 @@ class SO2(SuperPose):
         elif type(obj) is SE2:
             err = None
             try:
-                test_args.se2_valid(obj)
+                check_args.se2_valid(obj)
             except AssertionError as err:
                 pass
             if err is None:
@@ -186,7 +186,7 @@ class SO2(SuperPose):
     def interp(self, other, s):
         """Returns the interpolated SO2 object"""
         # TODO Refactor "angle" to "theta" everywhere
-        test_args.so2_interp_check(self, other, s)
+        check_args.so2_interp_check(self, other, s)
         if type(self.angle) is list:
             angle_diff = []
             for i in range(len(self._list)):
@@ -208,8 +208,8 @@ class SO2(SuperPose):
 class SE2(SO2):
     # ---------------------------------------------------------------------------------
     def __init__(self, theta=None, unit='rad', x=None, y=None, rot=None, so2=None, se2=None, null=False):
-        test_args.unit_check(unit)
-        test_args.se2_constructor_args_check(x, y, rot, theta, so2, se2)
+        check_args.unit_check(unit)
+        check_args.se2_constructor_args_check(x, y, rot, theta, so2, se2)
         self._list = []
         self._transl = []
         self._unit = unit
@@ -351,7 +351,7 @@ class SE2(SO2):
 
     def xyt(self, unit='rad'):
         """Return list of 3x1 dimension vectors containing x, y translation components and theta"""
-        test_args.unit_check(unit)
+        check_args.unit_check(unit)
         val = []
         assert len(self._transl) == len(self.angle)
         for i in range(len(self._list)):
@@ -380,7 +380,7 @@ class SO3(SuperPose):
         :param args_in: Can be None or of type: Rotation numpy matrix, se3 object, so3 object or a list of these data types
         :param null: Creates empty objects with no matrices. Mostly for internal use only.
         """
-        test_args.so3_constructor_args_check(args_in)
+        check_args.so3_constructor_args_check(args_in)
         # TODO make sure all list elements are of same data type. !!! Throw TypeError if not
 
         self._list = []
@@ -427,11 +427,11 @@ class SO3(SuperPose):
 
     @classmethod
     def Rx(cls, theta=0, unit="rad"):
-        test_args.unit_check(unit)
+        check_args.unit_check(unit)
         if unit == 'deg':
             if type(theta) is float or type(theta) is int:
                 theta = theta * math.pi / 180
-                rot = transforms.rotx(theta)
+                rot = transforms.transforms.rotx(theta)
                 obj = cls(args_in=rot)
             elif type(theta) is list:
                 theta = [(each * math.pi / 180) for each in theta]
@@ -441,11 +441,11 @@ class SO3(SuperPose):
 
     @classmethod
     def Ry(cls, theta=0, unit="rad"):
-        test_args.unit_check(unit)
+        check_args.unit_check(unit)
         if unit == 'deg':
             if type(theta) is float or type(theta) is int:
                 theta = theta * math.pi / 180
-                rot = transforms.roty(theta)
+                rot = transforms.transforms.roty(theta)
                 obj = cls(args_in=rot)
             elif type(theta) is list:
                 theta = [(each * math.pi / 180) for each in theta]
@@ -456,7 +456,7 @@ class SO3(SuperPose):
     @classmethod
     def Rz(cls, theta=0, unit="rad"):
         obj = cls(null=True)
-        test_args.unit_check(unit)
+        check_args.unit_check(unit)
         if unit == 'deg':
             if type(theta) is float or type(theta) is int:
                 theta = theta * math.pi / 180
@@ -496,28 +496,9 @@ class SO3(SuperPose):
         return obj
 
     @classmethod
-    def rpy(cls, theta=[], order='zyx', unit='rad'):  # TODO: Gives wrong output. Fix it.
-        if unit == 'deg':
-            theta = [(each * math.pi / 180) for each in theta]
-        if order == 'xyz' or order == 'arm':
-            x_rot = transforms.rotx(theta[2])
-            y_rot = transforms.roty(theta[1])
-            z_rot = transforms.rotz(theta[0])
-            xyz = x_rot * y_rot * z_rot
-            obj = cls(args_in=xyz)
-        elif order == 'zyx' or order == 'vehicle':
-            z_rot = transforms.rotz(theta[2])
-            y_rot = transforms.roty(theta[1])
-            x_rot = transforms.rotx(theta[0])
-            zyx = z_rot * y_rot * x_rot
-            obj = cls(args_in=zyx)
-        elif order == 'yxz' or order == 'camera':
-            x_rot = transforms.rotx(theta[2])
-            y_rot = transforms.roty(theta[1])
-            z_rot = transforms.rotz(theta[0])
-            yxz = y_rot * x_rot * z_rot
-            obj = cls(args_in=yxz)
-
+    def rpy(cls, thetas, order='zyx', unit='rad'):
+        rotation = transforms.rpy2r(thetas=thetas, order=order, unit=unit)
+        obj = cls(rotation)
         return obj
 
 

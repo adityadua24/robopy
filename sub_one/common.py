@@ -3,7 +3,7 @@
 
 """Common Module contains code shared by robotics and machine vision toolboxes"""
 import numpy as np
-from . import test_args
+from . import check_args
 
 
 def ishomog(tr, dim, rtest=''):
@@ -17,7 +17,7 @@ def ishomog(tr, dim, rtest=''):
     if rtest == 'valid':
         is_valid = lambda matrix: abs(np.linalg.det(matrix) - 1) < np.spacing(1)
     flag = True
-    if test_args.is_mat_list(tr):
+    if check_args.is_mat_list(tr):
         for matrix in tr:
             if not (matrix.shape[0] == dim[0] and matrix.shape[1] == dim[0]):
                 flag = False

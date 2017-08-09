@@ -2,7 +2,7 @@
 # 13 June, 2017
 
 import numpy as np
-from . import test_args
+from . import check_args
 from abc import ABC, abstractmethod
 import numpy.testing as npt
 from . import pose
@@ -68,7 +68,7 @@ class SuperPose(ABC):
             return True
 
     def append(self, item):
-        test_args.super_pose_appenditem(self, item)
+        check_args.super_pose_appenditem(self, item)
         if type(item) is np.matrix:
             self._list.append(item)
         else:
@@ -111,7 +111,7 @@ class SuperPose(ABC):
         pass  # TODO
 
     def __mul__(self, other):
-        test_args.super_pose_multiply_check(self, other)
+        check_args.super_pose_multiply_check(self, other)
         if isinstance(other, SuperPose):
             new_pose = type(self)(null=True)  # Creates empty poses with no data
             if self.length == other.length:
@@ -136,7 +136,7 @@ class SuperPose(ABC):
                 return mat
 
     def __truediv__(self, other):
-        test_args.super_pose_divide_check(self, other)
+        check_args.super_pose_divide_check(self, other)
         new_pose = type(self)(null=True)  # Creates empty poses with no data
         if self.length == other.length:
             for i in range(self.length):
@@ -150,7 +150,7 @@ class SuperPose(ABC):
         return new_pose
 
     def __add__(self, other):
-        test_args.super_pose_add_sub_check(self, other)
+        check_args.super_pose_add_sub_check(self, other)
         mat = []
         for i in range(self.length):
             mat.append(self.data[i] + other.data[i])
@@ -161,7 +161,7 @@ class SuperPose(ABC):
             return mat
 
     def __sub__(self, other):
-        test_args.super_pose_add_sub_check(self, other)
+        check_args.super_pose_add_sub_check(self, other)
         mat = []
         for i in range(self.length):
             mat.append(self.data[i] - other.data[i])

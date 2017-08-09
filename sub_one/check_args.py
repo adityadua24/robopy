@@ -39,7 +39,16 @@ def is_vector(item):
 
 
 # ------------------------------------------------------
-# ------------  SUPER POSE CHECKS-----------------------
+#               TRANSFORMS CHECKS
+# ------------------------------------------------------
+
+def rpy2r(theta, order):
+    pass   # TODO Implement this
+
+
+# ------------------------------------------------------
+#                SUPER POSE CHECKS
+# ------------------------------------------------------
 def valid_pose(obj):
     # TODO -- Check if its a valid pose object
     assert isinstance(obj, super_pose.SuperPose)

@@ -5,8 +5,8 @@ import unittest
 from math import pi
 from .. import transforms
 import numpy as np
-from .common import matrix_mismatch_string_builder
-from .common import matrices_equal
+from .test_common import matrix_mismatch_string_builder
+from .test_common import matrices_equal
 
 
 class TestRotx(unittest.TestCase):

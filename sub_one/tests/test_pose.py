@@ -6,8 +6,8 @@ Test module for poses: SO2, SE2, SO3 and SE3
 import unittest
 import numpy as np
 from .. import pose
-from .common import matrix_mismatch_string_builder
-from .common import matrices_equal
+from .test_common import matrix_mismatch_string_builder
+from .test_common import matrices_equal
 from .. import transforms as tr
 from random import uniform
 
