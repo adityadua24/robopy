@@ -328,7 +328,10 @@ class SE2(SO2):
 
     def t_matrix(self):
         """Returns list of translation matrices of SE2 object"""
-        return self._list
+        if self.length == 1:
+            return self._list[0]
+        elif self.length > 1:
+            return self._list
 
     def inv(self):
         """Returns an inverse SE2 object of same length"""
@@ -500,6 +503,28 @@ class SO3(SuperPose):
         rotation = transforms.rpy2r(thetas=thetas, order=order, unit=unit)
         obj = cls(rotation)
         return obj
+
+    def rotation(self):
+        return self.mat
+
+    def t_matrix(self):
+        mat = []
+        for each in self:
+            mat.append(transforms.r2t(each))
+
+        if self.length == 1:
+            return mat[0]
+        elif self.length > 1:
+            return mat
+
+    def det(self):
+        det_list = []
+        for each in self:
+            det_list.append(np.linalg.det(each))
+        if self.length == 1:
+            return det_list[0]
+        elif self.length > 1:
+            return det_list
 
 
 # ---------------------------------------------------------------------------------

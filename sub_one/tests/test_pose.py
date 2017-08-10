@@ -171,7 +171,36 @@ class TestSO3(unittest.TestCase):
         self.fail("Not implemented yet")
 
     def test_pose_so3_det(self):
-        obj = pose.SO3()
+        obj = pose.SO3.Rx(theta=80, unit='deg')
+        det = obj.det()
+        if det != 1:
+            self.fail("Expected determinant value: 1.\n"
+                      "Received determinant value: det")
+
+    def test_pose_so3_rotation(self):
+        obj = pose.SO3.Rx(theta=45, unit='deg')
+        exp_rot = tr.rotx(theta=45, unit='deg')
+        rec_rot = obj.rotation()
+        if not matrices_equal(rec_rot, exp_rot):
+            output_str = matrix_mismatch_string_builder(rec_rot, exp_rot)
+            self.fail(output_str)
+
+    def test_pose_so3_rotation_list(self):
+        obj = pose.SO3.Rx(theta=[70, 80], unit='deg')
+        rot = [0, 0]
+        rot[0] = tr.rotx(theta=70, unit='deg')
+        rot[1] = tr.rotx(theta=80, unit='deg')
+        for i in range(obj.length):
+            if not matrices_equal(obj.data[i], rot[i]):
+                output_str = matrix_mismatch_string_builder(obj.data[i], rot[i])
+                self.fail(output_str)
+
+    def test_pose_so3_tr_matrix(self):
+        obj = pose.SO3.Rx(theta=45, unit='deg')
+        mat = np.matrix([[1.0000, 0, 0, 0], [0, 0.7071, -0.7071, 0], [0, 0.7071, 0.7071, 0], [0, 0, 0, 1.0000]])
+        if not matrices_equal(obj.t_matrix(), mat, decimal=4):
+            output_str = matrix_mismatch_string_builder(obj.t_matrix(), mat)
+            self.fail(output_str)
 
     def test_pose_so3_eig(self):
         self.fail("Not implemented yet")
