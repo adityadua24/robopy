@@ -504,6 +504,11 @@ class SO3(SuperPose):
         obj = cls(rotation)
         return obj
 
+    @classmethod
+    def oa(cls, o, a):
+        # TODO
+        pass
+
     def rotation(self):
         return self.mat
 
@@ -564,7 +569,42 @@ class SO3(SuperPose):
         # TODO
         pass
 
-    def trlog(self):
+    def toangvec(self):
+        # TODO
+        pass
+
+    def new(self):
+        new_pose = SO3(null=True)
+        for each in self:
+            new_pose.append(each)
+        return new_pose
+
+    def exp(self):
+        # TODO - maybe a static method
+        pass
+
+    @staticmethod
+    def check(self):
+        # TODO - maybe a static method
+        pass
+
+    def angvec(self):
+        # TODO - maybe a static method
+        pass
+
+    def torpy(self):
+        # TODO
+        pass
+
+    def toeul(self):
+        # TODO
+        pass
+
+    def interp(self):
+        # TODO
+        pass
+
+    def log(self):
         # TODO
         pass
 
