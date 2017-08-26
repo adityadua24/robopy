@@ -508,6 +508,10 @@ class SO3(SuperPose):
         return self.mat
 
     def t_matrix(self):
+        """
+        Returns transformation matrices associated with the pose object.
+        Return data type is list or np.matrix depending on number of transformation matrices present.
+        """
         mat = []
         for each in self:
             mat.append(transforms.r2t(each))
@@ -525,6 +529,63 @@ class SO3(SuperPose):
             return det_list[0]
         elif self.length > 1:
             return det_list
+
+    def norm_vec(self):
+        vec = []
+        for each in self:
+            vec.append(each[:, 0])  # Return first column, x-axis unit vector.
+
+        if self.length == 1:
+            return vec[0]
+        elif self.length > 1:
+            return vec
+
+    def orient_vec(self):
+        vec = []
+        for each in self:
+            vec.append(each[:, 1])  # Return first column, x-axis unit vector.
+
+        if self.length == 1:
+            return vec[0]
+        elif self.length > 1:
+            return vec
+
+    def approach_vec(self):
+        vec = []
+        for each in self:
+            vec.append(each[:, 2])  # Return first column, x-axis unit vector.
+
+        if self.length == 1:
+            return vec[0]
+        elif self.length > 1:
+            return vec
+
+    def trnorm(self):
+        # TODO
+        pass
+
+    def trlog(self):
+        # TODO
+        pass
+
+    def inv(self):
+        inv_mat = []
+        for each in self:
+            inv_mat.append(np.transpose(each))
+        return SO3(inv_mat)
+
+    def eig(self):
+        vec = []
+        mat = []
+        for each in self:
+            v, m = np.linalg.eig(each)
+            vec.append(v)
+            mat.append(m)
+        vec = [np.transpose(np.asmatrix(each)) for each in vec]
+        if self.length == 1:
+            return vec[0], mat[0]
+        elif self.length > 1:
+            return vec, mat
 
 
 # ---------------------------------------------------------------------------------

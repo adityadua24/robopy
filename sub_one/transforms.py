@@ -147,6 +147,7 @@ def rot2(theta, unit='rad'):
     return mat
 
 
+# ---------------------------------------------------------------------------------------#
 def rpy2r(thetas, order='zyx', unit='rad'):
     check_args.unit_check(unit)
     check_args.rpy2r(theta=thetas, order=order)

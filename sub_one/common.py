@@ -4,6 +4,7 @@
 """Common Module contains code shared by robotics and machine vision toolboxes"""
 import numpy as np
 from . import check_args
+import numpy.testing as npt
 
 
 def ishomog(tr, dim, rtest=''):
@@ -44,3 +45,14 @@ def isvec(v, l=3):
     h = d.size == 2 and min(v.shape) == 1 and v.size == l
 
     return h
+
+
+def isrot(rot, dtest=False):
+    err = None
+    if type(rot) is np.matrix:
+        rot = [rot]
+    if type(rot) is list:
+        for each in rot:
+            assert type(each) is np.matrix
+            assert rot.shape == (3, 3)
+            npt.assert_almost_equal(np.linalg.det(each), 1)
