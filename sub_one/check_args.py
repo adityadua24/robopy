@@ -46,6 +46,10 @@ def rpy2r(theta, order):
     pass   # TODO Implement this
 
 
+def np2vtk(mat):
+    pass  # TODO
+
+
 # ------------------------------------------------------
 #                SUPER POSE CHECKS
 # ------------------------------------------------------

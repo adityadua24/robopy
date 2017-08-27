@@ -8,6 +8,8 @@ from . import check_args
 from .super_pose import SuperPose
 from random import uniform, randint
 from . import transforms
+import vtk
+from . import graphics
 
 
 # TODO Implement argument checking for all poses
@@ -514,6 +516,20 @@ class SO3(SuperPose):
     def oa(cls, o, a):
         # TODO
         pass
+
+    def plot(self):
+        pose_se3 = self.se3()
+        ren, renWin, iren = graphics.setupStack()
+        axes = [vtk.vtkAxesActor() for i in range(self.length)]
+
+        vtkMat = [transforms.np2vtk(each) for each in pose_se3]
+        for i in range(len(axes)):
+            axes[i].SetUserMatrix(vtkMat[i])
+            axes[i].SetAxisLabels(0)
+            ren.AddActor(axes[i])
+
+        ren.AddActor(graphics.axesUniversal())
+        graphics.render(ren, renWin, iren)
 
     def rotation(self):
         return self.mat

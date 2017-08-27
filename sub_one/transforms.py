@@ -7,6 +7,7 @@ import numpy as np
 from . import check_args
 from .tests import test_transforms
 import unittest
+import vtk
 
 
 # ---------------------------------------------------------------------------------------#
@@ -188,6 +189,16 @@ def rpy2r(thetas, order='zyx', unit='rad'):
     else:
         raise TypeError('thetas must be a list of roll pitch yaw angles\n'
                         'OR a list of list of roll pitch yaw angles.')
+
+
+# ---------------------------------------------------------------------------------------#
+def np2vtk(mat):
+    if mat.shape == (4, 4):
+        obj = vtk.vtkMatrix4x4()
+        for i in range(4):
+            for j in range(4):
+                obj.SetElement(i, j, mat[i, j])
+        return obj
 
 
 # ---------------------------------------------------------------------------------------#
