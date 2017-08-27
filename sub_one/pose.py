@@ -528,7 +528,8 @@ class SO3(SuperPose):
             axes[i].SetAxisLabels(0)
             ren.AddActor(axes[i])
 
-        ren.AddActor(graphics.axesUniversal())
+        # ren.AddActor(graphics.axesUniversal())
+        ren.AddActor(graphics.axesCube(ren))
         graphics.render(ren, renWin, iren)
 
     def rotation(self):
