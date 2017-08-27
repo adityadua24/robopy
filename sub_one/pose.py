@@ -369,6 +369,7 @@ class SE2(SO2):
         return val
 
     def log(self):
+        # TODO
         pass
 
 
@@ -431,45 +432,50 @@ class SO3(SuperPose):
     @classmethod
     def Rx(cls, theta=0, unit="rad"):
         check_args.unit_check(unit)
-        if unit == 'deg':
-            if type(theta) is float or type(theta) is int:
+        if type(theta) is float or type(theta) is int:
+            if unit == 'deg':
                 theta = theta * math.pi / 180
-                rot = transforms.rotx(theta)
-                obj = cls(args_in=rot)
-            elif type(theta) is list:
+            rot = transforms.rotx(theta)
+            obj = cls(args_in=rot)
+            return obj
+        elif type(theta) is list:
+            if unit == 'deg':
                 theta = [(each * math.pi / 180) for each in theta]
-                rot = [transforms.rotx(each) for each in theta]
-                obj = cls(args_in=rot)
-        return obj
+            rot = [transforms.rotx(each) for each in theta]
+            obj = cls(args_in=rot)
+            return obj
 
     @classmethod
     def Ry(cls, theta=0, unit="rad"):
         check_args.unit_check(unit)
-        if unit == 'deg':
-            if type(theta) is float or type(theta) is int:
+        if type(theta) is float or type(theta) is int:
+            if unit == 'deg':
                 theta = theta * math.pi / 180
-                rot = transforms.roty(theta)
-                obj = cls(args_in=rot)
-            elif type(theta) is list:
+            rot = transforms.roty(theta)
+            obj = cls(args_in=rot)
+            return obj
+        elif type(theta) is list:
+            if unit == 'deg':
                 theta = [(each * math.pi / 180) for each in theta]
-                rot = [transforms.roty(each) for each in theta]
-                obj = cls(args_in=rot)
-        return obj
+            rot = [transforms.roty(each) for each in theta]
+            obj = cls(args_in=rot)
+            return obj
 
     @classmethod
     def Rz(cls, theta=0, unit="rad"):
-        obj = cls(null=True)
         check_args.unit_check(unit)
-        if unit == 'deg':
-            if type(theta) is float or type(theta) is int:
+        if type(theta) is float or type(theta) is int:
+            if unit == 'deg':
                 theta = theta * math.pi / 180
-                rot = transforms.rotz(theta)
-                obj = cls(args_in=rot)
-            elif type(theta) is list:
+            rot = transforms.rotz(theta)
+            obj = cls(args_in=rot)
+            return obj
+        elif type(theta) is list:
+            if unit == 'deg':
                 theta = [(each * math.pi / 180) for each in theta]
-                rot = [transforms.rotz(each) for each in theta]
-                obj = cls(args_in=rot)
-        return obj
+            rot = [transforms.rotz(each) for each in theta]
+            obj = cls(args_in=rot)
+            return obj
 
     @classmethod
     def rand(cls):
@@ -614,6 +620,12 @@ class SO3(SuperPose):
             inv_mat.append(np.transpose(each))
         return SO3(inv_mat)
 
+    def se3(self):
+        pose_se3 = SE3(null=True)
+        for each in self:
+            pose_se3.append(transforms.r2t(each))
+        return pose_se3
+
     def eig(self):
         vec = []
         mat = []
@@ -631,6 +643,10 @@ class SO3(SuperPose):
 # ---------------------------------------------------------------------------------
 class SE3(SO3):
     # ---------------------------------------------------------------------------------
-    pass
+
+    def __init__(self, null=False):
+        self._list = []
+        if null:
+            pass
 
 # ------------------------------------------------------------------------------------
