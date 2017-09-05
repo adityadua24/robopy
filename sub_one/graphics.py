@@ -5,57 +5,57 @@ def setupStack():
     """Sets renderer, renderWindow and renderWindowInteractor with TrackballCamera interaction style. """
     ren = vtk.vtkRenderer()
     ren.SetBackground(0.15, 0.15, 0.15)
-    renWin = vtk.vtkRenderWindow()
-    renWin.AddRenderer(ren)
+    ren_win = vtk.vtkRenderWindow()
+    ren_win.AddRenderer(ren)
     iren = vtk.vtkRenderWindowInteractor()
-    iren.SetRenderWindow(renWin)
+    iren.SetRenderWindow(ren_win)
     iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
-    return ren, renWin, iren
+    return ren, ren_win, iren
 
 
-def render(ren, renWin, iren):
+def render(ren, ren_win, iren):
     ren.ResetCamera()
-    renWin.Render()
+    ren_win.Render()
     iren.Initialize()
     iren.Start()
 
 
 def axesUniversal():
-    axesUni = vtk.vtkAxesActor()
-    axesUni.SetXAxisLabelText("x'")
-    axesUni.SetYAxisLabelText("y'")
-    axesUni.SetZAxisLabelText("z'")
-    axesUni.SetTipTypeToSphere()
-    axesUni.SetShaftTypeToCylinder()
-    axesUni.SetTotalLength(2, 2, 2)
-    axesUni.SetCylinderRadius(0.02)
-    axesUni.SetAxisLabels(0)
-    # axesUni.SetCylinderResolution(40)
-    # axesUni.SetSphereResolution(40)
-    return axesUni
+    axes_uni = vtk.vtkAxesActor()
+    axes_uni.SetXAxisLabelText("x'")
+    axes_uni.SetYAxisLabelText("y'")
+    axes_uni.SetZAxisLabelText("z'")
+    axes_uni.SetTipTypeToSphere()
+    axes_uni.SetShaftTypeToCylinder()
+    axes_uni.SetTotalLength(2, 2, 2)
+    axes_uni.SetCylinderRadius(0.02)
+    axes_uni.SetAxisLabels(0)
+    # axes_uni.SetCylinderResolution(40)
+    # axes_uni.SetSphereResolution(40)
+    return axes_uni
 
 
 def axesCube(ren):
-    cubeAxesActor = vtk.vtkCubeAxesActor()
-    cubeAxesActor.SetBounds(-3, 3, -3, 3,-3, 3)
-    cubeAxesActor.SetCamera(ren.GetActiveCamera())
-    cubeAxesActor.GetTitleTextProperty(0).SetColor(1.0, 0.0, 0.0)
-    cubeAxesActor.GetLabelTextProperty(0).SetColor(1.0, 0.0, 0.0)
+    cube_axes_actor = vtk.vtkCubeAxesActor()
+    cube_axes_actor.SetBounds(-3, 3, -3, 3, -3, 3)
+    cube_axes_actor.SetCamera(ren.GetActiveCamera())
+    cube_axes_actor.GetTitleTextProperty(0).SetColor(1.0, 0.0, 0.0)
+    cube_axes_actor.GetLabelTextProperty(0).SetColor(1.0, 0.0, 0.0)
 
-    cubeAxesActor.GetTitleTextProperty(1).SetColor(0.0, 1.0, 0.0)
-    cubeAxesActor.GetLabelTextProperty(1).SetColor(0.0, 1.0, 0.0)
+    cube_axes_actor.GetTitleTextProperty(1).SetColor(0.0, 1.0, 0.0)
+    cube_axes_actor.GetLabelTextProperty(1).SetColor(0.0, 1.0, 0.0)
 
-    cubeAxesActor.GetTitleTextProperty(2).SetColor(0.0, 0.0, 1.0)
-    cubeAxesActor.GetLabelTextProperty(2).SetColor(0.0, 0.0, 1.0)
+    cube_axes_actor.GetTitleTextProperty(2).SetColor(0.0, 0.0, 1.0)
+    cube_axes_actor.GetLabelTextProperty(2).SetColor(0.0, 0.0, 1.0)
 
-    cubeAxesActor.DrawXGridlinesOff()
-    cubeAxesActor.DrawYGridlinesOff()
-    cubeAxesActor.DrawZGridlinesOff()
+    cube_axes_actor.DrawXGridlinesOff()
+    cube_axes_actor.DrawYGridlinesOff()
+    cube_axes_actor.DrawZGridlinesOff()
 
-    cubeAxesActor.XAxisMinorTickVisibilityOff()
-    cubeAxesActor.YAxisMinorTickVisibilityOff()
-    cubeAxesActor.ZAxisMinorTickVisibilityOff()
+    cube_axes_actor.XAxisMinorTickVisibilityOff()
+    cube_axes_actor.YAxisMinorTickVisibilityOff()
+    cube_axes_actor.ZAxisMinorTickVisibilityOff()
 
-    # cubeAxesActor.SetAxisOrigin(1.5, 1.5, 1.5)
-    cubeAxesActor.SetUseAxisOrigin(1)
-    return cubeAxesActor
+    cube_axes_actor.SetFlyModeToStaticTriad()
+
+    return cube_axes_actor
