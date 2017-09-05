@@ -37,7 +37,7 @@ def axesUniversal():
 
 def axesCube(ren):
     cubeAxesActor = vtk.vtkCubeAxesActor()
-    cubeAxesActor.SetBounds(-1.5, 1.5, -1.5, 1.5,-1.5, 1.5)
+    cubeAxesActor.SetBounds(-3, 3, -3, 3,-3, 3)
     cubeAxesActor.SetCamera(ren.GetActiveCamera())
     cubeAxesActor.GetTitleTextProperty(0).SetColor(1.0, 0.0, 0.0)
     cubeAxesActor.GetLabelTextProperty(0).SetColor(1.0, 0.0, 0.0)
@@ -48,14 +48,14 @@ def axesCube(ren):
     cubeAxesActor.GetTitleTextProperty(2).SetColor(0.0, 0.0, 1.0)
     cubeAxesActor.GetLabelTextProperty(2).SetColor(0.0, 0.0, 1.0)
 
-    cubeAxesActor.DrawXGridlinesOn()
-    cubeAxesActor.DrawYGridlinesOn()
-    cubeAxesActor.DrawZGridlinesOn()
+    cubeAxesActor.DrawXGridlinesOff()
+    cubeAxesActor.DrawYGridlinesOff()
+    cubeAxesActor.DrawZGridlinesOff()
 
     cubeAxesActor.XAxisMinorTickVisibilityOff()
     cubeAxesActor.YAxisMinorTickVisibilityOff()
     cubeAxesActor.ZAxisMinorTickVisibilityOff()
 
-    cubeAxesActor.SetAxisOrigin(1.5, 1.5, 1.5)
+    # cubeAxesActor.SetAxisOrigin(1.5, 1.5, 1.5)
     cubeAxesActor.SetUseAxisOrigin(1)
     return cubeAxesActor

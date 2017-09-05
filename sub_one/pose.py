@@ -536,7 +536,9 @@ class SO3(SuperPose):
         pass
 
     def plot(self):
-        pose_se3 = self.se3()
+        pose_se3 = self
+        if type(self) is SO3:
+            pose_se3 = self.se3()
         ren, renWin, iren = graphics.setupStack()
         axes = [vtk.vtkAxesActor() for i in range(self.length)]
 
@@ -679,9 +681,105 @@ class SO3(SuperPose):
 class SE3(SO3):
     # ---------------------------------------------------------------------------------
 
-    def __init__(self, null=False):
+    def __init__(self, x=None, y=None, z=None, rot=None, so3=None, se3=None, null=False):
         self._list = []
+        self._transl = []
         if null:
             pass
+        elif x is not None and y is not None and z is not None and rot is None and so3 is None and se3 is None:
+            if (type(x) is int or type(x) is float) and (type(y) is int or type(y) is float) and (type(z) is int or type(z) is float):
+                x = [x]
+                y = [y]
+                z = [z]
+            if isinstance(x, list) and isinstance(y, list) and isinstance(z, list):
+                # Assert they are all same length
+                for i in range(len(x)):
+                    self._transl.append((x[i], y[i], z[i]))
+                    rot = transforms.rotx(0)
+                    self._list.append(SE3.form_trans_matrix(rot, (x[i], y[i], z[i])))
+        elif x is not None and y is not None and z is not None and rot is not None and so3 is None and se3 is None:
+            if (type(x) is int or type(x) is float) and \
+                    (type(y) is int or type(y) is float) and \
+                    (type(z) is int or type(z) is float) and \
+                    (type(rot) is np.matrix):
+                x = [x]
+                y = [y]
+                z = [z]
+                rot = [rot]
+            if isinstance(x, list) and isinstance(y, list) and isinstance(z, list) and isinstance(rot, list):
+                for i in range(len(x)):
+                    self._transl.append((x[i], y[i], z[i]))
+                    self._list.append(SE3.form_trans_matrix(rot[i], (x[i], y[i], z[i])))
+        elif x is not None and y is not None and z is not None and rot is None and so3 is not None and se3 is None:
+            if (type(x) is int or type(x) is float) and \
+                    (type(y) is int or type(y) is float) and \
+                    (type(z) is int or type(z) is float) and \
+                    (type(so3) is SO3):
+                x = [x]
+                y = [y]
+                z = [z]
+            if isinstance(x, list) and isinstance(y, list) and isinstance(z, list):
+                for i in range(len(x)):
+                    self._transl.append((x[i], y[i], z[i]))
+                    self._list.append(SE3.form_trans_matrix(so3.data[i], (x[i], y[i], z[i])))
+        elif x is None and y is None and z is None and rot is not None and so3 is None and se3 is None:
+            if type(rot) is np.matrix:
+                rot = [rot]
+            if type(rot) is list:
+                for i in range(len(rot)):
+                    self._transl.append((0, 0, 0))
+                    self._list.append(SE3.form_trans_matrix(rot[i], (0, 0, 0)))
+        elif x is None and y is None and z is None and rot is None and so3 is not None and se3 is None:
+            for each in so3:
+                self._transl.append((0, 0, 0))
+                self._list.append(SE3.form_trans_matrix(each, (0, 0, 0)))
+        elif x is None and y is None and z is None and rot is None and so3 is None and se3 is not None:
+            for i in range(se3.length):
+                self._transl.append(se3.transl[i])
+                self._list.append(se3.data[i])
+        elif x is None and y is None and z is None and rot is None and so3 is None and se3 is None:
+            self._list.append(np.asmatrix(np.eye(4, 4)))
+            self._transl.append((0, 0, 0))
+        else:
+            raise AttributeError("\nINVALID instantiation. Valid scenarios:-\n"
+                                 "- SE3(x, y, z)\n"
+                                 "- SE3(x, y, z, rot)\n"
+                                 "- SE3(x, y, z, so3)\n"
+                                 "- SE3(so3)\n"
+                                 "- SE3(se3)\n"
+                                 "- SE3(rot)\n")
+
+        for i in range(len(self._list)):
+            self._list[i] = np.asmatrix(self._list[i].round(15))
+
+    @property  # transl_vec is dependent on this !
+    def transl(self):
+        return self._transl
+
+    @classmethod
+    def Rx(cls, theta=0, unit="rad", x=None, y=None, z=None):
+        so3 = SO3.Rx(theta, unit)
+        obj = cls(x=x, y=y, z=z, so3=so3)
+        return obj
+
+    @classmethod
+    def Ry(cls, theta=0, unit="rad", x=None, y=None, z=None):
+        so3 = SO3.Ry(theta, unit)
+        obj = cls(x=x, y=y, z=z, so3=so3)
+        return obj
+
+    @classmethod
+    def Rz(cls, theta=0, unit="rad", x=None, y=None, z=None):
+        so3 = SO3.Rz(theta, unit)
+        obj = cls(x=x, y=y, z=z, so3=so3)
+        return obj
+
+    @staticmethod
+    def form_trans_matrix(rot, transl):
+        rot = np.r_[rot, np.matrix([0, 0, 0])]
+        rot = np.c_[rot, np.matrix([[transl[0]], [transl[1]], [transl[2]], [1]])]
+        return rot
+
+
 
 # ------------------------------------------------------------------------------------
