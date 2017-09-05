@@ -447,7 +447,7 @@ class SO3(SuperPose):
             obj = cls(args_in=rot)
             return obj
         else:
-            raise AttributeError("Invalid argument type.\n"
+            raise AttributeError("\nInvalid argument type.\n"
                                  "theta must be of type: \n"
                                  "float, \n"
                                  "int, or \n"
@@ -469,7 +469,7 @@ class SO3(SuperPose):
             obj = cls(args_in=rot)
             return obj
         else:
-            raise AttributeError("Invalid argument type.\n"
+            raise AttributeError("\nInvalid argument type.\n"
                                  "theta must be of type: \n"
                                  "float, \n"
                                  "int, or \n"
@@ -491,7 +491,7 @@ class SO3(SuperPose):
             obj = cls(args_in=rot)
             return obj
         else:
-            raise AttributeError("Invalid argument type.\n"
+            raise AttributeError("\nInvalid argument type.\n"
                                  "theta must be of type: \n"
                                  "float, \n"
                                  "int, or \n"
