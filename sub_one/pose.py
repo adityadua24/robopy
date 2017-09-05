@@ -446,6 +446,12 @@ class SO3(SuperPose):
             rot = [transforms.rotx(each) for each in theta]
             obj = cls(args_in=rot)
             return obj
+        else:
+            raise AttributeError("Invalid argument type.\n"
+                                 "theta must be of type: \n"
+                                 "float, \n"
+                                 "int, or \n"
+                                 "list of float or int")
 
     @classmethod
     def Ry(cls, theta=0, unit="rad"):
@@ -462,6 +468,12 @@ class SO3(SuperPose):
             rot = [transforms.roty(each) for each in theta]
             obj = cls(args_in=rot)
             return obj
+        else:
+            raise AttributeError("Invalid argument type.\n"
+                                 "theta must be of type: \n"
+                                 "float, \n"
+                                 "int, or \n"
+                                 "list of float or int")
 
     @classmethod
     def Rz(cls, theta=0, unit="rad"):
@@ -478,6 +490,12 @@ class SO3(SuperPose):
             rot = [transforms.rotz(each) for each in theta]
             obj = cls(args_in=rot)
             return obj
+        else:
+            raise AttributeError("Invalid argument type.\n"
+                                 "theta must be of type: \n"
+                                 "float, \n"
+                                 "int, or \n"
+                                 "list of float or int")
 
     @classmethod
     def rand(cls):
