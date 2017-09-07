@@ -59,3 +59,30 @@ def axesCube(ren):
     cube_axes_actor.SetFlyModeToStaticTriad()
 
     return cube_axes_actor
+
+
+def axes_x_y():
+    axis_actor_2d_x = vtk.vtkAxisActor2D()
+    axis_actor_2d_y = vtk.vtkAxisActor2D()
+
+    axis_actor_2d_x.SetPoint1(0.2, 0.2)
+    axis_actor_2d_x.SetPoint2(0.2, 0.8)
+    axis_actor_2d_y.SetPoint1(0.2, 0.2)
+    axis_actor_2d_y.SetPoint2(0.8, 0.2)
+
+    axis_actor_2d_x.SetNumberOfMinorTicks(10)
+    axis_actor_2d_y.SetNumberOfMinorTicks(10)
+
+    assemble_x_y = vtk.vtkAssembly()
+    assemble_x_y.AddPart(axis_actor_2d_x)
+    assemble_x_y.AddPart(axis_actor_2d_y)
+
+    return assemble_x_y
+
+
+def axesActor2d():
+    axes = vtk.vtkAxesActor()
+    axes.SetTotalLength(1, 1, 0)
+    axes.SetZAxisLabelText("")
+
+    return axes

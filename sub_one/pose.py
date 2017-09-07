@@ -205,6 +205,18 @@ class SO2(SuperPose):
             new_pose.append(each_matrix)
         return new_pose
 
+    def plot(self):
+        pose_se2 = self
+        if type(self) is SO2:
+            pose_se2 = self.SE2()
+        ren, ren_win, iren = graphics.setupStack()
+
+        axis_x_y = graphics.axes_x_y()
+
+        axes_pose = [graphics.axesActor2d() for each in pose_se2]
+
+        pass
+
 
 # ---------------------------------------------------------------------------------
 class SE2(SO2):
@@ -687,7 +699,8 @@ class SE3(SO3):
         if null:
             pass
         elif x is not None and y is not None and z is not None and rot is None and so3 is None and se3 is None:
-            if (type(x) is int or type(x) is float) and (type(y) is int or type(y) is float) and (type(z) is int or type(z) is float):
+            if (type(x) is int or type(x) is float) and (type(y) is int or type(y) is float) and (
+                    type(z) is int or type(z) is float):
                 x = [x]
                 y = [y]
                 z = [z]
@@ -779,7 +792,5 @@ class SE3(SO3):
         rot = np.r_[rot, np.matrix([0, 0, 0])]
         rot = np.c_[rot, np.matrix([[transl[0]], [transl[1]], [transl[2]], [1]])]
         return rot
-
-
 
 # ------------------------------------------------------------------------------------
