@@ -206,16 +206,38 @@ class SO2(SuperPose):
         return new_pose
 
     def plot(self):
-        pose_se2 = self
+
+        angles = self.angle
+        if type(angles) == int or type(angles) == float:
+            angles = [angles]
+        z = [0, ] * len(angles)
+        x = []
+        y = []
         if type(self) is SO2:
-            pose_se2 = self.SE2()
+            x = [0, ] * len(angles)
+            y = [0, ] * len(angles)
+        elif type(self) is SE2:
+            for each in self.transl:
+                x.append(each[0])
+                y.append(each[1])
+        pose_se3 = SE3.Rz(theta=angles, x=x, y=y, z=z)
+        axes_pose = [graphics.axesActor2d() for each in pose_se3]
+        vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
         ren, ren_win, iren = graphics.setupStack()
+        axis_x_y = graphics.axesCube(ren)
 
-        axis_x_y = graphics.axes_x_y()
+        for i in range(pose_se3.length):
+            axes_pose[i].SetUserMatrix(vtk_mat[i])
+            axes_pose[i].SetAxisLabels(0)
+            ren.AddActor(axes_pose[i])
 
-        axes_pose = [graphics.axesActor2d() for each in pose_se2]
-
-        pass
+        # Set CubeAxisActor in 2D
+        axis_x_y.SetUse2DMode(1)
+        axis_x_y.ZAxisLabelVisibilityOff()
+        axis_x_y.SetAxisOrigin(-3, -3, 0)
+        axis_x_y.SetUseAxisOrigin(1)
+        ren.AddActor2D(axis_x_y)
+        graphics.render(ren, ren_win, iren)
 
 
 # ---------------------------------------------------------------------------------
@@ -551,18 +573,18 @@ class SO3(SuperPose):
         pose_se3 = self
         if type(self) is SO3:
             pose_se3 = self.se3()
-        ren, renWin, iren = graphics.setupStack()
+        ren, ren_win, iren = graphics.setupStack()
         axes = [vtk.vtkAxesActor() for i in range(self.length)]
 
-        vtkMat = [transforms.np2vtk(each) for each in pose_se3]
+        vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
         for i in range(len(axes)):
-            axes[i].SetUserMatrix(vtkMat[i])
+            axes[i].SetUserMatrix(vtk_mat[i])
             axes[i].SetAxisLabels(0)
             ren.AddActor(axes[i])
 
         # ren.AddActor(graphics.axesUniversal())
         ren.AddActor(graphics.axesCube(ren))
-        graphics.render(ren, renWin, iren)
+        graphics.render(ren, ren_win, iren)
 
     def rotation(self):
         return self.mat
@@ -700,7 +722,7 @@ class SE3(SO3):
             pass
         elif x is not None and y is not None and z is not None and rot is None and so3 is None and se3 is None:
             if (type(x) is int or type(x) is float) and (type(y) is int or type(y) is float) and (
-                    type(z) is int or type(z) is float):
+                            type(z) is int or type(z) is float):
                 x = [x]
                 y = [y]
                 z = [z]
@@ -770,19 +792,19 @@ class SE3(SO3):
         return self._transl
 
     @classmethod
-    def Rx(cls, theta=0, unit="rad", x=None, y=None, z=None):
+    def Rx(cls, theta, unit="rad", x=None, y=None, z=None):
         so3 = SO3.Rx(theta, unit)
         obj = cls(x=x, y=y, z=z, so3=so3)
         return obj
 
     @classmethod
-    def Ry(cls, theta=0, unit="rad", x=None, y=None, z=None):
+    def Ry(cls, theta, unit="rad", x=None, y=None, z=None):
         so3 = SO3.Ry(theta, unit)
         obj = cls(x=x, y=y, z=z, so3=so3)
         return obj
 
     @classmethod
-    def Rz(cls, theta=0, unit="rad", x=None, y=None, z=None):
+    def Rz(cls, theta, unit="rad", x=None, y=None, z=None):
         so3 = SO3.Rz(theta, unit)
         obj = cls(x=x, y=y, z=z, so3=so3)
         return obj
