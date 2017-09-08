@@ -1,7 +1,7 @@
 class SerialLink:
     def __init__(self):
         self.links = []
-        self
+        self.q = []  # List of al angles
 
     def fkine(self, q=None):
         # q is vector of real numbers (List of angles)
@@ -23,14 +23,18 @@ class Link:
         self.offset = offset
         # self.type = type
 
+
 class Revolute(Link):
-    def A(cls, q):
+    def A(q):
         # If insiatn
         pass
+
     pass
 
+
 class Prismatic(Link):
-    def A(cls, q):
+    def A(q):
         # If insiatn
         pass
+
     pass
