@@ -10,15 +10,19 @@ class SerialLink:
         self.links = links
         self.q = []  # List of al angles
         self.base = np.asmatrix(np.eye(4, 4))
+        self.tool = np.asmatrix(np.eye(4, 4))
 
     @property
     def length(self):
         return len(self.links)
 
-    def fkine(self, q=None):
+    def fkine(self, q):
         # q is vector of real numbers (List of angles)
-
-        pass
+        t = self.base
+        for i in range(self.length):
+            t = t * self.links[i].A(q[i])
+        t = t * self.tool
+        return t
 
     def plot(self, q=None):
         # PLot the serialLink object
@@ -27,15 +31,16 @@ class SerialLink:
 
 class Link(ABC):
     # Abstract methods
-    def __init__(self, j, theta, d, a, alpha, offset, kind='', mdh=0):
+    def __init__(self, j, theta, d, a, alpha, offset=None, kind='', mdh=0, flip=None):
         self.theta = theta
         self.d = d
-        self.j = j
+        # self.j = j
         self.a = a
         self.alpha = alpha
         self.offset = offset
         self.kind = kind
         self.mdh = mdh
+        self.flip = flip
 
     def A(self, q):
         sa = math.sin(self.alpha)
@@ -44,7 +49,9 @@ class Link(ABC):
             q = -q + self.offset
         else:
             q = q + self.offset
-        st, ct, d = 0
+        st = 0
+        ct = 0
+        d = 0
         if self.kind == 'r':
             st = math.sin(q)
             ct = math.cos(q)
@@ -61,18 +68,18 @@ class Link(ABC):
                                 [0, sa, ca, d],
                                 [0, 0, 0, 1]])
 
-        return pose.SE3(se3=se3_np)
+        return se3_np
 
 
 class Revolute(Link):
     def __init__(self, j, theta, d, a, alpha, offset):
-        super().__init__(j=j, theta=theta, d=d, a=a, offset=offset, kind='r')
+        super().__init__(j=j, theta=theta, d=d, a=a, alpha=alpha, offset=offset, kind='r')
         pass
 
 
 class Prismatic(Link):
     def __init__(self, j, theta, d, a, alpha, offset):
-        super().__init__(j=j, theta=theta, d=d, a=a, offset=offset, kind='p')
+        super().__init__(j=j, theta=theta, d=d, a=a, alpha=alpha, offset=offset, kind='p')
         pass
 
     pass
