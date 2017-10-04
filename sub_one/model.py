@@ -25,6 +25,7 @@ def puma560():
     links.append(link5)
 
     robot = SerialLink(links=links, name='puma 560')
+    # return robot
 
     filenames = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
     readerList = []
@@ -42,10 +43,11 @@ def puma560():
         colorsRGB[i] = list(nc.GetColor3d(colors[i]))
 
     path_prefix = 'C:\\Users\\Aditya Dua\\Documents\\IdeaProjects\\robopy\\sub_one\\media\\puma_560\\'
+    path_prefix_mac = '/Users/eddy/Documents/IdeaProjects/robopy/sub_one/media/puma_560/'
 
     for i in range(len(filenames)):
         readerList[i] = vtk.vtkSTLReader()
-        readerList[i].SetFileName(path_prefix + filenames[i])
+        readerList[i].SetFileName(path_prefix_mac + filenames[i])
         mapperList[i] = vtk.vtkPolyDataMapper()
         mapperList[i].SetInputConnection(readerList[i].GetOutputPort())
         actorList[i] = vtk.vtkActor()
@@ -62,8 +64,8 @@ def puma560():
     t = robot.base
 
     for i in range(robot.length):
-        t = t * robot.links[i].A(qz[i])
         actorList[i].SetUserMatrix(transforms.np2vtk(t))
+        t = t * robot.links[i].A(qz[i])
     t = t * robot.tool
     actorList[6].SetUserMatrix(transforms.np2vtk(t))
 
