@@ -2,6 +2,11 @@ from abc import ABC, abstractmethod
 from . import pose
 import math
 import numpy as np
+import vtk
+from . import transforms
+from . import graphics
+from math import pi
+import os
 
 
 class SerialLink:
@@ -24,9 +29,48 @@ class SerialLink:
         t = t * self.tool
         return t
 
-    def plot(self, q=None):
+    def plot(self, filenames, files_loc, stance_angles):
         # PLot the serialLink object
-        pass
+        reader_list = []
+        actor_list = []
+        mapper_list = []
+        for file in filenames:
+            reader_list.append(0)
+            actor_list.append(0)
+            mapper_list.append(0)
+
+        nc = vtk.vtkNamedColors()
+        colors = ["Red", "DarkGreen", "Blue", "Cyan", "Magenta", "Yellow", "White"]
+        colors_r_g_b = [0] * len(colors)
+        for i in range(len(colors)):
+            colors_r_g_b[i] = list(nc.GetColor3d(colors[i]))
+
+        robopy_dir = os.getcwd()
+        robopy_dir += files_loc
+
+        for i in range(len(filenames)):
+            reader_list[i] = vtk.vtkSTLReader()
+            reader_list[i].SetFileName(robopy_dir + filenames[i])
+            mapper_list[i] = vtk.vtkPolyDataMapper()
+            mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
+            actor_list[i] = vtk.vtkActor()
+            actor_list[i].SetMapper(mapper_list[i])
+            actor_list[i].GetProperty().SetColor(colors_r_g_b[i]) # (R,G,B)
+
+        ren, ren_win, iren = graphics.setupStack()
+
+        t = self.base
+
+        for i in range(self.length):
+            actor_list[i].SetUserMatrix(transforms.np2vtk(t))
+            t = t * self.links[i].A(stance_angles[i])
+        t = t * self.tool
+        actor_list[6].SetUserMatrix(transforms.np2vtk(t))
+
+        for each in actor_list:
+            ren.AddActor(each)
+
+        graphics.render(ren, ren_win, iren)
 
 
 class Link(ABC):
