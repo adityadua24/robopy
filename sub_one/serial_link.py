@@ -25,7 +25,7 @@ class SerialLink:
     def length(self):
         return len(self.links)
 
-    def fkine(self, stance, apply_stance=False, actor_list=None, timer=None):
+    def fkine(self, stance, unit='rad', apply_stance=False, actor_list=None, timer=None):
         # q is vector or matrix of real numbers (List of angles)
         # apply_stance, actor_list are only used for plotting
         # timer is used for animation
@@ -41,7 +41,7 @@ class SerialLink:
             actor_list[self.length].SetUserMatrix(transforms.np2vtk(t))
         return t
 
-    def plot(self, stance):
+    def plot(self, stance, unit='rad'):
         # PLot the serialLink object
         reader_list = []
         actor_list = []
@@ -71,20 +71,21 @@ class SerialLink:
 
         ren, ren_win, iren = graphics.setupStack()
 
-        self.fkine(stance, apply_stance=True, actor_list=actor_list)
+        self.fkine(stance, unit=unit, apply_stance=True, actor_list=actor_list)
 
         for each in actor_list:
             ren.AddActor(each)
 
         graphics.render(ren, ren_win, iren)
 
-    def animate(self, stances, frame_rate=None):
+    def animate(self, stances, unit, frame_rate):
         class vtkTimerCallback():
-            def __init__(self, robot, stances, actors):
+            def __init__(self, robot, stances, unit, actors):
                 self.timer_count = 0
                 self.robot = robot
                 self.stances = stances
                 self.actor_list = actors
+                self.unit = unit
 
             def execute(self, obj, event):
                 print(self.timer_count)
@@ -93,12 +94,10 @@ class SerialLink:
                     obj.DestroyTimer()
                     return
 
-                self.robot.fkine(self.stances, apply_stance=True, actor_list=actor_list, timer=self.timer_count)
+                self.robot.fkine(self.stances, unit=self.unit, apply_stance=True, actor_list=actor_list, timer=self.timer_count)
                 iren = obj
                 iren.GetRenderWindow().Render()
 
-        if frame_rate is None:
-            frame_rate = 25
         reader_list = []
         actor_list = []
         mapper_list = []
@@ -135,7 +134,7 @@ class SerialLink:
         ren.ResetCamera()
         ren_win.Render()
         iren.Initialize()
-        cb = vtkTimerCallback(robot=self, stances=stances, actors=actor_list)
+        cb = vtkTimerCallback(robot=self, stances=stances, unit=unit, actors=actor_list)
         iren.AddObserver('TimerEvent', cb.execute)
         timerId = iren.CreateRepeatingTimer((int)(1000/frame_rate))
         iren.Start()

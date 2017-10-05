@@ -24,7 +24,7 @@ class Puma560(SerialLink):
         links.append(link5)
         super().__init__(links=links, name='puma560')
 
-    def plot(self, stance='qr'):
+    def plot(self, stance='qr', unit='rad'):
         self.file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
         if platform.system() == 'Windows':
             self.files_loc = '\\sub_one\\media\\puma_560\\'
@@ -49,9 +49,16 @@ class Puma560(SerialLink):
         else:
             stance_angles = qr
 
-        super().plot(stance=stance_angles)
+        if unit == 'deg':
+            stance_angles = stance_angles * (pi/180)
+        super().plot(stance=stance_angles, unit=unit)
 
-    def animate(self, stances):
+    def animate(self, stances, unit='rad', frame_rate=None):
+        if frame_rate is None:
+            frame_rate = 25
+        if unit == 'deg':
+            stances = stances * (pi/180)
+
         self.file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
         if platform.system() == 'Windows':
             self.files_loc = '\\sub_one\\media\\puma_560\\'
@@ -64,7 +71,7 @@ class Puma560(SerialLink):
         qn = np.matrix([[0, pi/4, pi, 0, pi/4, 0]])
 
         stance_angles = 0
-        super().animate(stances)
+        super().animate(stances, unit=unit, frame_rate=frame_rate)
 
 
 
