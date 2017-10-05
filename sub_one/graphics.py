@@ -86,3 +86,21 @@ def axesActor2d():
     axes.SetZAxisLabelText("")
 
     return axes
+
+class VtkPipeline():
+    def __init__(self):
+        self.ren = vtk.vtkRenderer()
+        self.ren.SetBackground(0.15, 0.15, 0.15)
+        self.ren_win = vtk.vtkRenderWindow()
+        self.ren_win.AddRenderer(self.ren)
+        self.iren = vtk.vtkRenderWindowInteractor()
+        self.iren.SetRenderWindow(self.ren_win)
+        self.iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
+        self.actor_list = []
+        self.mapper_list = []
+
+    def render(self):
+        self.ren.ResetCamera()
+        self.ren_win.Render()
+        self.iren.Initialize()
+        self.iren.Start()
