@@ -3,9 +3,7 @@
 from .serial_link import SerialLink
 from .serial_link import Revolute
 from math import pi
-from . import graphics
-from . import transforms
-import os
+import numpy as np
 import platform
 
 
@@ -27,17 +25,16 @@ class Puma560(SerialLink):
         super().__init__(links=links, name='puma560')
 
     def plot(self, stance='qr'):
-        filenames = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
-        files_loc = 0
+        self.file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
         if platform.system() == 'Windows':
-            files_loc = '\\sub_one\\media\\puma_560\\'
+            self.files_loc = '\\sub_one\\media\\puma_560\\'
         else:
-            files_loc = '/sub_one/media/puma_560/'
+            self.files_loc = '/sub_one/media/puma_560/'
 
-        qz = [0, 0, 0, 0, 0, 0]
-        qr = [0, pi/2, -pi/2, 0, 0, 0]
-        qs = [0, 0, -pi/2, 0, 0, 0]
-        qn = [0, pi/4, pi, 0, pi/4, 0]
+        qz = np.matrix([[0, 0, 0, 0, 0, 0]])
+        qr = np.matrix([[0, pi/2, -pi/2, 0, 0, 0]])
+        qs = np.matrix([[0, 0, -pi/2, 0, 0, 0]])
+        qn = np.matrix([[0, pi/4, pi, 0, pi/4, 0]])
 
         stance_angles = 0
 
@@ -52,7 +49,22 @@ class Puma560(SerialLink):
         else:
             stance_angles = qr
 
-        super().plot(filenames=filenames, files_loc=files_loc, stance_angles=stance_angles)
+        super().plot(stance=stance_angles)
+
+    def animate(self, stances):
+        self.file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
+        if platform.system() == 'Windows':
+            self.files_loc = '\\sub_one\\media\\puma_560\\'
+        else:
+            self.files_loc = '/sub_one/media/puma_560/'
+
+        qz = np.matrix([[0, 0, 0, 0, 0, 0]])
+        qr = np.matrix([[0, pi/2, -pi/2, 0, 0, 0]])
+        qs = np.matrix([[0, 0, -pi/2, 0, 0, 0]])
+        qn = np.matrix([[0, pi/4, pi, 0, pi/4, 0]])
+
+        stance_angles = 0
+        super().animate(stances)
 
 
 

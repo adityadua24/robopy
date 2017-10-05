@@ -1,3 +1,4 @@
+from __future__ import print_function
 from abc import ABC, abstractmethod
 from . import pose
 import math
@@ -16,25 +17,36 @@ class SerialLink:
         self.q = []  # List of al angles
         self.base = np.asmatrix(np.eye(4, 4))
         self.tool = np.asmatrix(np.eye(4, 4))
+        # Arguments initialised by plot function and animate functions only
+        self.file_names = 0
+        self.files_loc = 0
 
     @property
     def length(self):
         return len(self.links)
 
-    def fkine(self, q):
-        # q is vector of real numbers (List of angles)
+    def fkine(self, stance, apply_stance=False, actor_list=None, timer=None):
+        # q is vector or matrix of real numbers (List of angles)
+        # apply_stance, actor_list are only used for plotting
+        # timer is used for animation
+        if timer is None:
+            timer = 0
         t = self.base
         for i in range(self.length):
-            t = t * self.links[i].A(q[i])
+            if apply_stance:
+                actor_list[i].SetUserMatrix(transforms.np2vtk(t))
+            t = t * self.links[i].A(stance[timer, i])
         t = t * self.tool
+        if apply_stance:
+            actor_list[self.length].SetUserMatrix(transforms.np2vtk(t))
         return t
 
-    def plot(self, filenames, files_loc, stance_angles):
+    def plot(self, stance):
         # PLot the serialLink object
         reader_list = []
         actor_list = []
         mapper_list = []
-        for file in filenames:
+        for file in self.file_names:
             reader_list.append(0)
             actor_list.append(0)
             mapper_list.append(0)
@@ -46,31 +58,87 @@ class SerialLink:
             colors_r_g_b[i] = list(nc.GetColor3d(colors[i]))
 
         robopy_dir = os.getcwd()
-        robopy_dir += files_loc
+        robopy_dir += self.files_loc
 
-        for i in range(len(filenames)):
+        for i in range(len(self.file_names)):
             reader_list[i] = vtk.vtkSTLReader()
-            reader_list[i].SetFileName(robopy_dir + filenames[i])
+            reader_list[i].SetFileName(robopy_dir + self.file_names[i])
             mapper_list[i] = vtk.vtkPolyDataMapper()
             mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
             actor_list[i] = vtk.vtkActor()
             actor_list[i].SetMapper(mapper_list[i])
-            actor_list[i].GetProperty().SetColor(colors_r_g_b[i]) # (R,G,B)
+            actor_list[i].GetProperty().SetColor(colors_r_g_b[i])  # (R,G,B)
 
         ren, ren_win, iren = graphics.setupStack()
 
-        t = self.base
-
-        for i in range(self.length):
-            actor_list[i].SetUserMatrix(transforms.np2vtk(t))
-            t = t * self.links[i].A(stance_angles[i])
-        t = t * self.tool
-        actor_list[6].SetUserMatrix(transforms.np2vtk(t))
+        self.fkine(stance, apply_stance=True, actor_list=actor_list)
 
         for each in actor_list:
             ren.AddActor(each)
 
         graphics.render(ren, ren_win, iren)
+
+    def animate(self, stances, frame_rate=None):
+        class vtkTimerCallback():
+            def __init__(self, robot, stances, actors):
+                self.timer_count = 0
+                self.robot = robot
+                self.stances = stances
+                self.actor_list = actors
+
+            def execute(self, obj, event):
+                print(self.timer_count)
+                self.timer_count += 1
+                if self.timer_count == self.stances.shape[0]:
+                    obj.DestroyTimer()
+                    return
+
+                self.robot.fkine(self.stances, apply_stance=True, actor_list=actor_list, timer=self.timer_count)
+                iren = obj
+                iren.GetRenderWindow().Render()
+
+        if frame_rate is None:
+            frame_rate = 25
+        reader_list = []
+        actor_list = []
+        mapper_list = []
+        for file in self.file_names:
+            reader_list.append(0)
+            actor_list.append(0)
+            mapper_list.append(0)
+
+        nc = vtk.vtkNamedColors()
+        colors = ["Red", "DarkGreen", "Blue", "Cyan", "Magenta", "Yellow", "White"]
+        colors_r_g_b = [0] * len(colors)
+        for i in range(len(colors)):
+            colors_r_g_b[i] = list(nc.GetColor3d(colors[i]))
+
+        robopy_dir = os.getcwd()
+        robopy_dir += self.files_loc
+
+        for i in range(len(self.file_names)):
+            reader_list[i] = vtk.vtkSTLReader()
+            reader_list[i].SetFileName(robopy_dir + self.file_names[i])
+            mapper_list[i] = vtk.vtkPolyDataMapper()
+            mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
+            actor_list[i] = vtk.vtkActor()
+            actor_list[i].SetMapper(mapper_list[i])
+            actor_list[i].GetProperty().SetColor(colors_r_g_b[i])  # (R,G,B)
+
+        ren, ren_win, iren = graphics.setupStack()
+
+        self.fkine(stances, apply_stance=True, actor_list=actor_list)
+
+        for each in actor_list:
+            ren.AddActor(each)
+
+        ren.ResetCamera()
+        ren_win.Render()
+        iren.Initialize()
+        cb = vtkTimerCallback(robot=self, stances=stances, actors=actor_list)
+        iren.AddObserver('TimerEvent', cb.execute)
+        timerId = iren.CreateRepeatingTimer((int)(1000/frame_rate))
+        iren.Start()
 
 
 class Link(ABC):
