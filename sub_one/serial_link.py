@@ -6,6 +6,7 @@ import numpy as np
 import vtk
 from . import transforms
 from . import graphics
+from .graphics import VtkPipeline
 from math import pi
 import os
 
@@ -69,14 +70,14 @@ class SerialLink:
             actor_list[i].SetMapper(mapper_list[i])
             actor_list[i].GetProperty().SetColor(colors_r_g_b[i])  # (R,G,B)
 
-        ren, ren_win, iren = graphics.setupStack()
+        pipeline = VtkPipeline()
 
         self.fkine(stance, unit=unit, apply_stance=True, actor_list=actor_list)
 
         for each in actor_list:
-            ren.AddActor(each)
+            pipeline.add_actor(each)
 
-        graphics.render(ren, ren_win, iren)
+        pipeline.render()
 
     def animate(self, stances, unit, frame_rate):
         class vtkTimerCallback():
@@ -95,8 +96,8 @@ class SerialLink:
                     return
 
                 self.robot.fkine(self.stances, unit=self.unit, apply_stance=True, actor_list=actor_list, timer=self.timer_count)
-                iren = obj
-                iren.GetRenderWindow().Render()
+                pipeline.iren = obj
+                pipeline.iren.GetRenderWindow().Render()
 
         reader_list = []
         actor_list = []
@@ -124,20 +125,20 @@ class SerialLink:
             actor_list[i].SetMapper(mapper_list[i])
             actor_list[i].GetProperty().SetColor(colors_r_g_b[i])  # (R,G,B)
 
-        ren, ren_win, iren = graphics.setupStack()
+        pipeline = VtkPipeline()
 
         self.fkine(stances, apply_stance=True, actor_list=actor_list)
 
         for each in actor_list:
-            ren.AddActor(each)
+            pipeline.add_actor(each)
 
-        ren.ResetCamera()
-        ren_win.Render()
-        iren.Initialize()
-        cb = vtkTimerCallback(robot=self, stances=stances, unit=unit, actors=actor_list)
-        iren.AddObserver('TimerEvent', cb.execute)
-        timerId = iren.CreateRepeatingTimer((int)(1000/frame_rate))
-        iren.Start()
+        pipeline.ren.ResetCamera()
+        pipeline.ren_win.Render()
+        pipeline.iren.Initialize()
+        cb = vtkTimerCallback(robot=self, stances=stances, unit=unit, actors=pipeline.actor_list)
+        pipeline.iren.AddObserver('TimerEvent', cb.execute)
+        timerId = pipeline.iren.CreateRepeatingTimer((int)(1000/frame_rate))
+        pipeline.iren.Start()
 
 
 class Link(ABC):

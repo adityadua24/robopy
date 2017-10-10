@@ -10,6 +10,7 @@ from random import uniform, randint
 from . import transforms
 import vtk
 from . import graphics
+from .graphics import VtkPipeline
 
 
 # TODO Implement argument checking for all poses
@@ -223,21 +224,16 @@ class SO2(SuperPose):
         pose_se3 = SE3.Rz(theta=angles, x=x, y=y, z=z)
         axes_pose = [graphics.axesActor2d() for each in pose_se3]
         vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
-        ren, ren_win, iren = graphics.setupStack()
-        axis_x_y = graphics.axesCube(ren)
+        pipeline = VtkPipeline()
+        axis_x_y = graphics.axes_x_y(pipeline.ren)
 
         for i in range(pose_se3.length):
             axes_pose[i].SetUserMatrix(vtk_mat[i])
             axes_pose[i].SetAxisLabels(0)
-            ren.AddActor(axes_pose[i])
+            pipeline.add_actor(axes_pose[i])
 
-        # Set CubeAxisActor in 2D
-        axis_x_y.SetUse2DMode(1)
-        axis_x_y.ZAxisLabelVisibilityOff()
-        axis_x_y.SetAxisOrigin(-3, -3, 0)
-        axis_x_y.SetUseAxisOrigin(1)
-        ren.AddActor2D(axis_x_y)
-        graphics.render(ren, ren_win, iren)
+        pipeline.add_actor(axis_x_y)
+        pipeline.render()
 
 
 # ---------------------------------------------------------------------------------
@@ -408,6 +404,14 @@ class SE2(SO2):
         # TODO
         pass
 
+    @classmethod
+    def rand(cls):
+        x = uniform(-2, 3)
+        y = uniform(-2, 3)
+        theta = uniform(0, 360)
+        obj = cls(x=x, y=y, theta=theta, unit='deg')
+        return obj
+
 
 # ------------------------------------------------------------------------------------
 
@@ -547,7 +551,6 @@ class SO3(SuperPose):
 
         return obj
 
-
     @classmethod
     def eul(cls, theta=[], unit="rad"):
         if unit == 'deg':
@@ -574,18 +577,16 @@ class SO3(SuperPose):
         pose_se3 = self
         if type(self) is SO3:
             pose_se3 = self.se3()
-        ren, ren_win, iren = graphics.setupStack()
+        pipeline = VtkPipeline()
         axes = [vtk.vtkAxesActor() for i in range(self.length)]
-
         vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
         for i in range(len(axes)):
             axes[i].SetUserMatrix(vtk_mat[i])
             axes[i].SetAxisLabels(0)
-            ren.AddActor(axes[i])
+            pipeline.add_actor(axes[i])
 
-        # ren.AddActor(graphics.axesUniversal())
-        ren.AddActor(graphics.axesCube(ren))
-        graphics.render(ren, ren_win, iren)
+        pipeline.add_actor(graphics.axesCube(pipeline.ren))
+        pipeline.render()
 
     def rotation(self):
         return self.mat
