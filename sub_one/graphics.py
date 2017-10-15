@@ -15,6 +15,7 @@ class VtkPipeline():
 
     def render(self):
         self.ren.ResetCamera()
+        self.set_camera()
         self.ren_win.Render()
         self.iren.Initialize()
         self.iren.Start()
@@ -22,6 +23,12 @@ class VtkPipeline():
     def add_actor(self, actor):
         self.actor_list.append(actor)
         self.ren.AddActor(actor)
+
+    def set_camera(self):
+        cam = self.ren.GetActiveCamera()
+        cam.Roll(-90)
+        cam.Elevation(-90)
+        cam.Zoom(0.6)
 
 
 def axesUniversal():
