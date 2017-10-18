@@ -16,7 +16,7 @@ def ishomog(tr, dim, rtest=''):
     assert dim == [3, 3] or dim == [4, 4]
     is_valid = None
     if rtest == 'valid':
-        is_valid = lambda matrix: abs(np.linalg.det(matrix) - 1) < np.spacing(1)
+        is_valid = lambda matrix: abs(np.linalg.det(matrix) - 1) < np.spacing([1])[0]
     flag = True
     if check_args.is_mat_list(tr):
         for matrix in tr:
@@ -42,17 +42,34 @@ def isvec(v, l=3):
     ISVEC Test if vector
     """
     d = v.shape
-    h = d.size == 2 and min(v.shape) == 1 and v.size == l
+    h = len(d) == 2 and min(v.shape) == 1 and v.size == l
 
     return h
 
 
 def isrot(rot, dtest=False):
-    err = None
     if type(rot) is np.matrix:
         rot = [rot]
     if type(rot) is list:
         for each in rot:
-            assert type(each) is np.matrix
-            assert rot.shape == (3, 3)
-            npt.assert_almost_equal(np.linalg.det(each), 1)
+            try:
+                assert type(each) is np.matrix
+                assert each.shape == (3, 3)
+                npt.assert_almost_equal(np.linalg.det(each), 1)
+            except AssertionError:
+                return False
+    return True
+
+
+def isrot2(rot, dtest=False):
+    if type(rot) is np.matrix:
+        rot = [rot]
+    if type(rot) is list:
+        for each in rot:
+            try:
+                assert type(each) is np.matrix
+                assert each.shape == (2, 2)
+                npt.assert_almost_equal(np.linalg.det(each), 1)
+            except AssertionError:
+                return False
+    return True

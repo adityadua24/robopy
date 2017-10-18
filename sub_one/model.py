@@ -59,6 +59,7 @@ class Puma560(SerialLink):
         if unit == 'deg':
             stances = stances * (pi/180)
 
+        # TODO Intelligent way -> os.path.join()
         self.file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
         if platform.system() == 'Windows':
             self.files_loc = '\\sub_one\\media\\puma_560\\'
@@ -72,12 +73,5 @@ class Puma560(SerialLink):
 
         stance_angles = 0
         super().animate(stances, unit=unit, frame_rate=frame_rate)
-
-
-
-
-
-
-
 
 
