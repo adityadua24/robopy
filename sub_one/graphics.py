@@ -1,7 +1,9 @@
+# Created by: Aditya Dua
+# 18 August 2017
 import vtk
 
 
-class VtkPipeline():
+class VtkPipeline:
     def __init__(self, background=(0.15, 0.15, 0.15)):
         self.ren = vtk.vtkRenderer()
         self.ren.SetBackground(background[0], background[1], background[2])

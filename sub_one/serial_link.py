@@ -1,3 +1,5 @@
+# Created by: Aditya Dua
+# 30 September 2017
 from __future__ import print_function
 from abc import ABC, abstractmethod
 from . import pose

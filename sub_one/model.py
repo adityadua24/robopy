@@ -1,5 +1,5 @@
-# puma560 model
-# page 202, 203
+# Created by: Aditya Dua
+# 5 October 2017
 from .serial_link import SerialLink
 from .serial_link import Revolute
 from math import pi

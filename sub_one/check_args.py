@@ -43,10 +43,22 @@ def is_vector(item):
 # ------------------------------------------------------
 
 def rpy2r(theta, order):
-    pass   # TODO Implement this
+    pass  # TODO Implement this
 
 
 def np2vtk(mat):
+    pass  # TODO
+
+
+def tr2angvec(tr, unit):
+    pass  # TODO
+
+
+def tr2eul(tr, unit, flip):
+    pass  # TODO
+
+
+def tr2rpy(tr, unit, order):
     pass  # TODO
 
 

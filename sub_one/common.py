@@ -48,6 +48,12 @@ def isvec(v, l=3):
 
 
 def isrot(rot, dtest=False):
+    """
+    ISROT Test if SO(2) or SO(3) rotation matrix
+    ISROT(rot) is true if the argument if of dimension 2x2, 2x2xN, 3x3, or 3x3xN, else false (0).
+    ISROT(rot, 'valid') as above, but also checks the validity of the rotation.
+    See also  ISHOMOG, ISROT2, ISVEC.
+    """
     if type(rot) is np.matrix:
         rot = [rot]
     if type(rot) is list:
