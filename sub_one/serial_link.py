@@ -1,15 +1,12 @@
 # Created by: Aditya Dua
 # 30 September 2017
 from __future__ import print_function
-from abc import ABC, abstractmethod
-from . import pose
+from abc import ABC
 import math
 import numpy as np
 import vtk
 from . import transforms
-from . import graphics
 from .graphics import VtkPipeline
-from math import pi
 import os
 
 
@@ -21,7 +18,7 @@ class SerialLink:
         self.base = np.asmatrix(np.eye(4, 4))
         self.tool = np.asmatrix(np.eye(4, 4))
         # Arguments initialised by plot function and animate functions only
-        self.file_names = 0
+        self.file_names = []
         self.files_loc = 0
 
     @property
@@ -137,6 +134,10 @@ class SerialLink:
         pipeline.ren.ResetCamera()
         pipeline.ren_win.Render()
         pipeline.iren.Initialize()
+        cam = pipeline.ren.GetActiveCamera()
+        cam.Roll(-90)
+        cam.Elevation(-90)
+        cam.Zoom(0.6)
         cb = vtkTimerCallback(robot=self, stances=stances, unit=unit, actors=pipeline.actor_list)
         pipeline.iren.AddObserver('TimerEvent', cb.execute)
         timerId = pipeline.iren.CreateRepeatingTimer((int)(1000/frame_rate))
@@ -170,7 +171,7 @@ class Link(ABC):
             st = math.sin(q)
             ct = math.cos(q)
             d = self.d
-        elif self.type == 'p':
+        elif self.kind == 'p':
             st = math.sin(self.theta)
             ct = math.cos(self.theta)
             d = q
