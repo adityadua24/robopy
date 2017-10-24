@@ -1,11 +1,5 @@
- <h1>Introduction</h1>
-The Robotics Toolbox (RTB) (The brainchild of Peter Corke) provides a range of functions that are useful
-
-                        in the study and simulation of classical arm-type robotics including kinematics, dynamics and trajectory
-
-                        generation. The current RTB is designed for use within MATLAB consisting of a range of scripts using
-
-                        .m-files and has been used in a wide range of applications including research and teaching. With
+<h1>Introduction</h1>
+The Robotics Toolbox (RTB) (The brainchild of Peter Corke) provides a range of functions that are useful in the study and simulation of classical arm-type robotics including kinematics, dynamics and trajectory generation. The current RTB is designed for use within MATLAB consisting of a range of scripts using .m-files and has been used in a wide range of applications including research and teaching. With
 
                         the RTB currently in its 10th release the toolbox provides users with mature code, straightforward
 
