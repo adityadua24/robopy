@@ -818,18 +818,21 @@ class SE3(SO3):
         rot = np.c_[rot, np.matrix([[transl[0]], [transl[1]], [transl[2]], [1]])]
         return rot
 
-    @staticmethod
-    def rand():
+    @classmethod
+    def rand(cls):
         ran = randint(1, 3)
         theta = uniform(0, 360)
         x = uniform(-2, 2)
         y = uniform(-2, 2)
         z = uniform(-2, 2)
         if ran == 1:
-            return SE3.Rx(theta, unit='deg', x=x, y=y, z=z)
+            obj = cls.Rx(theta, unit='deg', x=x, y=y, z=z)
+            return obj
         elif ran == 2:
-            return SE3.Ry(theta, unit='deg', x=x, y=y, z=z)
+            obj = cls.Ry(theta, unit='deg', x=x, y=y, z=z)
+            return obj
         elif ran == 3:
-            return SE3.Rz(theta, unit='deg', x=x, y=y, z=z)
+            obj = cls.Rz(theta, unit='deg', x=x, y=y, z=z)
+            return obj
 
 # ------------------------------------------------------------------------------------
