@@ -68,7 +68,7 @@ class SO2(SuperPose):
         """Checks if a np.matrix is a valid SO2 pose."""
         if type(obj) is np.matrix \
                 and obj.shape == (2, 2) \
-                and abs(np.linalg.det(obj) - 1) < np.spacing(1):
+                and abs(np.linalg.det(obj) - 1) < np.spacing([1])[0]:
             return True
         else:
             return False

@@ -120,7 +120,7 @@ def so2_valid(obj):
     assert type(obj) is pose.SO2
     for each in obj:
         assert each.shape == (2, 2)
-        assert abs(np.linalg.det(each) - 1) < np.spacing(1)
+        assert abs(np.linalg.det(each) - 1) < np.spacing([1])[0]
 
 
 def so2_input_matrix(args_in):
