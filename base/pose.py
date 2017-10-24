@@ -119,9 +119,10 @@ class SO2(SuperPose):
                              "- np.matrix (2, 2)\n"
                              "- np.matrix (3, 3)\n")
 
-    @staticmethod
-    def rand():
-        return SO2(uniform(0, 360), 'deg')
+    @classmethod
+    def rand(cls):
+        obj = cls(uniform(0, 360), unit='deg')
+        return obj
 
     @staticmethod
     def exp():
@@ -552,7 +553,7 @@ class SO3(SuperPose):
         return obj
 
     @classmethod
-    def eul(cls, theta=[], unit="rad"):
+    def eul(cls, theta, unit="rad"):
         if unit == 'deg':
             theta = [(each * math.pi / 180) for each in theta]
         z1_rot = transforms.rotz(theta[0])
