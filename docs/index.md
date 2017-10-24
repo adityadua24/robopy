@@ -1,6 +1,5 @@
  <h1>Introduction</h1>
-
-                    <p>The Robotics Toolbox (RTB) (The brainchild of Peter Corke) provides a range of functions that are useful
+The Robotics Toolbox (RTB) (The brainchild of Peter Corke) provides a range of functions that are useful
 
                         in the study and simulation of classical arm-type robotics including kinematics, dynamics and trajectory
 
@@ -34,4 +33,4 @@
 
                         the RTB has suffered and therefor via the porting of the toolbox the code can be re-designed to ensure
 
-                        computational efficiency while maintaining ease of understanding for the user. </p>
+                        computational efficiency while maintaining ease of understanding for the user.
