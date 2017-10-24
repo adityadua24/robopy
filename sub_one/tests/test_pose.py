@@ -12,6 +12,26 @@ from .. import transforms as tr
 from random import uniform
 
 
+class TestSE2(unittest.TestCase):
+    def test_pose_se2_constructor_no_args(self):
+        obj = pose.SE2()
+        exp_mat = np.asmatrix(np.eye(3, 3))
+        rec_mat = obj.data[0]
+        if not matrices_equal(rec_mat, exp_mat, ):
+            output_str = matrix_mismatch_string_builder(rec_mat, exp_mat)
+            self.fail(output_str)
+
+
+class TestSE3(unittest.TestCase):
+    def test_pose_se3_constructor_no_args(self):
+        obj = pose.SE3()
+        exp_mat = np.asmatrix(np.eye(4, 4))
+        rec_mat = obj.data[0]
+        if not matrices_equal(rec_mat, exp_mat, ):
+            output_str = matrix_mismatch_string_builder(rec_mat, exp_mat)
+            self.fail(output_str)
+
+
 class TestSO3(unittest.TestCase):
     # TODO Validate tests on matrices other than identity as well!!
 
@@ -33,7 +53,8 @@ class TestSO3(unittest.TestCase):
         obj2 = pose.SO3(obj1)
         for i in range(obj2.length):
             if not np.array_equal(obj1.data[i], obj2.data[i]):
-                output_str = matrix_mismatch_string_builder(obj2.data[i], obj1.data[i])
+                output_str = matrix_mismatch_string_builder(
+                    obj2.data[i], obj1.data[i])
                 self.fail(output_str)
 
     def test_pose_so3_constructor_so3_list(self):
@@ -53,7 +74,8 @@ class TestSO3(unittest.TestCase):
         obj = pose.SO3(rot_list)
         for i in range(obj.length):
             if not matrices_equal(obj.data[i], rot_list[i], ):
-                output_str = matrix_mismatch_string_builder(obj.data[i], rot_list[i])
+                output_str = matrix_mismatch_string_builder(
+                    obj.data[i], rot_list[i])
                 self.fail(output_str)
 
     def test_pose_so3_constructor_se3_length(self):
@@ -69,7 +91,8 @@ class TestSO3(unittest.TestCase):
             rot_mats.append(tr.t2r(each))
         for i in range(objso3.length):
             if not np.array_equal(rot_mats[i], objso3.data[i]):
-                output_str = matrix_mismatch_string_builder(objso3.data[i], rot_mats[i])
+                output_str = matrix_mismatch_string_builder(
+                    objso3.data[i], rot_mats[i])
                 self.fail(output_str)
 
     def test_pose_so3_constructor_se3_list(self):
@@ -89,7 +112,8 @@ class TestSO3(unittest.TestCase):
         obj = pose.SO3.Rx(theta_list, unit='deg')
         for i in range(obj.length):
             if not matrices_equal(obj.data[i], rotx_list[i], ):
-                output_str = matrix_mismatch_string_builder(obj.data[i], rotx_list[i])
+                output_str = matrix_mismatch_string_builder(
+                    obj.data[i], rotx_list[i])
                 self.fail(output_str)
 
     def test_pose_so3_constructor_ry(self):
@@ -106,7 +130,8 @@ class TestSO3(unittest.TestCase):
         obj = pose.SO3.Ry(theta_list, unit='deg')
         for i in range(obj.length):
             if not matrices_equal(obj.data[i], roty_list[i], ):
-                output_str = matrix_mismatch_string_builder(obj.data[i], roty_list[i])
+                output_str = matrix_mismatch_string_builder(
+                    obj.data[i], roty_list[i])
                 self.fail(output_str)
 
     def test_pose_so3_constructor_rz(self):
@@ -123,7 +148,8 @@ class TestSO3(unittest.TestCase):
         obj = pose.SO3.Rz(theta_list, unit='deg')
         for i in range(obj.length):
             if not matrices_equal(obj.data[i], rotz_list[i], ):
-                output_str = matrix_mismatch_string_builder(obj.data[i], rotz_list[i])
+                output_str = matrix_mismatch_string_builder(
+                    obj.data[i], rotz_list[i])
                 self.fail(output_str)
 
     def test_pose_so3_constructor_rand(self):
@@ -140,7 +166,8 @@ class TestSO3(unittest.TestCase):
         self.fail("Not implemented yet")
 
     def test_pose_so3_constructor_rpy(self):
-        mat = np.matrix([[0.7259, 0.4803, 0.4924], [0.3536, 0.3536, -0.8660], [-0.5900, 0.8027, 0.0868]])
+        mat = np.matrix([[0.7259, 0.4803, 0.4924], [
+            0.3536, 0.3536, -0.8660], [-0.5900, 0.8027, 0.0868]])
         obj = pose.SO3.rpy(thetas=[45, 60, 80], order='camera', unit='deg')
         if not matrices_equal(obj.data[0], mat, decimal=4):
             output_str = matrix_mismatch_string_builder(obj.data[0], mat)
@@ -148,12 +175,15 @@ class TestSO3(unittest.TestCase):
 
     def test_pose_so3_constructor_rpy_list(self):
         mat = [0, 0]
-        mat[0] = np.matrix([[-0.2248, 0.3502, 0.9093], [-0.7637, -0.6429, 0.0587], [0.6051, -0.6812, 0.4120]])
-        mat[1] = np.matrix([[-0.1854, 0.2147, -0.9589], [-0.9018, -0.4248, 0.0793], [-0.3904, 0.8794, 0.2724]])
+        mat[0] = np.matrix([[-0.2248, 0.3502, 0.9093],
+                            [-0.7637, -0.6429, 0.0587], [0.6051, -0.6812, 0.4120]])
+        mat[1] = np.matrix([[-0.1854, 0.2147, -0.9589],
+                            [-0.9018, -0.4248, 0.0793], [-0.3904, 0.8794, 0.2724]])
         obj = pose.SO3.rpy([[1, 2, 3], [4, 5, 6]], order='arm')
         for i in range(obj.length):
             if not matrices_equal(obj.data[i], mat[i], decimal=4):
-                output_str = matrix_mismatch_string_builder(obj.data[i], mat[i])
+                output_str = matrix_mismatch_string_builder(
+                    obj.data[i], mat[i])
                 self.fail(output_str)
 
     def test_pose_so3_constructor_angvec(self):
@@ -192,7 +222,8 @@ class TestSO3(unittest.TestCase):
         rot[1] = tr.rotx(theta=80, unit='deg')
         for i in range(obj.length):
             if not matrices_equal(obj.data[i], rot[i]):
-                output_str = matrix_mismatch_string_builder(obj.data[i], rot[i])
+                output_str = matrix_mismatch_string_builder(
+                    obj.data[i], rot[i])
                 self.fail(output_str)
 
     def test_pose_so3_tr_matrix(self):
@@ -231,6 +262,7 @@ class TestSO3(unittest.TestCase):
 
     def test_pose_so3_static_rpy(self):
         self.fail("Not implemented yet")
+
 
 if __name__ == '__main__':
     unittest.main()
