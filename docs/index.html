@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+        crossorigin="anonymous">
+</head>
+
+<body class="bg-dark text-light">
+    <div class="jumbotron jumbotron-fluid text-dark bg-success">
+        <div class="container">
+            <h1 class="display-3">ROBOPY</h1>
+            <p class="lead">A Python 3 implementation of Peter Corke's Robotics Toolbox</p>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-4 m-auto">
+                <h3 class="text-success">Welcome to Robopy</h3>
+                <p class="text text-light">
+
+                    ROBOPY is a python implimentation of The Robotics Toolbox (RTB) (The brainchild of Peter Corke) for Matlab. The toolbox provides
+                    a range of functions that are useful in the study and simulation of classical arm-type robotics including
+                    kinematics, dynamics and trajectory generation. Via the porting of the toolbox we hope to create greater
+                    access to the toolbox without the need for pricy software subscriptions.
+
+                </p>
+            </div>
+            <div class="col-4">
+                <img src="..." class="rounded float-right" alt="...">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-8 m-auto">
+                <h3 class="text-success">Getting Started</h3>
+                <p>Guide to getting started wiuth the ROBOPY toolbox</p>
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="text-success">Downloading the toolbox</h4>
+                            <p>Robopy is currently only availible for download through the github repositry.
+                                <br> We are working on compling ROBOPY as a package for quciker install in the coming weeks so
+                                keep posted.</p>
+                            The toolbox is availbile for download at the following locations:
+                            <div class="card bg-secondary text-dark mt-2 mb-2" style="width: 20rem;">
+                                <div class="card-body">
+                                    <h4 class="card-title text-light">Github</h4>
+                                    <p class="card-text">A complete download of ROBOPY including docs and all compelted functionality is availible
+                                        by either cloning or downloading a zip via the github.</p>
+                                    <a href="https://github.com/adityadua24/robopy" class="btn btn-success">ROBOPY GITHUB</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="text-success">Installing the toolbox</h4>
+                            <p>Installing the robopy requires the following software:</p>
+                            <div class="card bg-secondary text-dark mt-2 mb-2">
+                                <div class="card-body">
+                                    <h4 class="card-title text-light">Required Software</h4>
+                                    <p class="card-text">
+                                        <ul>
+                                            <li>Python 3 (we recommend anaconda python distribution)</li>
+                                            <li>Python 3.5</li>
+                                        </ul>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="text-success">Using the Toolbox</h4>
+                            <p>Verify you ROBOPY install following these guides to plotting your first model and creating a
+                                rotation matrix. </p>
+                            <div id="Examples" class="row">
+                                <div class="col-sm-12">
+                                    <h3>Getting Started with the toolbox...</h3>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-header text-dark bg-light">
+                                            Create SO3 Object
+                                        </div>
+                                        <div class="card-body bg-dark">
+                                            <h5 class="card-title">1. Import Pose</h5>
+                                            <p class="card-text">
+                                                <kbd>import base.pose as pose</kbd>
+                                            </p>
+                                            <h5 class="card-title">2. Create a SO3 pose using the random constructor</h5>
+                                            <p class="card-text">
+                                                <kbd>x = pose.SO3</kbd>
+                                            </p>
+                                            <h5 class="card-title">3. Display the object</h5>
+                                            <p class="card-text">
+                                                <kbd>x</kbd>
+                                            </p>
+                                            <img class="card-img" src="imgs/SO3.png" alt="Card image cap">
+                                            <br>
+                                            <h5 class="card-title">4. Visualise SO3</h5>
+                                            <p class="card-text">
+                                                <kbd>x.plot()</kbd>
+                                            </p>
+                                            <img class="card-img-top" src="..." alt="Card image cap">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="card">
+                                        <div class="card-header  text-dark bg-light">
+                                            Create rotation matrix
+                                        </div>
+                                        <div class="card-body bg-dark">
+                                            <h5 class="card-title">1. Import tranforms</h5>
+                                            <p class="card-text">
+                                                <kbd>import base.transforms as trans</kbd>
+                                            </p>
+                                            <h5 class="card-title">2. Create rotation matrix around x</h5>
+                                            <p class="card-text">
+                                                <kbd>rot = trans.rotx()</kbd>
+                                            </p>
+                                            <h5 class="card-title">3. Display the object</h5>
+                                            <p class="card-text">
+                                                <kbd>x</kbd>
+                                            </p>
+                                            <img class="card-img-top" src="imgs/rotx.png" alt="Card image cap">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-8 m-auto">
+                <h3 class="text-success mt-4 mb-2">Documentation</h3>
+                <div class="card bg-secondary">
+                        <div class="card-body">
+                                <p class="text text-light">Documentation for the ROBOPY toolbox can be found in the docs folder within the toolbox</p>
+                                <br> Alternativaly if you are reading this from within the docs folder
+                                <a href="robopy_docs.html" class="text-warning">click here </a>to view the documentation.</p>
+                            </div>
+                        </div>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <h3 class="text-success"></h3>
+                        <p>In addition to our documentation on ROBOPY, an abundance of resources are availible for the original
+                            Robitcs toolbox for matlab. Most of these can be found on Peter Corkes
+                            <a class="" href="http://petercorke.com/wordpress/toolboxes/robotics-toolbox">Peter Corkes Website</a>
+                        </p>
+                        The book Robotics, Vision & Control, second edition (Corke, 2017) is a detailed introduction to mobile robotics, navigation,
+                        localization; and arm robot kinematics, Jacobians and dynamics illustrated using the Robotics Toolbox
+                        for MATLAB. While this focusses on the MATLAB toolbox the book is still extremely usefull in understand
+                        ROBOPY.
+                        </div>
+                        <!--<img class="col-4 img-thumbnail" src="http://petercorke.com/wordpress/wp-content/uploads/2016/09/rtb10-724x1024.jpg" alt="Card image cap">-->
+                </div>
+            </div>
+        <div class="row">
+            <div class="col-8 m-auto">
+                <h3 class="text-success">Support</h3>
+                <p>Community pages have been setup to aid in the solving of common issues:
+                    <br>
+                    <a class="btn btn-primary mt-1 mb-1" href="">Facebook Community</a>
+                    <a class="btn btn-success mt-1 mb-1" href="https://robopy.slack.com">Slack Disscussion</a>
+                    <br> Besides the commiuity groups there is no support! This software is made freely availible in the hope
+                    that you find it useful in solving whatever problems you have to hand. We are very happy to accept contributions
+                    for inclusion in future versions of the toolbox, and you will be suitably acknowledged.</p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+
+
+    <div class="container-fluid">
+
+        <div id="download"></div>
+        <div class="row">
+
+        </div>
+
+    </div>
+
+    <div class="container-fluid">
+        <div class="container mx-auto " style="width: 60%;">
+            <div class="row">
+                <div class="col">
+                    Capstone Group 25 | Peter Corke | Aditya Dua | Jack Button | Josh Hodson | Chee Ho Chan
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
