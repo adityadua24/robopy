@@ -470,21 +470,15 @@ class SO3(SuperPose):
     # SO3.eig(e) ?
     # TODO
 
-    @classmethod
-    def Rx(cls, theta=0, unit="rad"):
+    @staticmethod
+    def __RxRyRz(theta, unit):
         check_args.unit_check(unit)
         if type(theta) is float or type(theta) is int:
-            if unit == 'deg':
-                theta = theta * math.pi / 180
-            rot = transforms.rotx(theta)
-            obj = cls(args_in=rot)
-            return obj
-        elif type(theta) is list:
+            theta = [theta]
+        if type(theta) is list:
             if unit == 'deg':
                 theta = [(each * math.pi / 180) for each in theta]
-            rot = [transforms.rotx(each) for each in theta]
-            obj = cls(args_in=rot)
-            return obj
+                return theta
         else:
             raise AttributeError("\nInvalid argument type.\n"
                                  "theta must be of type: \n"
@@ -493,64 +487,32 @@ class SO3(SuperPose):
                                  "list of float or int")
 
     @classmethod
-    def Ry(cls, theta=0, unit="rad"):
-        check_args.unit_check(unit)
-        if type(theta) is float or type(theta) is int:
-            if unit == 'deg':
-                theta = theta * math.pi / 180
-            rot = transforms.roty(theta)
-            obj = cls(args_in=rot)
-            return obj
-        elif type(theta) is list:
-            if unit == 'deg':
-                theta = [(each * math.pi / 180) for each in theta]
-            rot = [transforms.roty(each) for each in theta]
-            obj = cls(args_in=rot)
-            return obj
-        else:
-            raise AttributeError("\nInvalid argument type.\n"
-                                 "theta must be of type: \n"
-                                 "float, \n"
-                                 "int, or \n"
-                                 "list of float or int")
+    def Rx(cls, theta, unit="rad"):
+        theta = SO3.__RxRyRz(theta, unit)
+        rot = [transforms.rotx(each) for each in theta]
+        return cls(args_in=rot)
 
     @classmethod
-    def Rz(cls, theta=0, unit="rad"):
-        check_args.unit_check(unit)
-        if type(theta) is float or type(theta) is int:
-            if unit == 'deg':
-                theta = theta * math.pi / 180
-            rot = transforms.rotz(theta)
-            obj = cls(args_in=rot)
-            return obj
-        elif type(theta) is list:
-            if unit == 'deg':
-                theta = [(each * math.pi / 180) for each in theta]
-            rot = [transforms.rotz(each) for each in theta]
-            obj = cls(args_in=rot)
-            return obj
-        else:
-            raise AttributeError("\nInvalid argument type.\n"
-                                 "theta must be of type: \n"
-                                 "float, \n"
-                                 "int, or \n"
-                                 "list of float or int")
+    def Ry(cls, theta, unit="rad"):
+        theta = SO3.__RxRyRz(theta, unit)
+        rot = [transforms.roty(each) for each in theta]
+        return cls(args_in=rot)
+
+    @classmethod
+    def Rz(cls, theta, unit="rad"):
+        theta = SO3.__RxRyRz(theta, unit)
+        rot = [transforms.rotz(each) for each in theta]
+        return cls(args_in=rot)
 
     @classmethod
     def rand(cls):
-        obj = cls(null=True)
         ran = randint(1, 3)
         if ran == 1:
-            mat = transforms.rotx(uniform(0, 360), unit='deg')
-            obj._list.append(mat)
+            return cls(transforms.rotx(uniform(0, 360), unit='deg'))
         elif ran == 2:
-            mat = transforms.roty(uniform(0, 360), unit='deg')
-            obj._list.append(mat)
+            return cls(transforms.roty(uniform(0, 360), unit='deg'))
         elif ran == 3:
-            mat = transforms.rotz(uniform(0, 360), unit='deg')
-            obj._list.append(mat)
-
-        return obj
+            return cls(transforms.rotz(uniform(0, 360), unit='deg'))
 
     @classmethod
     def eul(cls, theta, unit="rad"):
@@ -560,14 +522,11 @@ class SO3(SuperPose):
         y_rot = transforms.roty(theta[1])
         z2_rot = transforms.rotz(theta[2])
         zyz = z1_rot * y_rot * z2_rot
-        obj = cls(args_in=zyz)
-        return obj
+        return cls(args_in=zyz)
 
     @classmethod
     def rpy(cls, thetas, order='zyx', unit='rad'):
-        rotation = transforms.rpy2r(thetas=thetas, order=order, unit=unit)
-        obj = cls(rotation)
-        return obj
+        return cls(transforms.rpy2r(thetas=thetas, order=order, unit=unit))
 
     @classmethod
     def oa(cls, o, a):
@@ -797,20 +756,17 @@ class SE3(SO3):
     @classmethod
     def Rx(cls, theta, unit="rad", x=None, y=None, z=None):
         so3 = SO3.Rx(theta, unit)
-        obj = cls(x=x, y=y, z=z, so3=so3)
-        return obj
+        return cls(x=x, y=y, z=z, so3=so3)
 
     @classmethod
     def Ry(cls, theta, unit="rad", x=None, y=None, z=None):
         so3 = SO3.Ry(theta, unit)
-        obj = cls(x=x, y=y, z=z, so3=so3)
-        return obj
+        return cls(x=x, y=y, z=z, so3=so3)
 
     @classmethod
     def Rz(cls, theta, unit="rad", x=None, y=None, z=None):
         so3 = SO3.Rz(theta, unit)
-        obj = cls(x=x, y=y, z=z, so3=so3)
-        return obj
+        return cls(x=x, y=y, z=z, so3=so3)
 
     @staticmethod
     def form_trans_matrix(rot, transl):
