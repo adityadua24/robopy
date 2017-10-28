@@ -421,10 +421,10 @@ class SO3(SuperPose):
     # -------------------------------------------------------------------------------
     def __init__(self, args_in=None, null=False):
         """
-        Initialises SO3 object.
-        :param args_in: Can be None or of type: Rotation numpy matrix, se3 object, so3 object or a list of these data types
+        Initialises SO3 object with identity matrix
         :param null: Creates empty objects with no matrices. Mostly for internal use only.
         """
+
         check_args.so3_constructor_args_check(args_in)
         # TODO make sure all list elements are of same data type. !!! Throw TypeError if not
 
@@ -435,23 +435,13 @@ class SO3(SuperPose):
         elif args_in is None and null is False:
             self._list.append(np.asmatrix(np.eye(3, 3)))
         elif type(args_in) is list:
-            if type(args_in[0]) is SE3:  # If first element is se3 - all are.
-                pass
-            elif type(args_in[0]) is SO3:
-                pass
-            elif type(args_in[0]) is np.matrix:
-                for each in args_in:
-                    self._list.append(each)
+            SO3.np(args_in)
         elif type(args_in) is SE3:
-            for each in args_in:
-                each = np.delete(each, [3], axis=0)
-                each = np.delete(each, [3], axis=1)
-                self._list.append(each)
+            SO3.se3(args_in)
         elif type(args_in) is SO3:
-            for each in args_in:
-                self._list.append(each)
+            SO3.so3(args_in)
         elif type(args_in) is np.matrix:
-            self._list.append(args_in)
+            self.np(args_in)
         else:
             raise AttributeError("\n INVALID instantiation. Valid scenarios:\n"
                                  "- SO3()\n"
@@ -466,9 +456,73 @@ class SO3(SuperPose):
         for i in range(len(self._list)):
             self._list[i] = np.asmatrix(self._list[i].round(15))
 
-    # Constructors
-    # SO3.eig(e) ?
-    # TODO
+    @classmethod
+    def so3(cls, args_in):
+        assert type(args_in) is SO3
+        return cls(null=True).__fill(args_in.data)
+
+    @classmethod
+    def se3(cls, args_in):
+        assert type(args_in) is SE3
+        obj = cls(null=True)
+        for each in args_in:
+            obj._list.append(np.delete(np.delete(each, [3], axis=0), [3], axis=1))
+        return obj
+
+    @classmethod
+    def np(cls, args_in):
+        assert type(args_in) is np.matrix or type(args_in) is list
+        if type(args_in) is np.matrix:
+            args_in = [args_in]
+        return cls(null=True).__fill(args_in)
+
+    @classmethod
+    def Rx(cls, theta, unit="rad"):
+        theta = cls.__RxRyRz(theta, unit)
+        rot = [transforms.rotx(each) for each in theta]
+        return cls(null=True).__fill(rot)
+
+    @classmethod
+    def Ry(cls, theta, unit="rad"):
+        theta = cls.__RxRyRz(theta, unit)
+        rot = [transforms.roty(each) for each in theta]
+        return cls(null=True).__fill(rot)
+
+    @classmethod
+    def Rz(cls, theta, unit="rad"):
+        theta = cls.__RxRyRz(theta, unit)
+        rot = [transforms.rotz(each) for each in theta]
+        return cls(null=True).__fill(rot)
+
+    @classmethod
+    def rand(cls):
+        ran = randint(1, 3)
+        if ran == 1:
+            rot = transforms.rotx(uniform(0, 360), unit='deg')
+            return cls(null=True).__fill([transforms.rotx(uniform(0, 360), unit='deg')])
+        elif ran == 2:
+            return cls(null=True).__fill([transforms.roty(uniform(0, 360), unit='deg')])
+        elif ran == 3:
+            return cls(null=True).__fill([transforms.rotz(uniform(0, 360), unit='deg')])
+
+    @classmethod
+    def eul(cls, theta, unit="rad"):
+        if unit == 'deg':
+            theta = [(each * math.pi / 180) for each in theta]
+        z1_rot = transforms.rotz(theta[0])
+        y_rot = transforms.roty(theta[1])
+        z2_rot = transforms.rotz(theta[2])
+        zyz = z1_rot * y_rot * z2_rot
+        return cls(null=True).__fill([zyz])
+
+    @classmethod
+    def rpy(cls, thetas, order='zyx', unit='rad'):
+        return cls(null=True).__fill([transforms.rpy2r(thetas=thetas, order=order, unit=unit)])
+
+    @classmethod
+    def oa(cls, o, a):
+        # TODO
+        pass
 
     @staticmethod
     def __RxRyRz(theta, unit):
@@ -479,6 +533,8 @@ class SO3(SuperPose):
             if unit == 'deg':
                 theta = [(each * math.pi / 180) for each in theta]
                 return theta
+            else:
+                return theta
         else:
             raise AttributeError("\nInvalid argument type.\n"
                                  "theta must be of type: \n"
@@ -486,57 +542,21 @@ class SO3(SuperPose):
                                  "int, or \n"
                                  "list of float or int")
 
-    @classmethod
-    def Rx(cls, theta, unit="rad"):
-        theta = SO3.__RxRyRz(theta, unit)
-        rot = [transforms.rotx(each) for each in theta]
-        return cls(args_in=rot)
+    def __fill(self, data):
+        for each in data:
+            self._list.append(each)
+        return self
 
-    @classmethod
-    def Ry(cls, theta, unit="rad"):
-        theta = SO3.__RxRyRz(theta, unit)
-        rot = [transforms.roty(each) for each in theta]
-        return cls(args_in=rot)
-
-    @classmethod
-    def Rz(cls, theta, unit="rad"):
-        theta = SO3.__RxRyRz(theta, unit)
-        rot = [transforms.rotz(each) for each in theta]
-        return cls(args_in=rot)
-
-    @classmethod
-    def rand(cls):
-        ran = randint(1, 3)
-        if ran == 1:
-            return cls(transforms.rotx(uniform(0, 360), unit='deg'))
-        elif ran == 2:
-            return cls(transforms.roty(uniform(0, 360), unit='deg'))
-        elif ran == 3:
-            return cls(transforms.rotz(uniform(0, 360), unit='deg'))
-
-    @classmethod
-    def eul(cls, theta, unit="rad"):
-        if unit == 'deg':
-            theta = [(each * math.pi / 180) for each in theta]
-        z1_rot = transforms.rotz(theta[0])
-        y_rot = transforms.roty(theta[1])
-        z2_rot = transforms.rotz(theta[2])
-        zyz = z1_rot * y_rot * z2_rot
-        return cls(args_in=zyz)
-
-    @classmethod
-    def rpy(cls, thetas, order='zyx', unit='rad'):
-        return cls(transforms.rpy2r(thetas=thetas, order=order, unit=unit))
-
-    @classmethod
-    def oa(cls, o, a):
-        # TODO
-        pass
+    def to_se3(self):
+        pose_se3 = SE3(null=True)
+        for each in self:
+            pose_se3.append(transforms.r2t(each))
+        return pose_se3
 
     def plot(self):
         pose_se3 = self
         if type(self) is SO3:
-            pose_se3 = self.se3()
+            pose_se3 = self.to_se3()
         pipeline = VtkPipeline()
         axes = [vtk.vtkAxesActor() for i in range(self.length)]
         vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
@@ -651,13 +671,7 @@ class SO3(SuperPose):
         inv_mat = []
         for each in self:
             inv_mat.append(np.transpose(each))
-        return SO3(inv_mat)
-
-    def se3(self):
-        pose_se3 = SE3(null=True)
-        for each in self:
-            pose_se3.append(transforms.r2t(each))
-        return pose_se3
+        return SO3.np(inv_mat)
 
     def eig(self):
         vec = []
@@ -782,13 +796,10 @@ class SE3(SO3):
         y = uniform(-2, 2)
         z = uniform(-2, 2)
         if ran == 1:
-            obj = cls.Rx(theta, unit='deg', x=x, y=y, z=z)
-            return obj
+            return cls.Rx(theta, unit='deg', x=x, y=y, z=z)
         elif ran == 2:
-            obj = cls.Ry(theta, unit='deg', x=x, y=y, z=z)
-            return obj
+            return cls.Ry(theta, unit='deg', x=x, y=y, z=z)
         elif ran == 3:
-            obj = cls.Rz(theta, unit='deg', x=x, y=y, z=z)
-            return obj
+            return cls.Rz(theta, unit='deg', x=x, y=y, z=z)
 
 # ------------------------------------------------------------------------------------
