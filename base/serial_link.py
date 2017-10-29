@@ -7,7 +7,7 @@ import numpy as np
 import vtk
 from . import transforms
 from .graphics import VtkPipeline
-import os
+import pkg_resources
 
 
 class SerialLink:
@@ -19,7 +19,6 @@ class SerialLink:
         self.tool = np.asmatrix(np.eye(4, 4))
         # Arguments initialised by plot function and animate functions only
         self.file_names = []
-        self.files_loc = 0
 
     @property
     def length(self):
@@ -46,7 +45,7 @@ class SerialLink:
         reader_list = []
         actor_list = []
         mapper_list = []
-        for file in self.file_names:
+        for i in range(len(self.file_names)):
             reader_list.append(0)
             actor_list.append(0)
             mapper_list.append(0)
@@ -57,17 +56,7 @@ class SerialLink:
         for i in range(len(colors)):
             colors_r_g_b[i] = list(nc.GetColor3d(colors[i]))
 
-        robopy_dir = os.getcwd()
-        robopy_dir += self.files_loc
-
-        for i in range(len(self.file_names)):
-            reader_list[i] = vtk.vtkSTLReader()
-            reader_list[i].SetFileName(robopy_dir + self.file_names[i])
-            mapper_list[i] = vtk.vtkPolyDataMapper()
-            mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
-            actor_list[i] = vtk.vtkActor()
-            actor_list[i].SetMapper(mapper_list[i])
-            actor_list[i].GetProperty().SetColor(colors_r_g_b[i])  # (R,G,B)
+        self.__setup_pipeline_objs(actor_list, colors_r_g_b, mapper_list, reader_list)
 
         pipeline = VtkPipeline()
 
@@ -77,6 +66,17 @@ class SerialLink:
             pipeline.add_actor(each)
 
         pipeline.render()
+
+    def __setup_pipeline_objs(self, actor_list, colors_r_g_b, mapper_list, reader_list):
+        for i in range(len(self.file_names)):
+            reader_list[i] = vtk.vtkSTLReader()
+            loc = pkg_resources.resource_filename(__name__, '/'.join(('media', 'puma_560', self.file_names[i])))
+            reader_list[i].SetFileName(loc)
+            mapper_list[i] = vtk.vtkPolyDataMapper()
+            mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
+            actor_list[i] = vtk.vtkActor()
+            actor_list[i].SetMapper(mapper_list[i])
+            actor_list[i].GetProperty().SetColor(colors_r_g_b[i])  # (R,G,B)
 
     def animate(self, stances, unit, frame_rate):
         class vtkTimerCallback():
@@ -101,7 +101,7 @@ class SerialLink:
         reader_list = []
         actor_list = []
         mapper_list = []
-        for file in self.file_names:
+        for i in range(len(self.file_names)):
             reader_list.append(0)
             actor_list.append(0)
             mapper_list.append(0)
@@ -112,17 +112,7 @@ class SerialLink:
         for i in range(len(colors)):
             colors_r_g_b[i] = list(nc.GetColor3d(colors[i]))
 
-        robopy_dir = os.getcwd()
-        robopy_dir += self.files_loc
-
-        for i in range(len(self.file_names)):
-            reader_list[i] = vtk.vtkSTLReader()
-            reader_list[i].SetFileName(robopy_dir + self.file_names[i])
-            mapper_list[i] = vtk.vtkPolyDataMapper()
-            mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
-            actor_list[i] = vtk.vtkActor()
-            actor_list[i].SetMapper(mapper_list[i])
-            actor_list[i].GetProperty().SetColor(colors_r_g_b[i])  # (R,G,B)
+        self.__setup_pipeline_objs(actor_list, colors_r_g_b, mapper_list, reader_list)
 
         pipeline = VtkPipeline()
 

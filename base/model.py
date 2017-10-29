@@ -4,7 +4,6 @@ from .serial_link import SerialLink
 from .serial_link import Revolute
 from math import pi
 import numpy as np
-import platform
 
 
 class Puma560(SerialLink):
@@ -26,10 +25,6 @@ class Puma560(SerialLink):
 
     def plot(self, stance='qr', unit='rad'):
         self.file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
-        if platform.system() == 'Windows':
-            self.files_loc = '\\base\\media\\puma_560\\'
-        else:
-            self.files_loc = '/base/media/puma_560/'
 
         qz = np.matrix([[0, 0, 0, 0, 0, 0]])
         qr = np.matrix([[0, pi/2, -pi/2, 0, 0, 0]])
@@ -61,10 +56,6 @@ class Puma560(SerialLink):
 
         # TODO Intelligent way -> os.path.join()
         self.file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
-        if platform.system() == 'Windows':
-            self.files_loc = '\\base\\media\\puma_560\\'
-        else:
-            self.files_loc = '/base/media/puma_560/'
 
         qz = np.matrix([[0, 0, 0, 0, 0, 0]])
         qr = np.matrix([[0, pi/2, -pi/2, 0, 0, 0]])
