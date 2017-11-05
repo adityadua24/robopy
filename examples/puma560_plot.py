@@ -1,4 +1,10 @@
 import robopy.base.model as model
 
-robot = model.Puma560()
-robot.plot('qn')
+
+def main():
+    robot = model.Puma560()
+    robot.plot('qn')
+
+
+if __name__ == '__main__':
+    main()
