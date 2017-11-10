@@ -7,22 +7,38 @@ import numpy as np
 import vtk
 from . import transforms
 from .graphics import VtkPipeline
+from .graphics import axesCube
+from .graphics import vtk_colors
 import pkg_resources
 
 
 class SerialLink:
-    def __init__(self, links, name=None, base=None):
+    def __init__(self, links, name=None, base=None, stl_files=None, q=None, colors=None):
         # Argument checks
         self.links = links
-        self.q = []  # List of al angles
-        self.base = np.asmatrix(np.eye(4, 4))
+        if q is None:
+            q = [0 for each in links]
+        if base is None:
+            self.base = np.asmatrix(np.eye(4, 4))
+        else:
+            assert type(base) is np.matrix
+            assert base.shape == (4, 4)
+            self.base = base
         self.tool = np.asmatrix(np.eye(4, 4))
         # Arguments initialised by plot function and animate functions only
-        self.file_names = []
+        if stl_files is None:
+            # Default stick figure model code goes here
+            pass
+        else:
+            self.stl_files = stl_files
         if name is None:
             self.name = ''
         else:
             self.name = name
+        if colors is None:
+            self.colors = vtk_colors(["Grey"] * len(links))
+        else:
+            self.colors = colors
 
     @property
     def length(self):
@@ -46,22 +62,8 @@ class SerialLink:
 
     def plot(self, stance, unit='rad'):
         # PLot the serialLink object
-        reader_list = []
-        actor_list = []
-        mapper_list = []
-        for i in range(len(self.file_names)):
-            reader_list.append(0)
-            actor_list.append(0)
-            mapper_list.append(0)
 
-        nc = vtk.vtkNamedColors()
-        colors = ["Red", "DarkGreen", "Blue", "Cyan", "Magenta", "Yellow", "White"]
-        colors_r_g_b = [0] * len(colors)
-        for i in range(len(colors)):
-            colors_r_g_b[i] = list(nc.GetColor3d(colors[i]))
-
-        self.__setup_pipeline_objs(actor_list, colors_r_g_b, mapper_list, reader_list)
-
+        reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
         pipeline = VtkPipeline()
 
         self.fkine(stance, unit=unit, apply_stance=True, actor_list=actor_list)
@@ -69,20 +71,27 @@ class SerialLink:
         for each in actor_list:
             pipeline.add_actor(each)
 
+        cube_axes = axesCube(pipeline.ren)
+        pipeline.add_actor(cube_axes)
         pipeline.render()
 
-    def __setup_pipeline_objs(self, actor_list, colors_r_g_b, mapper_list, reader_list):
-        for i in range(len(self.file_names)):
+    def __setup_pipeline_objs(self):
+        reader_list = [0] * len(self.stl_files)
+        actor_list = [0] * len(self.stl_files)
+        mapper_list = [0] * len(self.stl_files)
+        for i in range(len(self.stl_files)):
             reader_list[i] = vtk.vtkSTLReader()
-            loc = pkg_resources.resource_filename(__name__, '/'.join(('media', self.name, self.file_names[i])))
+            loc = pkg_resources.resource_filename(__name__, '/'.join(('media', self.name, self.stl_files[i])))
             reader_list[i].SetFileName(loc)
             mapper_list[i] = vtk.vtkPolyDataMapper()
             mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
             actor_list[i] = vtk.vtkActor()
             actor_list[i].SetMapper(mapper_list[i])
-            actor_list[i].GetProperty().SetColor(colors_r_g_b[i])  # (R,G,B)
+            actor_list[i].GetProperty().SetColor(self.colors[i])  # (R,G,B)
 
-    def animate(self, stances, unit, frame_rate):
+        return reader_list, actor_list, mapper_list
+
+    def animate(self, stances, unit='rad', frame_rate=25):
         class vtkTimerCallback():
             def __init__(self, robot, stances, unit, actors):
                 self.timer_count = 0
@@ -103,22 +112,10 @@ class SerialLink:
                 pipeline.iren = obj
                 pipeline.iren.GetRenderWindow().Render()
 
-        reader_list = []
-        actor_list = []
-        mapper_list = []
-        for i in range(len(self.file_names)):
-            reader_list.append(0)
-            actor_list.append(0)
-            mapper_list.append(0)
+        if unit == 'deg':
+            stances = stances * (math.pi / 180)
 
-        nc = vtk.vtkNamedColors()
-        colors = ["Red", "DarkGreen", "Blue", "Cyan", "Magenta", "Yellow", "White"]
-        colors_r_g_b = [0] * len(colors)
-        for i in range(len(colors)):
-            colors_r_g_b[i] = list(nc.GetColor3d(colors[i]))
-
-        self.__setup_pipeline_objs(actor_list, colors_r_g_b, mapper_list, reader_list)
-
+        reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
         pipeline = VtkPipeline()
 
         self.fkine(stances, apply_stance=True, actor_list=actor_list)
@@ -126,13 +123,13 @@ class SerialLink:
         for each in actor_list:
             pipeline.add_actor(each)
 
+        cube_axes = axesCube(pipeline.ren)
+        pipeline.add_actor(cube_axes)
+
         pipeline.ren.ResetCamera()
         pipeline.ren_win.Render()
         pipeline.iren.Initialize()
-        cam = pipeline.ren.GetActiveCamera()
-        cam.Roll(-90)
-        cam.Elevation(-90)
-        cam.Zoom(0.6)
+
         cb = vtkTimerCallback(robot=self, stances=stances, unit=unit, actors=pipeline.actor_list)
         pipeline.iren.AddObserver('TimerEvent', cb.execute)
         timerId = pipeline.iren.CreateRepeatingTimer((int)(1000 / frame_rate))

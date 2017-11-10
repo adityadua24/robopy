@@ -17,7 +17,7 @@ class VtkPipeline:
 
     def render(self):
         self.ren.ResetCamera()
-        self.set_camera()
+        # self.set_camera()
         self.ren_win.Render()
         self.iren.Initialize()
         self.iren.Start()
@@ -89,3 +89,17 @@ def axesActor2d():
     axes.SetZAxisLabelText("")
 
     return axes
+
+
+def vtk_colors(colors):
+    """
+    Returns a list of vtk colors
+    :param colors: List of color names supported by vtk
+    :return: A list of vtk colors
+    """
+    if type(colors) is not list:
+        colors = [colors]
+    colors_rgb = [0] * len(colors)
+    for i in range(len(colors)):
+        colors_rgb[i] = list(vtk.vtkNamedColors().GetColor3d(colors[i]))
+    return colors_rgb
