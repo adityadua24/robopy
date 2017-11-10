@@ -1,8 +1,8 @@
 ROBOPY
 ======
 [![Build Status](https://travis-ci.org/adityadua24/robopy.svg?branch=master)](https://travis-ci.org/adityadua24/robopy)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![PyPI version](https://badge.fury.io/py/robopy.svg)](https://badge.fury.io/py/robopy)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 A Python 3 implementation of Peter Corke's Robotics Toolbox
 - **Website:** https://adityadua24.github.io/robopy/

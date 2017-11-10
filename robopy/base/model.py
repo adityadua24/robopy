@@ -21,7 +21,7 @@ class Puma560(SerialLink):
         links.append(link4)
         link5 = Revolute(d=0, a=0, alpha=0, j=0, theta=0, offset=0)
         links.append(link5)
-        super().__init__(links=links, name='puma560')
+        super().__init__(links=links, name='puma_560')
 
     def plot(self, stance='qr', unit='rad'):
         self.file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]

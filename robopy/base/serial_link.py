@@ -19,6 +19,10 @@ class SerialLink:
         self.tool = np.asmatrix(np.eye(4, 4))
         # Arguments initialised by plot function and animate functions only
         self.file_names = []
+        if name is None:
+            self.name = ''
+        else:
+            self.name = name
 
     @property
     def length(self):
@@ -70,7 +74,7 @@ class SerialLink:
     def __setup_pipeline_objs(self, actor_list, colors_r_g_b, mapper_list, reader_list):
         for i in range(len(self.file_names)):
             reader_list[i] = vtk.vtkSTLReader()
-            loc = pkg_resources.resource_filename(__name__, '/'.join(('media', 'puma_560', self.file_names[i])))
+            loc = pkg_resources.resource_filename(__name__, '/'.join(('media', self.name, self.file_names[i])))
             reader_list[i].SetFileName(loc)
             mapper_list[i] = vtk.vtkPolyDataMapper()
             mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
@@ -94,7 +98,8 @@ class SerialLink:
                     obj.DestroyTimer()
                     return
 
-                self.robot.fkine(self.stances, unit=self.unit, apply_stance=True, actor_list=actor_list, timer=self.timer_count)
+                self.robot.fkine(self.stances, unit=self.unit, apply_stance=True, actor_list=actor_list,
+                                 timer=self.timer_count)
                 pipeline.iren = obj
                 pipeline.iren.GetRenderWindow().Render()
 
@@ -130,7 +135,7 @@ class SerialLink:
         cam.Zoom(0.6)
         cb = vtkTimerCallback(robot=self, stances=stances, unit=unit, actors=pipeline.actor_list)
         pipeline.iren.AddObserver('TimerEvent', cb.execute)
-        timerId = pipeline.iren.CreateRepeatingTimer((int)(1000/frame_rate))
+        timerId = pipeline.iren.CreateRepeatingTimer((int)(1000 / frame_rate))
         pipeline.iren.Start()
 
 
