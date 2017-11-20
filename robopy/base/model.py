@@ -15,12 +15,12 @@ class Puma560(SerialLink):
                   'qs': np.matrix([[0, 0, -pi / 2, 0, 0, 0]]),
                   'qn': np.matrix([[0, pi / 4, pi, 0, pi / 4, 0]])}
 
-        links = [Revolute(d=0, a=0, alpha=pi / 2, j=0, theta=0, offset=0),
-                 Revolute(d=0, a=0.4318, alpha=0, j=0, theta=0, offset=0),
-                 Revolute(d=0.15005, a=0.0203, alpha=-pi / 2, j=0, theta=0, offset=0),
-                 Revolute(d=0.4318, a=0, alpha=pi / 2, j=0, theta=0, offset=0),
-                 Revolute(d=0, a=0, alpha=-pi / 2, j=0, theta=0, offset=0),
-                 Revolute(d=0, a=0, alpha=0, j=0, theta=0, offset=0)]
+        links = [Revolute(d=0, a=0, alpha=pi / 2, j=0, theta=0, offset=0, qlim=(-160*pi/180, 160*pi/180)),
+                 Revolute(d=0, a=0.4318, alpha=0, j=0, theta=0, offset=0, qlim=(-45*pi/180, 225*pi/180)),
+                 Revolute(d=0.15005, a=0.0203, alpha=-pi / 2, j=0, theta=0, offset=0, qlim=(-225*pi/180, 45*pi/180)),
+                 Revolute(d=0.4318, a=0, alpha=pi / 2, j=0, theta=0, offset=0, qlim=(-110*pi/180, 170*pi/180)),
+                 Revolute(d=0, a=0, alpha=-pi / 2, j=0, theta=0, offset=0, qlim=(-100*pi/180, 100*pi/180)),
+                 Revolute(d=0, a=0, alpha=0, j=0, theta=0, offset=0, qlim=(-226*pi/180, 226*pi/180))]
 
         base_matrix = tr.trotx(-90, unit='deg')
         file_names = ["link0.stl", "link1.stl", "link2.stl", "link3.stl", "link4.stl", "link5.stl", "link6.stl"]
@@ -37,4 +37,4 @@ class Puma560(SerialLink):
         else:
             raise AttributeError("Type of stance must be numpy matrix of dim (1, n).\n Or you could pass one of the "
                                  "default stances")
-        super().plot(stance=stance, unit=unit)
+        super().plot(stance=stance)
