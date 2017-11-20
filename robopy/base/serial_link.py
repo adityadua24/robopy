@@ -10,6 +10,7 @@ from .graphics import VtkPipeline
 from .graphics import axesCube
 from .graphics import vtk_colors
 import pkg_resources
+from scipy.optimize import minimize
 
 
 class SerialLink:
@@ -40,6 +41,9 @@ class SerialLink:
         else:
             self.colors = colors
 
+    def __iter__(self):
+        return (each for each in self.links)
+
     @property
     def length(self):
         return len(self.links)
@@ -48,6 +52,10 @@ class SerialLink:
         # q is vector or matrix of real numbers (List of angles)
         # apply_stance, actor_list are only used for plotting
         # timer is used for animation
+        if type(stance) is np.ndarray:
+            stance = np.asmatrix(stance)
+        if unit == 'deg':
+            stance = stance * math.pi / 180
         if timer is None:
             timer = 0
         t = self.base
@@ -60,13 +68,40 @@ class SerialLink:
             actor_list[self.length].SetUserMatrix(transforms.np2vtk(t))
         return t
 
+    def ikine(self, end_effector, q0=None, unit='rad'):
+        assert type(end_effector) is np.matrix and end_effector.shape == (4, 4)
+        bounds = [(link.qlim[0], link.qlim[1]) for link in self]
+        print(bounds)
+        print('\nlength of bounds is: ', len(bounds))
+        # print(upper_bound, lower_bound)
+        print('\n\n')
+        reach = 0
+        for link in self:
+            reach += abs(link.a) + abs(link.d)
+        omega = np.diag([1, 1, 1, 3 / reach])
+        if q0 is None:
+            q0 = np.asmatrix(np.zeros((1, self.length)))
+
+        def objective(x):
+            return (
+                np.square((np.linalg.lstsq(end_effector, self.fkine(x))[0]) - np.asmatrix(np.eye(4, 4)) * omega)).sum()
+
+        print('length of bounds: ', len(bounds))
+        print('minimising objective: ', objective(q0))
+
+        sol = minimize(objective, x0=q0, bounds=bounds)
+        print(sol.x)
+        print(type(sol.x))
+        return np.asmatrix(sol.x)
+
     def plot(self, stance, unit='rad'):
         # PLot the serialLink object
-
+        if unit == 'deg':
+            stance = stance * math.pi / 180
         reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
         pipeline = VtkPipeline()
 
-        self.fkine(stance, unit=unit, apply_stance=True, actor_list=actor_list)
+        self.fkine(stance, apply_stance=True, actor_list=actor_list)
 
         for each in actor_list:
             pipeline.add_actor(each)
@@ -138,7 +173,7 @@ class SerialLink:
 
 class Link(ABC):
     # Abstract methods
-    def __init__(self, j, theta, d, a, alpha, offset=None, kind='', mdh=0, flip=None):
+    def __init__(self, j, theta, d, a, alpha, offset=None, kind='', mdh=0, flip=None, qlim=None):
         self.theta = theta
         self.d = d
         # self.j = j
@@ -148,6 +183,7 @@ class Link(ABC):
         self.kind = kind
         self.mdh = mdh
         self.flip = flip
+        self.qlim = qlim
 
     def A(self, q):
         sa = math.sin(self.alpha)
@@ -179,14 +215,14 @@ class Link(ABC):
 
 
 class Revolute(Link):
-    def __init__(self, j, theta, d, a, alpha, offset):
-        super().__init__(j=j, theta=theta, d=d, a=a, alpha=alpha, offset=offset, kind='r')
+    def __init__(self, j, theta, d, a, alpha, offset, qlim):
+        super().__init__(j=j, theta=theta, d=d, a=a, alpha=alpha, offset=offset, kind='r', qlim=qlim)
         pass
 
 
 class Prismatic(Link):
-    def __init__(self, j, theta, d, a, alpha, offset):
-        super().__init__(j=j, theta=theta, d=d, a=a, alpha=alpha, offset=offset, kind='p')
+    def __init__(self, j, theta, d, a, alpha, offset, qlim):
+        super().__init__(j=j, theta=theta, d=d, a=a, alpha=alpha, offset=offset, kind='p', qlim=qlim)
         pass
 
     pass
