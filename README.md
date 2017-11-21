@@ -13,6 +13,10 @@ A Python 3 implementation of Peter Corke's Robotics Toolbox
 - Numpy
 - Scipy
 
-**To install:** pip install robopy
+**To install:** 
+
+```
+pip install robopy
+```
 
 Unofficial windows binaries available from: https://www.lfd.uci.edu/~gohlke/pythonlibs/
