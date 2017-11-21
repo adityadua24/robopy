@@ -128,7 +128,7 @@ class SerialLink:
 
     def animate(self, stances, unit='rad', frame_rate=25):
         class vtkTimerCallback():
-            def __init__(self, robot, stances, unit, actors):
+            def __init__(self, robot, stances, actors):
                 self.timer_count = 0
                 self.robot = robot
                 self.stances = stances
@@ -142,8 +142,7 @@ class SerialLink:
                     obj.DestroyTimer()
                     return
 
-                self.robot.fkine(self.stances, unit=self.unit, apply_stance=True, actor_list=actor_list,
-                                 timer=self.timer_count)
+                self.robot.fkine(self.stances, apply_stance=True, actor_list=actor_list, timer=self.timer_count)
                 pipeline.iren = obj
                 pipeline.iren.GetRenderWindow().Render()
 
@@ -165,7 +164,7 @@ class SerialLink:
         pipeline.ren_win.Render()
         pipeline.iren.Initialize()
 
-        cb = vtkTimerCallback(robot=self, stances=stances, unit=unit, actors=pipeline.actor_list)
+        cb = vtkTimerCallback(robot=self, stances=stances, actors=pipeline.actor_list)
         pipeline.iren.AddObserver('TimerEvent', cb.execute)
         timerId = pipeline.iren.CreateRepeatingTimer((int)(1000 / frame_rate))
         pipeline.iren.Start()
