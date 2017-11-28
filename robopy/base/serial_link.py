@@ -70,13 +70,13 @@ class SerialLink:
 
     def ikine(self, end_effector, q0=None, unit='rad'):
         assert type(end_effector) is np.matrix and end_effector.shape == (4, 4)
-        bounds = [(link.qlim[0], link.qlim[1]) for link in self]
+        bounds = [(link.qlim[0], link.qlim[1]) for link in self.links]
         print(bounds)
         print('\nlength of bounds is: ', len(bounds))
         # print(upper_bound, lower_bound)
         print('\n\n')
         reach = 0
-        for link in self:
+        for link in self.links:
             reach += abs(link.a) + abs(link.d)
         omega = np.diag([1, 1, 1, 3 / reach])
         if q0 is None:
