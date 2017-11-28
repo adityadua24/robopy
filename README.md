@@ -21,4 +21,6 @@ pip install robopy
 
 Unofficial windows binaries available from: https://www.lfd.uci.edu/~gohlke/pythonlibs/
 
+**Puma 560 simulation:-**
+
 <img src="./docs/images/puma560.JPG" width="400" height="400" alt="Puma 560 image">
