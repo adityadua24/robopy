@@ -49,7 +49,7 @@ def axesUniversal():
 
 def axesCube(ren):
     cube_axes_actor = vtk.vtkCubeAxesActor()
-    cube_axes_actor.SetBounds(-3, 3, -3, 3, -3, 3)
+    cube_axes_actor.SetBounds(-1.5, 1.5, -1.5, 1.5, -1.5, 1.5)
     cube_axes_actor.SetCamera(ren.GetActiveCamera())
     cube_axes_actor.GetTitleTextProperty(0).SetColor(1.0, 0.0, 0.0)
     cube_axes_actor.GetLabelTextProperty(0).SetColor(1.0, 0.0, 0.0)
@@ -103,3 +103,11 @@ def vtk_colors(colors):
     for i in range(len(colors)):
         colors_rgb[i] = list(vtk.vtkNamedColors().GetColor3d(colors[i]))
     return colors_rgb
+
+
+def cylinder(length, radius):
+    cyl = vtk.vtkCylinderSource()
+    cyl.SetRadius(radius)
+    cyl.SetHeight(length)
+    cyl.SetResolution(100)
+    return cyl
