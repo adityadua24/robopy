@@ -9,12 +9,13 @@ from . import transforms
 from .graphics import VtkPipeline
 from .graphics import axesCube
 from .graphics import vtk_colors
+from .graphics import cylinder
 import pkg_resources
 from scipy.optimize import minimize
 
 
 class SerialLink:
-    def __init__(self, links, name=None, base=None, stl_files=None, q=None, colors=None):
+    def __init__(self, links, name=None, base=None, stl_files=None, q=None, colors=None, stick_fig=False):
         # Argument checks
         self.links = links
         if q is None:
@@ -28,9 +29,9 @@ class SerialLink:
         self.tool = np.asmatrix(np.eye(4, 4))
         # Arguments initialised by plot function and animate functions only
         if stl_files is None:
-            # Default stick figure model code goes here
-            pass
+            self.stick_fig = True
         else:
+            self.stick_fig = False
             self.stl_files = stl_files
         if name is None:
             self.name = ''
@@ -86,19 +87,17 @@ class SerialLink:
             return (
                 np.square((np.linalg.lstsq(end_effector, self.fkine(x))[0]) - np.asmatrix(np.eye(4, 4)) * omega)).sum()
 
-        print('length of bounds: ', len(bounds))
-        print('minimising objective: ', objective(q0))
-
         sol = minimize(objective, x0=q0, bounds=bounds)
-        print(sol.x)
-        print(type(sol.x))
         return np.asmatrix(sol.x)
 
     def plot(self, stance, unit='rad'):
         # PLot the serialLink object
         if unit == 'deg':
             stance = stance * math.pi / 180
-        reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
+        if self.stick_fig:
+            actor_list = self.__setup_pipeline_objs_stick_fig()
+        else:
+            actor_list = self.__setup_pipeline_objs_stl()
         pipeline = VtkPipeline()
 
         self.fkine(stance, apply_stance=True, actor_list=actor_list)
@@ -106,11 +105,12 @@ class SerialLink:
         for each in actor_list:
             pipeline.add_actor(each)
 
+        print(len(actor_list))
         cube_axes = axesCube(pipeline.ren)
         pipeline.add_actor(cube_axes)
         pipeline.render()
 
-    def __setup_pipeline_objs(self):
+    def __setup_pipeline_objs_stl(self):
         reader_list = [0] * len(self.stl_files)
         actor_list = [0] * len(self.stl_files)
         mapper_list = [0] * len(self.stl_files)
@@ -124,7 +124,26 @@ class SerialLink:
             actor_list[i].SetMapper(mapper_list[i])
             actor_list[i].GetProperty().SetColor(self.colors[i])  # (R,G,B)
 
-        return reader_list, actor_list, mapper_list
+        return actor_list
+
+    def __setup_pipeline_objs_stick_fig(self):
+        actor_list = [0] * len(self.links)
+        source_list = [0] * len(self.links)
+        mapper_list = [0] * len(self.links)
+        for i in range(len(self.links)):
+            source_list[i] = cylinder(0.5, 0.1)
+            mapper_list[i] = vtk.vtkPolyDataMapper()
+            mapper_list[i].SetInputConnection(source_list[i].GetOutputPort())
+            actor_list[i] = vtk.vtkActor()
+            actor_list[i].SetMapper(mapper_list[i])
+
+        source = cylinder(0.5, 0.1)
+        mapper = vtk.vtkPolyDataMapper()
+        mapper.SetInputConnection(source.GetOutputPort())
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+        actor_list.append(actor)
+        return actor_list
 
     def animate(self, stances, unit='rad', frame_rate=25):
         class vtkTimerCallback():
@@ -149,7 +168,7 @@ class SerialLink:
         if unit == 'deg':
             stances = stances * (math.pi / 180)
 
-        reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
+        reader_list, actor_list, mapper_list = self.__setup_pipeline_objs_stl()
         pipeline = VtkPipeline()
 
         self.fkine(stances, apply_stance=True, actor_list=actor_list)
