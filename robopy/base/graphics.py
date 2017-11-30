@@ -49,7 +49,7 @@ def axesUniversal():
 
 def axesCube(ren):
     cube_axes_actor = vtk.vtkCubeAxesActor()
-    cube_axes_actor.SetBounds(-3, 3, -3, 3, -3, 3)
+    cube_axes_actor.SetBounds(-1.5, 1.5, -1.5, 1.5, -1.5, 1.5)
     cube_axes_actor.SetCamera(ren.GetActiveCamera())
     cube_axes_actor.GetTitleTextProperty(0).SetColor(1.0, 0.0, 0.0)
     cube_axes_actor.GetLabelTextProperty(0).SetColor(1.0, 0.0, 0.0)
@@ -122,8 +122,8 @@ def axesCubeFloor(ren):
     axes = axesCube(ren)
     flr = floor()
     flr.RotateX(90)
-    flr.SetPosition(0, -3, 0)
-    flr.SetScale(6)
+    flr.SetPosition(0, -1.5, 0)
+    flr.SetScale(3)
     assembly = vtk.vtkAssembly()
     assembly.AddPart(flr)
     assembly.AddPart(axes)
