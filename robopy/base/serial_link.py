@@ -8,6 +8,7 @@ import vtk
 from . import transforms
 from .graphics import VtkPipeline
 from .graphics import axesCube
+from .graphics import axesCubeFloor
 from .graphics import vtk_colors
 import pkg_resources
 from scipy.optimize import minimize
@@ -106,7 +107,7 @@ class SerialLink:
         for each in actor_list:
             pipeline.add_actor(each)
 
-        cube_axes = axesCube(pipeline.ren)
+        cube_axes = axesCubeFloor(pipeline.ren)
         pipeline.add_actor(cube_axes)
         pipeline.render()
 

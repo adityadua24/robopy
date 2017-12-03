@@ -1,5 +1,6 @@
 # Created by: Aditya Dua
 # 18 August 2017
+import pkg_resources
 import vtk
 
 
@@ -49,7 +50,7 @@ def axesUniversal():
 
 def axesCube(ren):
     cube_axes_actor = vtk.vtkCubeAxesActor()
-    cube_axes_actor.SetBounds(-3, 3, -3, 3, -3, 3)
+    cube_axes_actor.SetBounds(-1.5, 1.5, -1.5, 1.5, -1.5, 1.5)
     cube_axes_actor.SetCamera(ren.GetActiveCamera())
     cube_axes_actor.GetTitleTextProperty(0).SetColor(1.0, 0.0, 0.0)
     cube_axes_actor.GetLabelTextProperty(0).SetColor(1.0, 0.0, 0.0)
@@ -59,10 +60,6 @@ def axesCube(ren):
 
     cube_axes_actor.GetTitleTextProperty(2).SetColor(0.0, 0.0, 1.0)
     cube_axes_actor.GetLabelTextProperty(2).SetColor(0.0, 0.0, 1.0)
-
-    cube_axes_actor.DrawXGridlinesOff()
-    cube_axes_actor.DrawYGridlinesOff()
-    cube_axes_actor.DrawZGridlinesOff()
 
     cube_axes_actor.XAxisMinorTickVisibilityOff()
     cube_axes_actor.YAxisMinorTickVisibilityOff()
@@ -103,3 +100,32 @@ def vtk_colors(colors):
     for i in range(len(colors)):
         colors_rgb[i] = list(vtk.vtkNamedColors().GetColor3d(colors[i]))
     return colors_rgb
+
+
+def floor():
+    plane = vtk.vtkPlaneSource()
+    reader = vtk.vtkJPEGReader()
+    reader.SetFileName(pkg_resources.resource_filename(__name__, '/'.join(('media', 'imgs', 'floor.jpg'))))
+    texture = vtk.vtkTexture()
+    texture.SetInputConnection(reader.GetOutputPort())
+    map_to_plane = vtk.vtkTextureMapToPlane()
+    map_to_plane.SetInputConnection(plane.GetOutputPort())
+    mapper = vtk.vtkPolyDataMapper()
+
+    mapper.SetInputConnection(map_to_plane.GetOutputPort())
+    actor = vtk.vtkActor()
+    actor.SetMapper(mapper)
+    actor.SetTexture(texture)
+    return actor
+
+
+def axesCubeFloor(ren):
+    axes = axesCube(ren)
+    flr = floor()
+    flr.RotateX(90)
+    flr.SetPosition(0, -1.5, 0)
+    flr.SetScale(3)
+    assembly = vtk.vtkAssembly()
+    assembly.AddPart(flr)
+    assembly.AddPart(axes)
+    return assembly
