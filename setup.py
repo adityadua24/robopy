@@ -4,11 +4,11 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
+# To use a consistent encoding
+from os import path
+
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
-# To use a consistent encoding
-from codecs import open
-from os import path
 
 here = path.abspath(path.dirname(__file__))
 
@@ -22,7 +22,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.0.2',
+    version='1.0.1.2',
 
     description='A Python 3 implementation of Peter Corke\'s Robotics Toolbox',
     long_description='ROBOPY is a python implimentation of The Robotics Toolbox (RTB) (The brainchild of Peter Corke) for Matlab. The toolbox provides a range of functions that are useful in the study and simulation of classical arm-type robotics including kinematics, dynamics and trajectory generation. Via the porting of the toolbox we hope to create greater access to the toolbox without the need for pricy software subscriptions.',
