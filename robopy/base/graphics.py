@@ -1,5 +1,6 @@
 # Created by: Aditya Dua
 # 18 August 2017
+import pkg_resources
 import vtk
 
 
@@ -104,7 +105,7 @@ def vtk_colors(colors):
 def floor():
     plane = vtk.vtkPlaneSource()
     reader = vtk.vtkJPEGReader()
-    reader.SetFileName('floor.jpg')
+    reader.SetFileName(pkg_resources.resource_filename(__name__, '/'.join(('media', 'imgs', 'floor.jpg'))))
     texture = vtk.vtkTexture()
     texture.SetInputConnection(reader.GetOutputPort())
     map_to_plane = vtk.vtkTextureMapToPlane()
