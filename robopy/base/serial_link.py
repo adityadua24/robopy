@@ -12,6 +12,7 @@ from .graphics import vtk_colors
 from .graphics import cylinder
 import pkg_resources
 from scipy.optimize import minimize
+from math import sqrt
 
 
 class SerialLink:
@@ -49,10 +50,11 @@ class SerialLink:
     def length(self):
         return len(self.links)
 
-    def fkine(self, stance, unit='rad', apply_stance=False, actor_list=None, timer=None):
+    def fkine(self, stance, unit='rad', apply_stance=False, actor_list=None, timer=None, trace=False):
         # q is vector or matrix of real numbers (List of angles)
         # apply_stance, actor_list are only used for plotting
         # timer is used for animation
+        trace = []
         if type(stance) is np.ndarray:
             stance = np.asmatrix(stance)
         if unit == 'deg':
@@ -60,14 +62,21 @@ class SerialLink:
         if timer is None:
             timer = 0
         t = self.base
+        trace.append(t)
         for i in range(self.length):
             if apply_stance:
                 actor_list[i].SetUserMatrix(transforms.np2vtk(t))
             t = t * self.links[i].A(stance[timer, i])
+            trace.append(t)
+
         t = t * self.tool
+        trace.append(t)
         if apply_stance:
             actor_list[self.length].SetUserMatrix(transforms.np2vtk(t))
-        return t
+        if trace:
+            return t, trace
+        else:
+            return t
 
     def ikine(self, end_effector, q0=None, unit='rad'):
         assert type(end_effector) is np.matrix and end_effector.shape == (4, 4)
@@ -95,17 +104,38 @@ class SerialLink:
         if unit == 'deg':
             stance = stance * math.pi / 180
         if self.stick_fig:
-            actor_list = self.__setup_pipeline_objs_stick_fig()
+            actor_list, actor_axes_list = self.__setup_pipeline_objs_stick_fig()
         else:
             actor_list = self.__setup_pipeline_objs_stl()
         pipeline = VtkPipeline()
 
+        actor_list, actor_axes_list = self.__setup_pipeline_objs_stick_fig()
+        # actor_list = self.__setup_pipeline_objs_stl()
+
         self.fkine(stance, apply_stance=True, actor_list=actor_list)
+        t, trace = self.fkine(stance, apply_stance=True, actor_list=actor_axes_list, trace=True)
+
+        for each in trace:
+            print(each.round(15))
 
         for each in actor_list:
             pipeline.add_actor(each)
 
-        print(len(actor_list))
+        actor_axes_list[1].SetAxisLabels(1)
+
+        # for each in actor_axes_list[3:5]:
+        #     pipeline.add_actor(each)
+
+        vtk_links = []
+        if self.stick_fig:
+            vtk_links = self.__compute_links(trace)
+
+        # for i in range(len(vtk_links)):
+        #     vtk_links[i].SetUserMatrix(actor_list[i].GetUserMatrix())
+
+        for each in vtk_links:
+            pipeline.add_actor(each)
+
         cube_axes = axesCube(pipeline.ren)
         pipeline.add_actor(cube_axes)
         pipeline.render()
@@ -131,18 +161,81 @@ class SerialLink:
         source_list = [0] * len(self.links)
         mapper_list = [0] * len(self.links)
         for i in range(len(self.links)):
-            source_list[i] = cylinder(0.5, 0.1)
+            source_list[i] = cylinder(0.125, 0.05)
             mapper_list[i] = vtk.vtkPolyDataMapper()
             mapper_list[i].SetInputConnection(source_list[i].GetOutputPort())
             actor_list[i] = vtk.vtkActor()
             actor_list[i].SetMapper(mapper_list[i])
 
-        source = cylinder(0.5, 0.1)
+        source = cylinder(0.125, 0.05)
         mapper = vtk.vtkPolyDataMapper()
         mapper.SetInputConnection(source.GetOutputPort())
         actor = vtk.vtkActor()
         actor.SetMapper(mapper)
         actor_list.append(actor)
+        actor_list2 = []
+        for i in range(len(actor_list)):
+            actor_list2.append(vtk.vtkAxesActor())
+        for each in actor_list2:
+            each.SetAxisLabels(0)
+            each.SetConeRadius(0.2)
+
+        return actor_list, actor_list2
+
+    def __compute_links(self, trace):
+        actor_list = [0] * (len(trace) - 1)
+        source_list = [0] * (len(trace) - 1)
+        mapper_list = [0] * (len(trace) - 1)
+        alpha = []
+        # a = []
+        # d = []
+        for each in self.links:
+            alpha.append(each.alpha)
+        #     a.append(each.a)
+        #     d.append(each.d)
+        #
+        # a.append(0)
+        # d.append(0)
+        alpha.append(0)
+        alpha.insert(0, 0)
+        # a.insert(0, 0)
+        # d.insert(0, 0)
+        #
+        # transformations = []
+        # for i in range(len(a)):
+        #     if (a[i] == 0) and (d[i]) == 0:
+        #         transformations.append(np.asmatrix(np.eye(4, 4)))
+        #     elif a[i] > 0:
+        #         transformations.append(transforms.trotx(90, unit='deg'))
+        #     elif d[i] > 0:
+        #         transformations.append(transforms.trotz(90, unit='deg'))
+        #     else:
+        #         transformations.append(np.asmatrix(np.eye(4, 4)))
+        print(alpha)
+        for i in range(len(trace) - 1):
+            link_length = sqrt(np.asmatrix(np.square(trace[i + 1] - trace[i]))[0:3, 3].sum())
+            pos = (trace[i + 1][0:3, 3] + trace[i][0:3, 3]) / 2
+            movement = (trace[i + 1][0:3, 3] - trace[i][0:3, 3])
+            link_t = trace[i]
+            if movement[0, 0] > movement[2, 0]:
+                link_t = transforms.trotz(math.pi/2 + alpha[i+1], xyz=[pos[0, 0], pos[1, 0], pos[2, 0]])
+            elif movement[0, 0] < movement[2, 0]:
+                link_t = transforms.trotx(math.pi/2, xyz=[pos[0, 0], pos[1, 0], pos[2, 0]])
+                pass
+
+            # print(alpha)
+            # link_t = transforms.trotz(alpha[i+1], unit='deg', xyz=[pos[0, 0], pos[1, 0], pos[2, 0]])
+            # link_t = transformations[i]
+            link_t[0:3, 3] = pos
+            source_list[i] = cylinder(link_length, 0.025)
+            mapper_list[i] = vtk.vtkPolyDataMapper()
+            mapper_list[i].SetInputConnection(source_list[i].GetOutputPort())
+            actor_list[i] = vtk.vtkActor()
+            actor_list[i].SetMapper(mapper_list[i])
+            actor_list[i].GetProperty().SetColor(0, 0, 1)
+            actor_list[i].SetUserMatrix(transforms.np2vtk(link_t))
+            # actor_list[i].SetPosition(pos)
+
         return actor_list
 
     def animate(self, stances, unit='rad', frame_rate=25):
