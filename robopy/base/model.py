@@ -33,7 +33,7 @@ class Puma560(SerialLink):
             stance = self.q[stance]
         elif type(stance) is np.matrix:
             if unit == 'deg':
-                stance = self.q[stance] * (pi / 180)
+                stance = stance * (pi / 180)
         else:
             raise AttributeError("Type of stance must be numpy matrix of dim (1, n).\n Or you could pass one of the "
                                  "default stances")

@@ -3,6 +3,7 @@
 from __future__ import print_function
 from abc import ABC
 import math
+from math import pi
 import numpy as np
 import vtk
 from . import transforms
@@ -56,7 +57,7 @@ class SerialLink:
         if type(stance) is np.ndarray:
             stance = np.asmatrix(stance)
         if unit == 'deg':
-            stance = stance * math.pi / 180
+            stance = stance * pi / 180
         if timer is None:
             timer = 0
         t = self.base
@@ -84,12 +85,15 @@ class SerialLink:
                 np.square(((np.linalg.lstsq(end_effector, self.fkine(x))[0]) - np.asmatrix(np.eye(4, 4))) * omega)).sum()
 
         sol = minimize(objective, x0=q0, bounds=bounds)
-        return np.asmatrix(sol.x)
+        if unit == 'deg':
+            return np.asmatrix(sol.x * 180 / pi)
+        else:
+            return np.asmatrix(sol.x)
 
     def plot(self, stance, unit='rad'):
         # PLot the serialLink object
         if unit == 'deg':
-            stance = stance * math.pi / 180
+            stance = stance * pi / 180
         reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
         pipeline = VtkPipeline()
 
@@ -139,7 +143,7 @@ class SerialLink:
                 pipeline.iren.GetRenderWindow().Render()
 
         if unit == 'deg':
-            stances = stances * (math.pi / 180)
+            stances = stances * (pi / 180)
 
         reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
         pipeline = VtkPipeline()
