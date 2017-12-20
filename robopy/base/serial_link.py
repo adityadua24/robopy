@@ -16,19 +16,33 @@ from scipy.optimize import minimize
 
 
 class SerialLink:
-    def __init__(self, links, name=None, base=None, stl_files=None, q=None, colors=None):
-        # Argument checks
+    """
+    SerialLink object class.
+    """
+    def __init__(self, links, name=None, base=None, tool=None, stl_files=None, q=None, colors=None):
+        """
+        Creates a SerialLink object.
+        :param links: a list of links that will constitute SerialLink object.
+        :param name: name property of the object.
+        :param base: base transform applied to the SerialLink object.
+        :param stl_files: STL file names to associate with links. Only works for pre-implemented models in model module.
+        :param q: initial angles for link joints.
+        :param colors: colors of STL files.
+        """
         self.links = links
         if q is None:
-            q = [0 for each in links]
+            self.q = [0 for each in links]
         if base is None:
             self.base = np.asmatrix(np.eye(4, 4))
         else:
-            assert type(base) is np.matrix
-            assert base.shape == (4, 4)
+            assert (type(base) is np.matrix) and (base.shape == (4, 4))
             self.base = base
-        self.tool = np.asmatrix(np.eye(4, 4))
-        # Arguments initialised by plot function and animate functions only
+        if tool is None:
+            self.tool = np.asmatrix(np.eye(4, 4))
+        else:
+            assert (type(tool) is np.matrix) and (tool.shape == (4, 4))
+            self.tool = tool
+        # Following arguments initialised by plot function and animate functions only
         if stl_files is None:
             # Default stick figure model code goes here
             pass
@@ -48,12 +62,22 @@ class SerialLink:
 
     @property
     def length(self):
+        """
+        length property
+        :return: int
+        """
         return len(self.links)
 
     def fkine(self, stance, unit='rad', apply_stance=False, actor_list=None, timer=None):
-        # q is vector or matrix of real numbers (List of angles)
-        # apply_stance, actor_list are only used for plotting
-        # timer is used for animation
+        """
+        Calculates forward kinematics for a list of joint angles.
+        :param stance: stance is list of joint angles.
+        :param unit: unit of input angles.
+        :param apply_stance: If True, then applied tp actor_list.
+        :param actor_list: Passed to apply transformations computed by fkine.
+        :param timer: internal use only (for animation).
+        :return: homogeneous transformation matrix.
+        """
         if type(stance) is np.ndarray:
             stance = np.asmatrix(stance)
         if unit == 'deg':
@@ -70,8 +94,15 @@ class SerialLink:
             actor_list[self.length].SetUserMatrix(transforms.np2vtk(t))
         return t
 
-    def ikine(self, end_effector, q0=None, unit='rad'):
-        assert type(end_effector) is np.matrix and end_effector.shape == (4, 4)
+    def ikine(self, T, q0=None, unit='rad'):
+        """
+        Calculates inverse kinematics for homogeneous transformation matrix using numerical optimisation method.
+        :param T: homogeneous transformation matrix.
+        :param q0: initial list of joint angles for optimisation.
+        :param unit: preferred unit for returned joint angles. Allowed values: 'rad' or 'deg'.
+        :return: a list of 6 joint angles.
+        """
+        assert type(T) is np.matrix and T.shape == (4, 4)
         bounds = [(link.qlim[0], link.qlim[1]) for link in self]
         reach = 0
         for link in self:
@@ -82,7 +113,7 @@ class SerialLink:
 
         def objective(x):
             return (
-                np.square(((np.linalg.lstsq(end_effector, self.fkine(x))[0]) - np.asmatrix(np.eye(4, 4))) * omega)).sum()
+                np.square(((np.linalg.lstsq(T, self.fkine(x))[0]) - np.asmatrix(np.eye(4, 4))) * omega)).sum()
 
         sol = minimize(objective, x0=q0, bounds=bounds)
         if unit == 'deg':
@@ -91,7 +122,12 @@ class SerialLink:
             return np.asmatrix(sol.x)
 
     def plot(self, stance, unit='rad'):
-        # PLot the serialLink object
+        """
+        Plots the SerialLink object in a desired stance.
+        :param stance: list of joint angles for SerialLink object.
+        :param unit: unit of input angles.
+        :return: null.
+        """
         if unit == 'deg':
             stance = stance * pi / 180
         reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
@@ -107,6 +143,10 @@ class SerialLink:
         pipeline.render()
 
     def __setup_pipeline_objs(self):
+        """
+        Internal function to initialise vtk objects.
+        :return: reader_list, actor_list, mapper_list
+        """
         reader_list = [0] * len(self.stl_files)
         actor_list = [0] * len(self.stl_files)
         mapper_list = [0] * len(self.stl_files)
@@ -123,6 +163,13 @@ class SerialLink:
         return reader_list, actor_list, mapper_list
 
     def animate(self, stances, unit='rad', frame_rate=25):
+        """
+        Animates SerialLink object over nx6 dimensional input matrix, with each row representing list of 6 joint angles.
+        :param stances: nx6 dimensional input matrix.
+        :param unit: unit of input angles. Allowed values: 'rad' or 'deg'
+        :param frame_rate: frame_rate for animation. Could be any integer more than 1. Higher value runs through stances faster.
+        :return: null
+        """
         class vtkTimerCallback():
             def __init__(self, robot, stances, actors):
                 self.timer_count = 0
@@ -167,8 +214,23 @@ class SerialLink:
 
 
 class Link(ABC):
-    # Abstract methods
+    """
+    Link object class.
+    """
     def __init__(self, j, theta, d, a, alpha, offset=None, kind='', mdh=0, flip=None, qlim=None):
+        """
+        initialises the link object.
+        :param j:
+        :param theta:
+        :param d:
+        :param a:
+        :param alpha:
+        :param offset:
+        :param kind: 'r' or 'p' as input. 'r' for Revolute. 'p' for Prismatic.
+        :param mdh:
+        :param flip:
+        :param qlim:
+        """
         self.theta = theta
         self.d = d
         # self.j = j
@@ -210,13 +272,39 @@ class Link(ABC):
 
 
 class Revolute(Link):
+    """
+    Revolute object class.
+    """
     def __init__(self, j, theta, d, a, alpha, offset, qlim):
+        """
+        Initialised revolute object.
+        :param j:
+        :param theta:
+        :param d:
+        :param a:
+        :param alpha:
+        :param offset:
+        :param qlim:
+        """
         super().__init__(j=j, theta=theta, d=d, a=a, alpha=alpha, offset=offset, kind='r', qlim=qlim)
         pass
 
 
 class Prismatic(Link):
+    """
+    Prismatic object class.
+    """
     def __init__(self, j, theta, d, a, alpha, offset, qlim):
+        """
+        Initialises prismatic object.
+        :param j:
+        :param theta:
+        :param d:
+        :param a:
+        :param alpha:
+        :param offset:
+        :param qlim:
+        """
         super().__init__(j=j, theta=theta, d=d, a=a, alpha=alpha, offset=offset, kind='p', qlim=qlim)
         pass
 

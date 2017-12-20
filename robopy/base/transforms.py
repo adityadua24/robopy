@@ -14,10 +14,10 @@ import vtk
 # ---------------------------------------------------------------------------------------#
 def rotx(theta, unit="rad"):
     """
-    ROTX Rotation about X axis
+    ROTX gives rotation about X axis
 
-    :param theta:
-    :param unit:
+    :param theta: angle for rotation matrix
+    :param unit: unit of input passed. 'rad' or 'deg'
     :return: rotation matrix
 
     rotx(THETA) is an SO(3) rotation matrix (3x3) representing a rotation
@@ -39,8 +39,8 @@ def roty(theta, unit="rad"):
     """
     ROTY Rotation about Y axis
 
-    :param theta:
-    :param unit:
+    :param theta: angle for rotation matrix
+    :param unit: unit of input passed. 'rad' or 'deg'
     :return: rotation matrix
 
     roty(THETA) is an SO(3) rotation matrix (3x3) representing a rotation
@@ -62,8 +62,8 @@ def rotz(theta, unit="rad"):
     """
     ROTZ Rotation about Z axis
 
-    :param theta:
-    :param unit:
+    :param theta: angle for rotation matrix
+    :param unit: unit of input passed. 'rad' or 'deg'
     :return: rotation matrix
 
     rotz(THETA) is an SO(3) rotation matrix (3x3) representing a rotation
@@ -269,7 +269,7 @@ def rpy2r(thetas, order='zyx', unit='rad'):
     :param unit: 'rad' or 'deg'
     :return: rotation matrix
 
-    RPY2R(ROLL, PITCH, YAW, OPTIONS) is an SO(3) orthonornal rotation matrix
+    RPY2R(ROLL, PITCH, YAW, OPTIONS) is an SO(3) orthonormal rotation matrix
     (3x3) equivalent to the specified roll, pitch, yaw angles angles.
     These correspond to rotations about the Z, Y, X axes respectively. If ROLL,
     PITCH, YAW are column vectors (Nx1) then they are assumed to represent a
@@ -337,10 +337,10 @@ def rpy2tr(thetas, order='zyx', unit='rad'):
     """
     RPY2TR Roll-pitch-yaw angles to homogeneous transform
 
-    :param thetas:
-    :param order:
-    :param unit:
-    :return:
+    :param thetas: list of angles
+    :param order: order can be 'xyz'/'arm', 'zyx'/'vehicle', 'yxz'/'camera'
+    :param unit: unit of input angles
+    :return: homogeneous transformation matrix
 
     T = RPY2TR(ROLL, PITCH, YAW, OPTIONS) is an SE(3) homogeneous
     transformation matrix (4x4) with zero translation and rotation equivalent
@@ -566,11 +566,11 @@ def tr2rt(t):
 
 
 # ---------------------------------------------------------------------------------------#
-def rt2tr(R, t):
+def rt2tr(r, t):
     """
     RT2TR Convert rotation and translation to homogeneous transform
 
-    :param R: rotation matrix
+    :param r: rotation matrix
     :param t: translation
     :return: homogeneous transform
 
@@ -580,20 +580,20 @@ def rt2tr(R, t):
     - If R is 2x2 and t is 2x1, then TR is 3x3
     - If R is 3x3 and t is 3x1, then TR is 4x4
     """
-    if R.shape == (2, 2):
-        if R.shape[0] != R.shape[1]:
+    if r.shape == (2, 2):
+        if r.shape[0] != r.shape[1]:
             raise AttributeError("R must be square")
-        if R.shape[0] != t.shape[0]:
+        if r.shape[0] != t.shape[0]:
             raise AttributeError("R and t must have the same number of rows")
-        tr = np.concatenate((R, t), axis=1)
+        tr = np.concatenate((r, t), axis=1)
         tr = np.concatenate((tr, np.matrix([[0, 0, 1]])), axis=0)
         return tr
     else:
-        if R.shape[0] != R.shape[1]:
+        if r.shape[0] != r.shape[1]:
             raise AttributeError("R must be square")
-        if R.shape[0] != t.shape[0]:
+        if r.shape[0] != t.shape[0]:
             raise AttributeError("R and t must have the same number of rows")
-        tr = np.concatenate((R, t), axis=1)
+        tr = np.concatenate((r, t), axis=1)
         tr = np.concatenate((tr, np.matrix([[0, 0, 0, 1]])), axis=0)
         return tr
 
@@ -1087,7 +1087,7 @@ def transl2(x=None, y=None):
     TRANSL2 Create or unpack an SE(2) translational homogeneous transform
 
     :param x: x translation, homogeneous transform or a list of translations
-    :param y: y trsnlation
+    :param y: y translation
     :return: homogeneous transform matrix or the translation elements of a
     homogeneous transform
 
