@@ -72,10 +72,6 @@ class SerialLink:
     def ikine(self, end_effector, q0=None, unit='rad'):
         assert type(end_effector) is np.matrix and end_effector.shape == (4, 4)
         bounds = [(link.qlim[0], link.qlim[1]) for link in self]
-        print(bounds)
-        print('\nlength of bounds is: ', len(bounds))
-        # print(upper_bound, lower_bound)
-        print('\n\n')
         reach = 0
         for link in self:
             reach += abs(link.a) + abs(link.d)
@@ -85,14 +81,9 @@ class SerialLink:
 
         def objective(x):
             return (
-                np.square((np.linalg.lstsq(end_effector, self.fkine(x))[0]) - np.asmatrix(np.eye(4, 4)) * omega)).sum()
-
-        print('length of bounds: ', len(bounds))
-        print('minimising objective: ', objective(q0))
+                np.square(((np.linalg.lstsq(end_effector, self.fkine(x))[0]) - np.asmatrix(np.eye(4, 4))) * omega)).sum()
 
         sol = minimize(objective, x0=q0, bounds=bounds)
-        print(sol.x)
-        print(type(sol.x))
         return np.asmatrix(sol.x)
 
     def plot(self, stance, unit='rad'):
