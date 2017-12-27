@@ -31,7 +31,7 @@ class SerialLink:
         """
         self.links = links
         if q is None:
-            self.q = [0 for each in links]
+            self.q = np.matrix([0 for each in links])
         if base is None:
             self.base = np.asmatrix(np.eye(4, 4))
         else:

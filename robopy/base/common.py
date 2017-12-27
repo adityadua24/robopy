@@ -13,7 +13,7 @@ def ishomog(tr, dim, rtest=''):
     ISHOMOG(T, 'valid') as above, but also checks the validity of the rotation sub-matrix.
     See Also: isrot, ishomog2, isvec"""
 
-    assert dim == [3, 3] or dim == [4, 4]
+    assert dim == (3, 3) or dim == (4, 4)
     is_valid = None
     if rtest == 'valid':
         is_valid = lambda matrix: abs(np.linalg.det(matrix) - 1) < np.spacing([1])[0]
