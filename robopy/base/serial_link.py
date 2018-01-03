@@ -10,7 +10,7 @@ from . import transforms
 from .graphics import VtkPipeline
 from .graphics import axesCube
 from .graphics import axesCubeFloor
-from .graphics import vtk_colors
+from .graphics import vtk_named_colors
 import pkg_resources
 from scipy.optimize import minimize
 
@@ -29,6 +29,7 @@ class SerialLink:
         :param q: initial angles for link joints.
         :param colors: colors of STL files.
         """
+        self.pipeline = None
         self.links = links
         if q is None:
             self.q = np.matrix([0 for each in links])
@@ -53,7 +54,7 @@ class SerialLink:
         else:
             self.name = name
         if colors is None:
-            self.colors = vtk_colors(["Grey"] * len(links))
+            self.colors = vtk_named_colors(["Grey"] * len(stl_files))
         else:
             self.colors = colors
 
@@ -128,19 +129,24 @@ class SerialLink:
         :param unit: unit of input angles.
         :return: null.
         """
+
+        assert type(stance) is np.matrix
+
         if unit == 'deg':
-            stance = stance * pi / 180
-        reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
-        pipeline = VtkPipeline()
+                stance = stance * (pi / 180)
 
-        self.fkine(stance, apply_stance=True, actor_list=actor_list)
+        self.pipeline = VtkPipeline()
+        self.pipeline.reader_list, self.pipeline.actor_list, self.pipeline.mapper_list = self.__setup_pipeline_objs()
 
-        for each in actor_list:
-            pipeline.add_actor(each)
+        self.fkine(stance, apply_stance=True, actor_list=self.pipeline.actor_list)
 
-        cube_axes = axesCubeFloor(pipeline.ren)
-        pipeline.add_actor(cube_axes)
-        pipeline.render()
+        cube_axes = axesCubeFloor(self.pipeline.ren)
+        self.pipeline.add_actor(cube_axes)
+
+        for each in self.pipeline.actor_list:
+            each.SetScale(self.scale)
+
+        self.pipeline.render()
 
     def __setup_pipeline_objs(self):
         """
@@ -162,6 +168,14 @@ class SerialLink:
 
         return reader_list, actor_list, mapper_list
 
+    @staticmethod
+    def _setup_file_names(num):
+        file_names = []
+        for i in range(0, num):
+            file_names.append('link'+str(i)+'.stl')
+
+        return file_names
+
     def animate(self, stances, unit='rad', frame_rate=25):
         """
         Animates SerialLink object over nx6 dimensional input matrix, with each row representing list of 6 joint angles.
@@ -171,46 +185,42 @@ class SerialLink:
         :return: null
         """
         class vtkTimerCallback():
-            def __init__(self, robot, stances, actors):
+            def __init__(self, robot, stances):
                 self.timer_count = 0
                 self.robot = robot
                 self.stances = stances
-                self.actor_list = actors
                 self.unit = unit
 
             def execute(self, obj, event):
-                print(self.timer_count)
+                # print(self.timer_count)
                 self.timer_count += 1
                 if self.timer_count == self.stances.shape[0]:
                     obj.DestroyTimer()
                     return
 
-                self.robot.fkine(self.stances, apply_stance=True, actor_list=actor_list, timer=self.timer_count)
-                pipeline.iren = obj
-                pipeline.iren.GetRenderWindow().Render()
+                self.robot.fkine(self.stances, apply_stance=True, actor_list=self.robot.pipeline.actor_list, timer=self.timer_count)
+                self.robot.pipeline.iren = obj
+                self.robot.pipeline.iren.GetRenderWindow().Render()
 
         if unit == 'deg':
             stances = stances * (pi / 180)
 
-        reader_list, actor_list, mapper_list = self.__setup_pipeline_objs()
-        pipeline = VtkPipeline()
+        self.pipeline = VtkPipeline()
+        self.pipeline.reader_list, self.pipeline.actor_list, self.pipeline.mapper_list = self.__setup_pipeline_objs()
 
-        self.fkine(stances, apply_stance=True, actor_list=actor_list)
+        self.fkine(stances, apply_stance=True, actor_list=self.pipeline.actor_list)
 
-        for each in actor_list:
-            pipeline.add_actor(each)
+        cube_axes = axesCube(self.pipeline.ren)
+        self.pipeline.add_actor(cube_axes)
 
-        cube_axes = axesCube(pipeline.ren)
-        pipeline.add_actor(cube_axes)
+        # self.pipeline.ren.ResetCamera()
+        # self.pipeline.ren_win.Render()
+        # self.pipeline.iren.Initialize()
 
-        pipeline.ren.ResetCamera()
-        pipeline.ren_win.Render()
-        pipeline.iren.Initialize()
-
-        cb = vtkTimerCallback(robot=self, stances=stances, actors=pipeline.actor_list)
-        pipeline.iren.AddObserver('TimerEvent', cb.execute)
-        timerId = pipeline.iren.CreateRepeatingTimer((int)(1000 / frame_rate))
-        pipeline.iren.Start()
+        cb = vtkTimerCallback(robot=self, stances=stances)
+        self.pipeline.iren.AddObserver('TimerEvent', cb.execute)
+        timerId = self.pipeline.iren.CreateRepeatingTimer((int)(1000 / frame_rate))
+        self.pipeline.render()
 
 
 class Link(ABC):

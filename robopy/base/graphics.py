@@ -15,8 +15,11 @@ class VtkPipeline:
         self.iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
         self.actor_list = []
         self.mapper_list = []
+        self.source_list = []
 
     def render(self):
+        for each in self.actor_list:
+            self.ren.AddActor(each)
         self.ren.ResetCamera()
         # self.set_camera()
         self.ren_win.Render()
@@ -25,7 +28,6 @@ class VtkPipeline:
 
     def add_actor(self, actor):
         self.actor_list.append(actor)
-        self.ren.AddActor(actor)
 
     def set_camera(self):
         cam = self.ren.GetActiveCamera()
@@ -88,7 +90,7 @@ def axesActor2d():
     return axes
 
 
-def vtk_colors(colors):
+def vtk_named_colors(colors):
     """
     Returns a list of vtk colors
     :param colors: List of color names supported by vtk

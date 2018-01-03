@@ -1,2 +1,3 @@
 include robopy/base/media/puma_560/*.stl
 include robopy/base/media/imgs/*.jpg
+include robopy/base/media/orion5/*.stl
