@@ -58,11 +58,10 @@ class Orion5(SerialLink):
             assert ishomog(base, (4, 4))
 
         file_names = SerialLink._setup_file_names(7)
-        colors = graphics.vtk_named_colors(["DimGray", "IndianRed", "DimGray", "IndianRed", "DimGray", "IndianRed", "IndianRed"])
+        colors = graphics.vtk_named_colors(
+            ["DimGray", "IndianRed", "DimGray", "IndianRed", "DimGray", "IndianRed", "IndianRed"])
 
         super().__init__(links=links, base=base, name='orion5', stl_files=file_names, colors=colors)
-
-
 
     # def __assemble_parts(self):
     #     # Assemblies-----------------------
