@@ -213,9 +213,9 @@ class SerialLink:
         cube_axes = axesCube(self.pipeline.ren)
         self.pipeline.add_actor(cube_axes)
 
-        # self.pipeline.ren.ResetCamera()
-        # self.pipeline.ren_win.Render()
-        # self.pipeline.iren.Initialize()
+        self.pipeline.ren.ResetCamera()
+        self.pipeline.ren_win.Render()
+        self.pipeline.iren.Initialize()
 
         cb = vtkTimerCallback(robot=self, stances=stances)
         self.pipeline.iren.AddObserver('TimerEvent', cb.execute)
