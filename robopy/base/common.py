@@ -41,6 +41,7 @@ def isvec(v, l=3):
     """
     ISVEC Test if vector
     """
+    assert type(v) is np.matrix
     d = v.shape
     h = len(d) == 2 and min(v.shape) == 1 and v.size == l
 
