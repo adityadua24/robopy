@@ -6,7 +6,8 @@ from .common import ishomog
 from math import sqrt
 from numpy import trace
 from .pose import SO3
-from .transforms import t2r
+from .pose import SE3
+from .transforms import *
 
 
 class Quaternion:
@@ -35,18 +36,9 @@ class Quaternion:
             self.s = s
 
     @classmethod
-    def rot(cls, arg_in):
-        qr = cls()
-        qr.tr2q(arg_in)
-        return qr
-
-    @classmethod
     def qt(cls, arg_in):
         assert type(arg_in) is Quaternion
         return cls(s=arg_in.s, v=arg_in.v)
-
-    def plot(self):
-        SO3.np(self.r()).plot()
 
     def conj(self):
         return Quaternion(s=self.s, v=-self.v)
@@ -56,55 +48,6 @@ class Quaternion:
 
     def tr(self):
         return t2r(self.r())
-
-    def tr2q(self, t):
-        """
-        Converts a homogeneous rotation matrix to a Quaternion object
-        Code retrieved from: https://github.com/petercorke/robotics-toolbox-python/blob/master/robot/Quaternion.py
-        Original authors: Luis Fernando Lara Tobar and Peter Corke
-        :param t: homogeneous matrix
-        :return: quaternion object
-        """
-        assert ishomog(t, (3, 3)), "Argument must be 3x3 homogeneous numpy matrix"
-        qs = sqrt(trace(t) + 1) / 2.0
-        kx = t[2, 1] - t[1, 2]  # Oz - Ay
-        ky = t[0, 2] - t[2, 0]  # Ax - Nz
-        kz = t[1, 0] - t[0, 1]  # Ny - Ox
-
-        if (t[0, 0] >= t[1, 1]) and (t[0, 0] >= t[2, 2]):
-            kx1 = t[0, 0] - t[1, 1] - t[2, 2] + 1  # Nx - Oy - Az + 1
-            ky1 = t[1, 0] + t[0, 1]  # Ny + Ox
-            kz1 = t[2, 0] + t[0, 2]  # Nz + Ax
-            add = (kx >= 0)
-        elif t[1, 1] >= t[2, 2]:
-            kx1 = t[1, 0] + t[0, 1]  # Ny + Ox
-            ky1 = t[1, 1] - t[0, 0] - t[2, 2] + 1  # Oy - Nx - Az + 1
-            kz1 = t[2, 1] + t[1, 2]  # Oz + Ay
-            add = (ky >= 0)
-        else:
-            kx1 = t[2, 0] + t[0, 2]  # Nz + Ax
-            ky1 = t[2, 1] + t[1, 2]  # Oz + Ay
-            kz1 = t[2, 2] - t[0, 0] - t[1, 1] + 1  # Az - Nx - Oy + 1
-            add = (kz >= 0)
-
-        if add:
-            kx = kx + kx1
-            ky = ky + ky1
-            kz = kz + kz1
-        else:
-            kx = kx - kx1
-            ky = ky - ky1
-            kz = kz - kz1
-
-        kv = np.matrix([[kx, ky, kz]])
-        nm = np.linalg.norm(kv)
-        if nm == 0:
-            self.s = 1.0
-            self.v = np.matrix([[0.0, 0.0, 0.0]])
-
-        else:
-            self.s = qs
-            self.v = (sqrt(1 - qs ** 2) / nm) * kv
 
     def norm(self):
         """Return the norm of this quaternion.
@@ -131,9 +74,9 @@ class Quaternion:
         @rtype: quaternion
         @return: equivalent unit quaternion
         """
-        qr = Quaternion()
+        qr = UnitQuaternion()
         nm = self.norm()
-        qr.s = self.s / nm
+        qr.s = float(self.s / nm)
         qr.v = self.v / nm
         return qr
 
@@ -203,8 +146,8 @@ class Quaternion:
             v2 = other.v
 
             # form the product
-            self.s = s1*s2 - v1*v2.T
-            self.v = s1*v2 + s2*v1 + np.cross(v1,v2)
+            self.s = s1 * s2 - v1 * v2.T
+            self.v = s1 * v2 + s2 * v1 + np.cross(v1, v2)
 
         elif type(other) is int or type(other) is float:
             self.s *= other
@@ -235,3 +178,129 @@ class Quaternion:
 
     def __repr__(self):
         return "%f <%f, %f, %f>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
+
+
+class UnitQuaternion(Quaternion):
+    def __init__(self, s=None, v=None):
+        if s is None:
+            s = 1
+        if v is None:
+            v = np.matrix([[0, 0, 0]])
+        super().__init__(s, v)
+
+    @classmethod
+    def rot(cls, arg_in):
+        qr = cls()
+        qr.tr2q(arg_in)
+        return qr
+
+    @classmethod
+    def qt(cls, arg_in):
+        if type(arg_in) is Quaternion:
+            arg_in = arg_in.unit()
+            print(type(arg_in.s))
+        else:
+            assert type(arg_in) is UnitQuaternion
+        return cls(arg_in.s, arg_in.v)
+
+    @classmethod
+    def eul(cls, arg_in, unit='rad'):
+        assert isvec(arg_in, 3)
+        return cls.rot(eul2r(phi=arg_in, unit=unit))
+
+    @classmethod
+    def rpy(cls, arg_in, unit='rad'):
+        return cls.rot(rpy2r(thetas=arg_in, unit=unit))  # rpy2r returns a list of matrices
+
+    @classmethod
+    def angvec(cls):
+        pass
+
+    @classmethod
+    def omega(cls):
+        pass
+
+    @classmethod
+    def Rx(cls, angle, unit='rad'):
+        return cls.rot(rotx(angle, unit=unit))
+
+    @classmethod
+    def Ry(cls, angle, unit='rad'):
+        return cls.rot(roty(angle, unit=unit))
+
+    @classmethod
+    def Rz(cls, angle, unit='rad'):
+        return cls.rot(rotz(angle, unit=unit))
+
+    @classmethod
+    def vec(cls, arg_in):
+        assert isvec(arg_in, 4)
+        unit_qr = cls(float(arg_in[0, 0]), arg_in[0, 1:4])
+        return unit_qr.unit()
+
+    def plot(self):
+        SO3.np(self.r()).plot()
+
+    def matrix(self):
+        pass
+
+    def to_rpy(self):
+        return tr2rpy(self.r())
+
+    def to_angvec(self):
+        pass
+
+    def to_so3(self):
+        return SO3.np(self.r())
+
+    def to_se3(self):
+        return SE3(so3=SO3.np(self.r()))
+
+    def tr2q(self, t):
+        """
+        Converts a homogeneous rotation matrix to a Quaternion object
+        Code retrieved from: https://github.com/petercorke/robotics-toolbox-python/blob/master/robot/Quaternion.py
+        Original authors: Luis Fernando Lara Tobar and Peter Corke
+        :param t: homogeneous matrix
+        :return: quaternion object
+        """
+        assert ishomog(t, (3, 3)), "Argument must be 3x3 homogeneous numpy matrix"
+        qs = sqrt(trace(t) + 1) / 2.0
+        kx = t[2, 1] - t[1, 2]  # Oz - Ay
+        ky = t[0, 2] - t[2, 0]  # Ax - Nz
+        kz = t[1, 0] - t[0, 1]  # Ny - Ox
+
+        if (t[0, 0] >= t[1, 1]) and (t[0, 0] >= t[2, 2]):
+            kx1 = t[0, 0] - t[1, 1] - t[2, 2] + 1  # Nx - Oy - Az + 1
+            ky1 = t[1, 0] + t[0, 1]  # Ny + Ox
+            kz1 = t[2, 0] + t[0, 2]  # Nz + Ax
+            add = (kx >= 0)
+        elif t[1, 1] >= t[2, 2]:
+            kx1 = t[1, 0] + t[0, 1]  # Ny + Ox
+            ky1 = t[1, 1] - t[0, 0] - t[2, 2] + 1  # Oy - Nx - Az + 1
+            kz1 = t[2, 1] + t[1, 2]  # Oz + Ay
+            add = (ky >= 0)
+        else:
+            kx1 = t[2, 0] + t[0, 2]  # Nz + Ax
+            ky1 = t[2, 1] + t[1, 2]  # Oz + Ay
+            kz1 = t[2, 2] - t[0, 0] - t[1, 1] + 1  # Az - Nx - Oy + 1
+            add = (kz >= 0)
+
+        if add:
+            kx = kx + kx1
+            ky = ky + ky1
+            kz = kz + kz1
+        else:
+            kx = kx - kx1
+            ky = ky - ky1
+            kz = kz - kz1
+
+        kv = np.matrix([[kx, ky, kz]])
+        nm = np.linalg.norm(kv)
+        if nm == 0:
+            self.s = 1.0
+            self.v = np.matrix([[0.0, 0.0, 0.0]])
+
+        else:
+            self.s = qs
+            self.v = (sqrt(1 - qs ** 2) / nm) * kv

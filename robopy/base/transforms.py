@@ -312,21 +312,30 @@ def rpy2r(thetas, order='zyx', unit='rad'):
             z = [rotz(theta) for theta in roll]
             xyz = [(x[i] * y[i] * z[i]) for i in range(len(thetas))]
             xyz = [np.asmatrix(each.round(15)) for each in xyz]
-            return xyz
+            if len(xyz) == 1:
+                return xyz[0]
+            else:
+                return xyz
         if order == 'zyx' or order == 'vehicle':
             z = [rotz(theta) for theta in yaw]
             y = [roty(theta) for theta in pitch]
             x = [rotx(theta) for theta in roll]
             zyx = [(z[i] * y[i] * x[i]) for i in range(len(thetas))]
             zyx = [np.asmatrix(each.round(15)) for each in zyx]
-            return zyx
+            if len(zyx) == 1:
+                return zyx[0]
+            else:
+                return zyx
         if order == 'yxz' or order == 'camera':
             y = [roty(theta) for theta in yaw]
             x = [rotx(theta) for theta in pitch]
             z = [rotz(theta) for theta in roll]
             yxz = [(y[i] * x[i] * z[i]) for i in range(len(thetas))]
             yxz = [np.asmatrix(each.round(15)) for each in yxz]
-            return yxz
+            if len(yxz) == 1:
+                return yxz[0]
+            else:
+                return yxz
     else:
         raise TypeError('thetas must be a list of roll pitch yaw angles\n'
                         'OR a list of list of roll pitch yaw angles.')
@@ -368,7 +377,10 @@ def rpy2tr(thetas, order='zyx', unit='rad'):
     direction.
     """
     rot = rpy2r(thetas, order, unit)
-    rot = [r2t(each) for each in rot]
+    if type(rot) is list:
+        rot = [r2t(each) for each in rot]
+    else:
+        rot = r2t(rot)
     return rot
 
 
