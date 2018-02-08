@@ -8,6 +8,7 @@ from numpy import trace
 from .pose import SO3
 from .pose import SE3
 from .transforms import *
+from .tests.test_common import *
 
 
 class Quaternion:
@@ -176,6 +177,22 @@ class Quaternion:
             qr.v = self.v / other
         return qr
 
+    def __eq__(self, other):
+        # assert type(other) is Quaternion
+        try:
+            np.testing.assert_almost_equal(self.s, other.s)
+        except AssertionError:
+            return False
+        if not matrices_equal(self.v, other.v, decimal=7):
+            return False
+        return True
+
+    def __ne__(self, other):
+        if self == other:
+            return False
+        else:
+            return True
+
     def __repr__(self):
         return "%f <%f, %f, %f>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
 
@@ -210,15 +227,26 @@ class UnitQuaternion(Quaternion):
 
     @classmethod
     def rpy(cls, arg_in, unit='rad'):
-        return cls.rot(rpy2r(thetas=arg_in, unit=unit))  # rpy2r returns a list of matrices
+        return cls.rot(rpy2r(thetas=arg_in, unit=unit))
 
     @classmethod
-    def angvec(cls):
-        pass
+    def angvec(cls, theta, v, unit='rad'):
+        assert isvec(v, 3)
+        assert type(theta) is float or type(theta) is int
+        uq = UnitQuaternion()
+        if unit == 'deg':
+            theta = theta * math.pi / 180
+        uq.s = math.cos(theta/2)
+        uq.v = math.sin(theta/2) * unitize(v)
+        return uq
 
     @classmethod
-    def omega(cls):
-        pass
+    def omega(cls, w):
+        assert isvec(w, 3)
+        theta = np.linalg.norm(w)
+        s = math.cos(theta / 2)
+        v = math.sin(theta / 2) * unitize(w)
+        return cls(s=s, v=v)
 
     @classmethod
     def Rx(cls, angle, unit='rad'):
@@ -234,21 +262,46 @@ class UnitQuaternion(Quaternion):
 
     @classmethod
     def vec(cls, arg_in):
-        assert isvec(arg_in, 4)
-        unit_qr = cls(float(arg_in[0, 0]), arg_in[0, 1:4])
-        return unit_qr.unit()
+        assert isvec(arg_in, 3)
+        s = 1 - np.linalg.norm(arg_in)
+        return cls(s=s, v=arg_in)
+
+    def new(self):
+        return UnitQuaternion(s=self.s, v=self.v)
 
     def plot(self):
         SO3.np(self.r()).plot()
 
+    def animate(self):
+        pass
+
     def matrix(self):
         pass
+
+    def interp(self, qr):
+        pass
+
+    def to_vec(self):
+        if self.s < 0:
+            return -self.v
+        else:
+            return self.v
 
     def to_rpy(self):
         return tr2rpy(self.r())
 
-    def to_angvec(self):
-        pass
+    def to_angvec(self, unit='rad'):
+        vec, theta = 0, 0
+        if np.linalg.norm(self.v) < 10 * np.spacing([1])[0]:
+            vec = np.matrix([[0, 0, 0]])
+            theta = 0
+        else:
+            vec = unitize(vec)
+            theta = 2 * math.atan2(np.linalg.norm(self.v), self.s)
+
+        if unit == 'deg':
+            theta = theta * 180 / math.pi
+        return theta, vec
 
     def to_so3(self):
         return SO3.np(self.r())
@@ -256,7 +309,24 @@ class UnitQuaternion(Quaternion):
     def to_se3(self):
         return SE3(so3=SO3.np(self.r()))
 
-    def tr2q(self, t):
+    def to_rot(self):
+        q = self.double()
+        s = q[0, 0]
+        x = q[0, 1]
+        y = q[0, 2]
+        z = q[0, 3]
+        return np.matrix([[1 - 2 * (y ** 2 + z ** 2), 2 * (x * y - s * z), 2 * (x * z + s * y)],
+                          [2 * (x * y + s * z), 1 - 2 * (x ** 2 + z ** 2), 2 * (y * z - s * x)],
+                          [2 * (x * z - s * y), 2 * (y * z + s * x), 1 - 2 * (x ** 2 + y ** 2)]])
+
+    def q2r(self):
+        return self.to_rot()
+
+    def q2tr(self):
+        return r2t(self.to_rot())
+
+    @staticmethod
+    def tr2q(t):
         """
         Converts a homogeneous rotation matrix to a Quaternion object
         Code retrieved from: https://github.com/petercorke/robotics-toolbox-python/blob/master/robot/Quaternion.py
@@ -297,10 +367,17 @@ class UnitQuaternion(Quaternion):
 
         kv = np.matrix([[kx, ky, kz]])
         nm = np.linalg.norm(kv)
+        qr = UnitQuaternion()
         if nm == 0:
-            self.s = 1.0
-            self.v = np.matrix([[0.0, 0.0, 0.0]])
+            qr.s = 1.0
+            qr.v = np.matrix([[0.0, 0.0, 0.0]])
 
         else:
-            self.s = qs
-            self.v = (sqrt(1 - qs ** 2) / nm) * kv
+            qr.s = qs
+            qr.v = (sqrt(1 - qs ** 2) / nm) * kv
+
+        return qr
+
+    def __matmul__(self, other):
+        # TODO Implement dot product for unit quaternions
+        return 0
