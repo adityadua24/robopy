@@ -41,6 +41,11 @@ class Quaternion:
         assert type(arg_in) is Quaternion
         return cls(s=arg_in.s, v=arg_in.v)
 
+    @classmethod
+    def pure(cls, vec):
+        assert isvec(vec, 3)
+        return cls(s=0, v=vec)
+
     def conj(self):
         return Quaternion(s=self.s, v=-self.v)
 
@@ -96,6 +101,16 @@ class Quaternion:
         return np.matrix([[1 - 2 * (y ** 2 + z ** 2), 2 * (x * y - s * z), 2 * (x * z + s * y)],
                           [2 * (x * y + s * z), 1 - 2 * (x ** 2 + z ** 2), 2 * (y * z - s * x)],
                           [2 * (x * z - s * y), 2 * (y * z + s * x), 1 - 2 * (x ** 2 + y ** 2)]])
+
+    def matrix(self):
+        s = self.s
+        x = self.v[0, 0]
+        y = self.v[0, 1]
+        z = self.v[0, 2]
+        return np.matrix([[s, -x, -y, -z],
+                          [x, s, -z, y],
+                          [y, z, s, -x],
+                          [z, -y, x, s]])
 
     def __mul__(self, other):
         assert isinstance(other, Quaternion) or isinstance(other, int) or isinstance(other,
@@ -196,6 +211,9 @@ class Quaternion:
     def __repr__(self):
         return "%f <%f, %f, %f>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
 
+    def __str__(self):
+        return self.__repr__()
+
 
 class UnitQuaternion(Quaternion):
     def __init__(self, s=None, v=None):
@@ -208,8 +226,7 @@ class UnitQuaternion(Quaternion):
     @classmethod
     def rot(cls, arg_in):
         qr = cls()
-        qr.tr2q(arg_in)
-        return qr
+        return qr.tr2q(arg_in)
 
     @classmethod
     def qt(cls, arg_in):
@@ -278,8 +295,36 @@ class UnitQuaternion(Quaternion):
     def matrix(self):
         pass
 
-    def interp(self, qr):
-        pass
+    def interp(self, qr, r=0.5, shortest=False,):
+        """
+        Algorithm source: https://en.wikipedia.org/wiki/Slerp
+        :param qr: UnitQuaternion
+        :param shortest: Take the shortest path along the great circle
+        :param r:
+        :return: interpolated UnitQuaternion
+        """
+        assert type(qr) is UnitQuaternion
+        q1 = self.double()
+        print(q1)
+        q2 = qr.double()
+        print(q2)
+        dot = q1*np.transpose(q2)
+        print(dot)
+        # If the dot product is negative, the quaternions
+        # have opposite handed-ness and slerp won't take
+        # the shorter path. Fix by reversing one quaternion.
+        if shortest:
+            if dot < 0:
+                q1 = - q1
+                dot = -dot
+
+        dot = np.clip(dot, -1, 1)  # Clip within domain of acos()
+        theta_0 = math.acos(dot)  # theta_0 = angle between input vectors
+        theta = theta_0 * r  # theta = angle between v0 and result
+        s1 = float(math.cos(theta) - dot * math.sin(theta) / math.sin(theta_0))
+        s2 = math.sin(theta) / math.sin(theta_0)
+        out = (q1 * s1) + (q2 * s2)
+        return UnitQuaternion(s=float(out[0, 0]), v=out[0, 1:])
 
     def to_vec(self):
         if self.s < 0:
