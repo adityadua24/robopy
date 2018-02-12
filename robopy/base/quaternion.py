@@ -113,20 +113,19 @@ class Quaternion:
                           [z, -y, x, s]])
 
     def __mul__(self, other):
-        assert isinstance(other, Quaternion) or isinstance(other, int) or isinstance(other,
-                                                                                     float), "Can be multiplied with " \
-                                                                                             "Quaternion, " \
-                                                                                             "int or a float "
-        qr = Quaternion()
+        assert isinstance(other, Quaternion) \
+               or isinstance(other, int) \
+               or isinstance(other, float), "Can be multiplied with Quaternion, int or a float. "
+        if type(other) is Quaternion:
+            qr = Quaternion()
+        else:
+            qr = UnitQuaternion()
         if isinstance(other, Quaternion):
             qr.s = self.s * other.s - self.v * np.transpose(other.v)
             qr.v = self.s * other.v + other.s * self.v + np.cross(self.v, other.v)
         elif type(other) is int or type(other) is float:
             qr.s = self.s * other
             qr.v = self.v * other
-        elif isvec(other, 3):
-            # TODO
-            pass
         return qr
 
     def __pow__(self, power, modulo=None):
@@ -286,6 +285,16 @@ class UnitQuaternion(Quaternion):
     def new(self):
         return UnitQuaternion(s=self.s, v=self.v)
 
+    def dot(self, omega):
+        E = self.s * np.asmatrix(np.eye(3, 3)) - skew(self.v)
+        qd = -self.v * omega
+        return 0.5 * np.r_[qd, E*omega]
+
+    def dotb(self, omega):
+        E = self.s * np.asmatrix(np.eye(3, 3)) + skew(self.v)
+        qd = -self.v * omega
+        return 0.5 * np.r_[qd, E*omega]
+
     def plot(self):
         SO3.np(self.r()).plot()
 
@@ -295,7 +304,7 @@ class UnitQuaternion(Quaternion):
     def matrix(self):
         pass
 
-    def interp(self, qr, r=0.5, shortest=False,):
+    def interp(self, qr, r=0.5, shortest=False):
         """
         Algorithm source: https://en.wikipedia.org/wiki/Slerp
         :param qr: UnitQuaternion
@@ -424,5 +433,9 @@ class UnitQuaternion(Quaternion):
         return qr
 
     def __matmul__(self, other):
-        # TODO Implement dot product for unit quaternions
-        return 0
+        assert type(other) is UnitQuaternion
+        return (self * other).unit()
+
+    def __floordiv__(self, other):
+        assert type(other) is UnitQuaternion
+        return (self / other).unit()
