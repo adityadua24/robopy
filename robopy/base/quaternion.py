@@ -1,6 +1,6 @@
 # Author: Aditya Dua
 # 28 January, 2018
-import numpy as np
+from __future__ import print_function
 from .common import isvec
 from .common import ishomog
 from math import sqrt
@@ -9,6 +9,7 @@ from .pose import SO3
 from .pose import SE3
 from .transforms import *
 from .tests.test_common import *
+from .graphics import *
 
 
 class Quaternion:
@@ -216,6 +217,7 @@ class Quaternion:
 
 class UnitQuaternion(Quaternion):
     def __init__(self, s=None, v=None):
+        self.pipeline = None
         if s is None:
             s = 1
         if v is None:
@@ -298,8 +300,48 @@ class UnitQuaternion(Quaternion):
     def plot(self):
         SO3.np(self.r()).plot()
 
-    def animate(self):
-        pass
+    def animate(self, qr=None, duration=5):
+        class vtkTimerCallback():
+            def __init__(self, q1, q2):
+                self.timer_count = 0
+                self.q1 = q1
+                self.q2 = q2
+
+            def execute(self, obj, event):
+                # print(self.timer_count)
+                total_steps = 60 * duration
+                self.timer_count += 1
+                if self.timer_count == total_steps:
+                    obj.DestroyTimer()
+                    return
+                self.axis.SetUserMatrix(np2vtk(q1.interp(q2, r=1/total_steps * self.timer_count).q2tr()))
+                iren = obj
+                iren.GetRenderWindow().Render()
+
+        self.pipeline = VtkPipeline()
+        axis = vtk.vtkAxesActor()
+        axis.SetAxisLabels(0)
+        self.pipeline.add_actor(axis)
+        if qr is None:
+            q1 = UnitQuaternion()
+            q2 = self
+        else:
+            assert type(qr) is UnitQuaternion
+            q1 = self
+            q2 = qr
+
+        cube_axes = axesCube(self.pipeline.ren)
+        self.pipeline.add_actor(cube_axes)
+
+        self.pipeline.ren.ResetCamera()
+        self.pipeline.ren_win.Render()
+        self.pipeline.iren.Initialize()
+
+        cb = vtkTimerCallback(q1, q2)
+        cb.axis = axis
+        self.pipeline.iren.AddObserver('TimerEvent', cb.execute)
+        timerId = self.pipeline.iren.CreateRepeatingTimer((int)(1000 / 60))  # Timer creates 60 fps
+        self.pipeline.render()
 
     def matrix(self):
         pass
@@ -314,11 +356,9 @@ class UnitQuaternion(Quaternion):
         """
         assert type(qr) is UnitQuaternion
         q1 = self.double()
-        print(q1)
         q2 = qr.double()
-        print(q2)
         dot = q1*np.transpose(q2)
-        print(dot)
+
         # If the dot product is negative, the quaternions
         # have opposite handed-ness and slerp won't take
         # the shorter path. Fix by reversing one quaternion.
