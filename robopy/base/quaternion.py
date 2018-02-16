@@ -5,8 +5,6 @@ from .common import isvec
 from .common import ishomog
 from math import sqrt
 from numpy import trace
-from .pose import SO3
-from .pose import SE3
 from .transforms import *
 from .tests.test_common import *
 from .graphics import *
@@ -298,26 +296,11 @@ class UnitQuaternion(Quaternion):
         return 0.5 * np.r_[qd, E*omega]
 
     def plot(self):
+        from .pose import SO3
         SO3.np(self.r()).plot()
 
     def animate(self, qr=None, duration=5):
-        class vtkTimerCallback():
-            def __init__(self, q1, q2):
-                self.timer_count = 0
-                self.q1 = q1
-                self.q2 = q2
-
-            def execute(self, obj, event):
-                # print(self.timer_count)
-                total_steps = 60 * duration
-                self.timer_count += 1
-                if self.timer_count == total_steps:
-                    obj.DestroyTimer()
-                    return
-                self.axis.SetUserMatrix(np2vtk(q1.interp(q2, r=1/total_steps * self.timer_count).q2tr()))
-                iren = obj
-                iren.GetRenderWindow().Render()
-
+        timer_count = 0
         self.pipeline = VtkPipeline()
         axis = vtk.vtkAxesActor()
         axis.SetAxisLabels(0)
@@ -333,15 +316,20 @@ class UnitQuaternion(Quaternion):
         cube_axes = axesCube(self.pipeline.ren)
         self.pipeline.add_actor(cube_axes)
 
-        self.pipeline.ren.ResetCamera()
-        self.pipeline.ren_win.Render()
-        self.pipeline.iren.Initialize()
+        def execute(obj, event):
+            # print(self.timer_count)
+            nonlocal timer_count
+            nonlocal axis
+            total_steps = 60 * duration
+            timer_count += 1
+            if timer_count == total_steps:
+                self.pipeline.iren.DestroyTimer()
+                return
+            axis.SetUserMatrix(np2vtk(q1.interp(q2, r=1/total_steps * timer_count).q2tr()))
+            self.pipeline.iren.GetRenderWindow().Render()
 
-        cb = vtkTimerCallback(q1, q2)
-        cb.axis = axis
-        self.pipeline.iren.AddObserver('TimerEvent', cb.execute)
-        timerId = self.pipeline.iren.CreateRepeatingTimer((int)(1000 / 60))  # Timer creates 60 fps
-        self.pipeline.render()
+        self.pipeline.iren.AddObserver('TimerEvent', execute)
+        self.pipeline.animate()
 
     def matrix(self):
         pass
@@ -398,9 +386,12 @@ class UnitQuaternion(Quaternion):
         return theta, vec
 
     def to_so3(self):
+        from .pose import SO3
         return SO3.np(self.r())
 
     def to_se3(self):
+        from .pose import SE3
+        from .pose import SO3
         return SE3(so3=SO3.np(self.r()))
 
     def to_rot(self):

@@ -2,6 +2,7 @@
 # 18 August 2017
 import pkg_resources
 import vtk
+import math
 
 
 class VtkPipeline:
@@ -34,6 +35,13 @@ class VtkPipeline:
         cam.Roll(-90)
         cam.Elevation(-90)
         cam.Zoom(0.6)
+
+    def animate(self, fps=60):
+        self.ren.ResetCamera()
+        self.ren_win.Render()
+        self.iren.Initialize()
+        self.iren.CreateRepeatingTimer(math.floor(1000 / fps))  # Timer creates 60 fps
+        self.render()
 
 
 def axesUniversal():
