@@ -19,6 +19,7 @@ class SerialLink:
     """
     SerialLink object class.
     """
+
     def __init__(self, links, name=None, base=None, tool=None, stl_files=None, q=None, colors=None):
         """
         Creates a SerialLink object.
@@ -133,7 +134,7 @@ class SerialLink:
         assert type(stance) is np.matrix
 
         if unit == 'deg':
-                stance = stance * (pi / 180)
+            stance = stance * (pi / 180)
 
         self.pipeline = VtkPipeline()
         self.pipeline.reader_list, self.pipeline.actor_list, self.pipeline.mapper_list = self.__setup_pipeline_objs()
@@ -172,7 +173,7 @@ class SerialLink:
     def _setup_file_names(num):
         file_names = []
         for i in range(0, num):
-            file_names.append('link'+str(i)+'.stl')
+            file_names.append('link' + str(i) + '.stl')
 
         return file_names
 
@@ -184,49 +185,39 @@ class SerialLink:
         :param frame_rate: frame_rate for animation. Could be any integer more than 1. Higher value runs through stances faster.
         :return: null
         """
-        class vtkTimerCallback():
-            def __init__(self, robot, stances):
-                self.timer_count = 0
-                self.robot = robot
-                self.stances = stances
-                self.unit = unit
-
-            def execute(self, obj, event):
-                # print(self.timer_count)
-                self.timer_count += 1
-                if self.timer_count == self.stances.shape[0]:
-                    obj.DestroyTimer()
-                    return
-
-                self.robot.fkine(self.stances, apply_stance=True, actor_list=self.robot.pipeline.actor_list, timer=self.timer_count)
-                self.robot.pipeline.iren = obj
-                self.robot.pipeline.iren.GetRenderWindow().Render()
-
         if unit == 'deg':
             stances = stances * (pi / 180)
 
         self.pipeline = VtkPipeline()
         self.pipeline.reader_list, self.pipeline.actor_list, self.pipeline.mapper_list = self.__setup_pipeline_objs()
-
         self.fkine(stances, apply_stance=True, actor_list=self.pipeline.actor_list)
-
         cube_axes = axesCube(self.pipeline.ren)
         self.pipeline.add_actor(cube_axes)
 
-        self.pipeline.ren.ResetCamera()
-        self.pipeline.ren_win.Render()
-        self.pipeline.iren.Initialize()
+        timer_count = 0
 
-        cb = vtkTimerCallback(robot=self, stances=stances)
-        self.pipeline.iren.AddObserver('TimerEvent', cb.execute)
-        timerId = self.pipeline.iren.CreateRepeatingTimer((int)(1000 / frame_rate))
-        self.pipeline.render()
+        def execute(obj, event):
+            # print(self.timer_count)
+            nonlocal timer_count
+            nonlocal stances
+            timer_count += 1
+            if timer_count == stances.shape[0]:
+                obj.DestroyTimer()
+                return
+
+            self.fkine(stances, apply_stance=True, actor_list=self.pipeline.actor_list, timer=timer_count)
+            self.pipeline.iren = obj
+            self.pipeline.iren.GetRenderWindow().Render()
+
+        self.pipeline.iren.AddObserver('TimerEvent', execute)
+        self.pipeline.animate()
 
 
 class Link(ABC):
     """
     Link object class.
     """
+
     def __init__(self, j, theta, d, a, alpha, offset=None, kind='', mdh=0, flip=None, qlim=None):
         """
         initialises the link object.
@@ -285,6 +276,7 @@ class Revolute(Link):
     """
     Revolute object class.
     """
+
     def __init__(self, j, theta, d, a, alpha, offset, qlim):
         """
         Initialised revolute object.
@@ -304,6 +296,7 @@ class Prismatic(Link):
     """
     Prismatic object class.
     """
+
     def __init__(self, j, theta, d, a, alpha, offset, qlim):
         """
         Initialises prismatic object.
