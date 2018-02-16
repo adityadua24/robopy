@@ -12,7 +12,7 @@ def ishomog(tr, dim, rtest=''):
     ISHOMOG(T) is true if the argument T is of dimension 4x4 or 4x4xN, else false.
     ISHOMOG(T, 'valid') as above, but also checks the validity of the rotation sub-matrix.
     See Also: isrot, ishomog2, isvec"""
-
+    assert type(tr) is np.matrix, "Argument should be a numpy matrix"
     assert dim == (3, 3) or dim == (4, 4)
     is_valid = None
     if rtest == 'valid':
@@ -41,6 +41,7 @@ def isvec(v, l=3):
     """
     ISVEC Test if vector
     """
+    assert type(v) is np.matrix
     d = v.shape
     h = len(d) == 2 and min(v.shape) == 1 and v.size == l
 
