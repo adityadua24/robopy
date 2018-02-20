@@ -1,5 +1,5 @@
-ROBOPY
-======
+<img src="./docs/images/logo.png" height="250" alt="robopy logo">
+
 [![Build Status](https://travis-ci.org/adityadua24/robopy.svg?branch=master)](https://travis-ci.org/adityadua24/robopy)
 [![PyPI](https://img.shields.io/pypi/v/robopy.svg)](https://pypi.python.org/pypi/robopy)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
