@@ -425,6 +425,7 @@ class SO3(SuperPose):
         :param null: Creates empty objects with no matrices. Mostly for internal use only.
         """
 
+        self.pipeline = None
         check_args.so3_constructor_args_check(args_in)
         # TODO make sure all list elements are of same data type. !!! Throw TypeError if not
 
@@ -568,6 +569,51 @@ class SO3(SuperPose):
         pipeline.add_actor(graphics.axesCube(pipeline.ren))
         pipeline.render()
 
+    def animate(self, other=None, duration=5):
+        from .quaternion import UnitQuaternion
+        q1 = []
+        q2 = []
+        if other is not None:
+            assert type(other) is SO3
+            assert self.length == other.length
+            for i in range(self.length):
+                q1.append(UnitQuaternion.rot(self.data[i]))
+                q2.append(UnitQuaternion.rot(other.data[i]))
+        else:
+            for i in range(self.length):
+                q1.append(UnitQuaternion())
+                q2.append(UnitQuaternion.rot(self.data[i]))
+
+        self.pipeline = VtkPipeline()
+        axis_list = []
+        for i in range(self.length):
+            axis_list.append(vtk.vtkAxesActor())
+            axis_list[i].SetAxisLabels(0)
+            axis_list[i].SetUserMatrix(transforms.np2vtk(q1[i].q2tr()))
+            self.pipeline.add_actor(axis_list[i])
+
+        cube_axes = graphics.axesCube(self.pipeline.ren)
+        self.pipeline.add_actor(cube_axes)
+        timer_count = 0
+
+        def execute(obj, event):
+            nonlocal timer_count
+            nonlocal axis_list
+            print(timer_count)
+            total_steps = 60 * duration
+            timer_count += 1
+            if timer_count == total_steps:
+                self.pipeline.iren.DestroyTimer()
+                return
+
+            for i in range(len(axis_list)):
+                axis_list[i].SetUserMatrix(
+                    transforms.np2vtk(q1[i].interp(q2[i], r=1 / total_steps * timer_count).q2tr()))
+            self.pipeline.iren.GetRenderWindow().Render()
+
+        self.pipeline.iren.AddObserver('TimerEvent', execute)
+        self.pipeline.animate()
+
     def rotation(self):
         return self.mat
 
@@ -698,7 +744,7 @@ class SE3(SO3):
             pass
         elif x is not None and y is not None and z is not None and rot is None and so3 is None and se3 is None:
             if (type(x) is int or type(x) is float) and (type(y) is int or type(y) is float) and (
-                            type(z) is int or type(z) is float):
+                    type(z) is int or type(z) is float):
                 x = [x]
                 y = [y]
                 z = [z]
