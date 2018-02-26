@@ -21,6 +21,12 @@ pip install robopy
 
 Unofficial windows binaries available from: https://www.lfd.uci.edu/~gohlke/pythonlibs/
 
+**Puma 560 simulation:-**
+
+_Click on the image to see a VR simulation_
+
+<a href="https://youtu.be/kWSJNwEWhRM"><img src="./docs/images/puma560.JPG" width="600" height="500" alt="Puma 560 image"></a>
+
 **Transformation functions:-**
 
 <img src="./docs/images/transforms.png" width="600">
@@ -29,14 +35,6 @@ Unofficial windows binaries available from: https://www.lfd.uci.edu/~gohlke/pyth
 
 <img src="./docs/images/plot_pose.png" width="600" height="500">
 
-**Puma 560 simulation:-**
-
-Click on the image to see a VR simulation
-
-<a href="https://youtu.be/kWSJNwEWhRM"><img src="./docs/images/puma560.JPG" width="600" height="500" alt="Puma 560 image"></a>
-
 **Orion5:-**
 
 <img src="./docs/images/Orion5.png" width="600">
-
-
