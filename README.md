@@ -27,6 +27,12 @@ _Click on the image to see a VR simulation_
 
 <a href="https://youtu.be/kWSJNwEWhRM"><img src="./docs/images/puma560.JPG" width="600" height="500" alt="Puma 560 image"></a>
 
+**UnitQuaternions:-**
+
+_Click on the image to see UnitQuaternion animation_
+
+<a href="https://youtu.be/AyiGMnGzESs"><img src="./docs/images/qt.png" width="600" height="500" alt="UnitQuaternion example code"></a>
+
 **Transformation functions:-**
 
 <img src="./docs/images/transforms.png" width="600">
