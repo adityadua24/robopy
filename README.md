@@ -31,7 +31,7 @@ _Click on the image to see a VR simulation_
 
 _Click on the image to see UnitQuaternion animation_
 
-<a href="https://youtu.be/AyiGMnGzESs"><img src="./docs/images/qt.png" width="600" height="500" alt="UnitQuaternion example code"></a>
+<a href="https://youtu.be/AyiGMnGzESs"><img src="./docs/images/qt.png" width="600" alt="UnitQuaternion example code"></a>
 
 **Transformation functions:-**
 
