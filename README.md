@@ -9,7 +9,7 @@ A Python 3 implementation of Peter Corke's Robotics Toolbox
 - **Bug reports:** https://github.com/adityadua24/robopy/issues
 
 **Dependencies:**
-- VTK 
+- [VTK](https://www.vtk.org/) 
 - Numpy
 - Scipy
 
