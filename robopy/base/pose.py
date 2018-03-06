@@ -732,6 +732,30 @@ class SO3(SuperPose):
         elif self.length > 1:
             return vec, mat
 
+    def ctraj(self, T1, N):
+        from .util import ctraj
+        from .common import ishomog
+        from .transforms import r2t
+        assert ishomog(T1, 3) or ishomog(T1, 4) or (type(self) == type(T1))
+
+        T0 = self.data
+        if type(T1) is SO3 or type(T1) is SE3:
+            T1 = T1.data
+
+        # Allow one to one, one to many, or many to one case.
+        assert (len(T0) == len(T1) == 1) \
+               or (len(T0) == 1 and len(T1) > 1) \
+               or (len(T0) > 1 and len(T1) == 1), " Allows only one to one, one to many, or many to one case."
+
+        if type(self) is SO3:
+            for i in range(len(T0)):
+                T0[i] = r2t(T0[i])
+
+            for i in range(len(T1)):
+                T1[i] = r2t(T1[i])
+
+        return ctraj(T0, T1, N)
+
 
 # ---------------------------------------------------------------------------------
 class SE3(SO3):
