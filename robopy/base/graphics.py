@@ -17,15 +17,16 @@ class VtkPipeline:
         self.actor_list = []
         self.mapper_list = []
         self.source_list = []
+        self.screenshot_count = 0
 
-    def render(self):
+    def render(self, ui=True):
         for each in self.actor_list:
             self.ren.AddActor(each)
         self.ren.ResetCamera()
-        # self.set_camera()
         self.ren_win.Render()
-        self.iren.Initialize()
-        self.iren.Start()
+        if ui:
+            self.iren.Initialize()
+            self.iren.Start()
 
     def add_actor(self, actor):
         self.actor_list.append(actor)
@@ -42,6 +43,17 @@ class VtkPipeline:
         self.iren.Initialize()
         self.iren.CreateRepeatingTimer(math.floor(1000 / fps))  # Timer creates 60 fps
         self.render()
+
+    def screenshot(self):
+        w2if = vtk.vtkWindowToImageFilter()
+        w2if.SetInput(self.ren_win)
+        w2if.Update()
+
+        writer = vtk.vtkPNGWriter()
+        writer.SetFileName(str)
+        self.screenshot_count += 1
+        writer.SetInputData(w2if.GetOutput())
+        writer.Write()
 
 
 def axesUniversal():
