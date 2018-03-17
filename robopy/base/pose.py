@@ -567,10 +567,15 @@ class SO3(SuperPose):
             pipeline.add_actor(axes[i])
 
         pipeline.add_actor(graphics.axesCube(pipeline.ren))
-        pipeline.render()
+        pipeline.render(ui=False)
+        pipeline.screenshot()
+        pipeline.iren.Initialize()
+        pipeline.iren.Start()
 
-    def animate(self, other=None, duration=5):
+    def animate(self, other=None, duration=5, gif=None):
+        import imageio
         from .quaternion import UnitQuaternion
+        assert duration > 0
         q1 = []
         q2 = []
         if other is not None:
@@ -596,15 +601,28 @@ class SO3(SuperPose):
         self.pipeline.add_actor(cube_axes)
         timer_count = 0
 
+        gif_data = []
+
         def execute(obj, event):
             nonlocal timer_count
             nonlocal axis_list
+            nonlocal gif_data
             print(timer_count)
             total_steps = 60 * duration
             timer_count += 1
-            if timer_count == total_steps:
+            if timer_count > total_steps:
                 self.pipeline.iren.DestroyTimer()
+                imageio.mimsave('animation.gif', gif_data)
                 return
+
+            if gif is not None:
+                assert type(gif) is str
+                self.pipeline.filename = str
+                if (timer_count % 60) == 0:
+                    self.pipeline.screenshot(gif)
+                    path = gif + str(self.pipeline.screenshot_count-1)+'.png'
+                    print(path)
+                    gif_data.append(imageio.imread(path))
 
             for i in range(len(axis_list)):
                 axis_list[i].SetUserMatrix(

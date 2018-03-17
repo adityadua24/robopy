@@ -44,13 +44,15 @@ class VtkPipeline:
         self.iren.CreateRepeatingTimer(math.floor(1000 / fps))  # Timer creates 60 fps
         self.render()
 
-    def screenshot(self):
+    def screenshot(self, filename=None):
         w2if = vtk.vtkWindowToImageFilter()
         w2if.SetInput(self.ren_win)
         w2if.Update()
-
+        if filename is None:
+            filename = 'screenshot'
+        filename = filename + '%d.png' % self.screenshot_count
         writer = vtk.vtkPNGWriter()
-        writer.SetFileName(str)
+        writer.SetFileName(filename)
         self.screenshot_count += 1
         writer.SetInputData(w2if.GetOutput())
         writer.Write()
