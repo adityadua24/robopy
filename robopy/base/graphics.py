@@ -81,13 +81,17 @@ class VtkPipeline:
             if self.gif_file is not None:
                 assert len(self.gif_data) > 0
                 imageio.mimsave(self.gif_file + '.gif', self.gif_data)
+                import os
+                for i in range(self.screenshot_count):
+                    os.remove(self.gif_file + '%d.png' % i)
                 return
 
         if self.gif_file is not None:
             if (self.timer_count % 60) == 0:
                 self.screenshot(self.gif_file)
-                path = self.gif_file + str(self.screenshot_count-1)+'.png'
+                path = self.gif_file + '%d.png' % (self.screenshot_count - 1)
                 self.gif_data.append(imageio.imread(path))
+
 
 def axesUniversal():
     axes_uni = vtk.vtkAxesActor()

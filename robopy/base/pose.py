@@ -608,7 +608,7 @@ class SO3(SuperPose):
                 axis_list[i].SetUserMatrix(
                     transforms.np2vtk(
                         q1[i].interp(
-                            q2[i], r=1 / self.pipeline.timer_duration * self.pipeline.timer_count).q2tr()))
+                            q2[i], r=1 / self.pipeline.total_time_steps * self.pipeline.timer_count).q2tr()))
             self.pipeline.iren.GetRenderWindow().Render()
 
         self.pipeline.iren.AddObserver('TimerEvent', execute)

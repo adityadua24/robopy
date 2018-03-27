@@ -22,7 +22,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.4',
+    version='1.0.5',
 
     description='A Python 3 implementation of Peter Corke\'s Robotics Toolbox',
     long_description='ROBOPY is a python implimentation of The Robotics Toolbox (RTB) (The brainchild of Peter Corke) '
