@@ -299,9 +299,8 @@ class UnitQuaternion(Quaternion):
         from .pose import SO3
         SO3.np(self.r()).plot()
 
-    def animate(self, qr=None, duration=5):
-        timer_count = 0
-        self.pipeline = VtkPipeline()
+    def animate(self, qr=None, duration=5, gif=None):
+        self.pipeline = VtkPipeline(total_time_steps=duration*60, gif_file=gif)
         axis = vtk.vtkAxesActor()
         axis.SetAxisLabels(0)
         self.pipeline.add_actor(axis)
@@ -318,14 +317,10 @@ class UnitQuaternion(Quaternion):
 
         def execute(obj, event):
             # print(self.timer_count)
-            nonlocal timer_count
             nonlocal axis
-            total_steps = 60 * duration
-            timer_count += 1
-            if timer_count == total_steps:
-                self.pipeline.iren.DestroyTimer()
-                return
-            axis.SetUserMatrix(np2vtk(q1.interp(q2, r=1/total_steps * timer_count).q2tr()))
+            self.pipeline.timer_tick()
+
+            axis.SetUserMatrix(np2vtk(q1.interp(q2, r=1/self.pipeline.total_time_steps * self.pipeline.timer_count).q2tr()))
             self.pipeline.iren.GetRenderWindow().Render()
 
         self.pipeline.iren.AddObserver('TimerEvent', execute)

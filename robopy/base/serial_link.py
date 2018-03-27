@@ -177,7 +177,7 @@ class SerialLink:
 
         return file_names
 
-    def animate(self, stances, unit='rad', frame_rate=25):
+    def animate(self, stances, unit='rad', frame_rate=25, gif=None):
         """
         Animates SerialLink object over nx6 dimensional input matrix, with each row representing list of 6 joint angles.
         :param stances: nx6 dimensional input matrix.
@@ -188,24 +188,17 @@ class SerialLink:
         if unit == 'deg':
             stances = stances * (pi / 180)
 
-        self.pipeline = VtkPipeline()
+        self.pipeline = VtkPipeline(total_time_steps=stances.shape[0] - 1, gif_file=gif)
         self.pipeline.reader_list, self.pipeline.actor_list, self.pipeline.mapper_list = self.__setup_pipeline_objs()
         self.fkine(stances, apply_stance=True, actor_list=self.pipeline.actor_list)
         cube_axes = axesCube(self.pipeline.ren)
         self.pipeline.add_actor(cube_axes)
 
-        timer_count = 0
-
         def execute(obj, event):
-            # print(self.timer_count)
-            nonlocal timer_count
             nonlocal stances
-            timer_count += 1
-            if timer_count == stances.shape[0]:
-                obj.DestroyTimer()
-                return
+            self.pipeline.timer_tick()
 
-            self.fkine(stances, apply_stance=True, actor_list=self.pipeline.actor_list, timer=timer_count)
+            self.fkine(stances, apply_stance=True, actor_list=self.pipeline.actor_list, timer=self.pipeline.timer_count)
             self.pipeline.iren = obj
             self.pipeline.iren.GetRenderWindow().Render()
 

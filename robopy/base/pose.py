@@ -573,7 +573,6 @@ class SO3(SuperPose):
         pipeline.iren.Start()
 
     def animate(self, other=None, duration=5, gif=None):
-        import imageio
         from .quaternion import UnitQuaternion
         assert duration > 0
         q1 = []
@@ -589,7 +588,7 @@ class SO3(SuperPose):
                 q1.append(UnitQuaternion())
                 q2.append(UnitQuaternion.rot(self.data[i]))
 
-        self.pipeline = VtkPipeline()
+        self.pipeline = VtkPipeline(total_time_steps=duration*60, gif_file=gif)
         axis_list = []
         for i in range(self.length):
             axis_list.append(vtk.vtkAxesActor())
@@ -599,34 +598,17 @@ class SO3(SuperPose):
 
         cube_axes = graphics.axesCube(self.pipeline.ren)
         self.pipeline.add_actor(cube_axes)
-        timer_count = 0
-
-        gif_data = []
 
         def execute(obj, event):
-            nonlocal timer_count
             nonlocal axis_list
-            nonlocal gif_data
-            print(timer_count)
-            total_steps = 60 * duration
-            timer_count += 1
-            if timer_count > total_steps:
-                self.pipeline.iren.DestroyTimer()
-                imageio.mimsave('animation.gif', gif_data)
-                return
-
-            if gif is not None:
-                assert type(gif) is str
-                self.pipeline.filename = str
-                if (timer_count % 60) == 0:
-                    self.pipeline.screenshot(gif)
-                    path = gif + str(self.pipeline.screenshot_count-1)+'.png'
-                    print(path)
-                    gif_data.append(imageio.imread(path))
+            self.pipeline.timer_tick()
+            print(self.pipeline.timer_count)
 
             for i in range(len(axis_list)):
                 axis_list[i].SetUserMatrix(
-                    transforms.np2vtk(q1[i].interp(q2[i], r=1 / total_steps * timer_count).q2tr()))
+                    transforms.np2vtk(
+                        q1[i].interp(
+                            q2[i], r=1 / self.pipeline.timer_duration * self.pipeline.timer_count).q2tr()))
             self.pipeline.iren.GetRenderWindow().Render()
 
         self.pipeline.iren.AddObserver('TimerEvent', execute)

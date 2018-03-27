@@ -6,7 +6,7 @@ import math
 
 
 class VtkPipeline:
-    def __init__(self, background=(0.15, 0.15, 0.15)):
+    def __init__(self, background=(0.15, 0.15, 0.15), total_time_steps=None, timer_rate=60, gif_file=None):
         self.ren = vtk.vtkRenderer()
         self.ren.SetBackground(background[0], background[1], background[2])
         self.ren_win = vtk.vtkRenderWindow()
@@ -18,6 +18,21 @@ class VtkPipeline:
         self.mapper_list = []
         self.source_list = []
         self.screenshot_count = 0
+        self.timer_rate = timer_rate
+        self.gif_data = []
+        if gif_file is not None:
+            try:
+                assert type(gif_file) is str
+            except AssertionError:
+                gif_file = str(gif_file)
+            self.gif_file = gif_file
+        else:
+            self.gif_file = None
+
+        if total_time_steps is not None:
+            assert type(total_time_steps) is int
+            self.timer_count = 0
+            self.total_time_steps = total_time_steps
 
     def render(self, ui=True):
         for each in self.actor_list:
@@ -37,11 +52,11 @@ class VtkPipeline:
         cam.Elevation(-90)
         cam.Zoom(0.6)
 
-    def animate(self, fps=60):
+    def animate(self):
         self.ren.ResetCamera()
         self.ren_win.Render()
         self.iren.Initialize()
-        self.iren.CreateRepeatingTimer(math.floor(1000 / fps))  # Timer creates 60 fps
+        self.iren.CreateRepeatingTimer(math.floor(1000 / self.timer_rate))  # Timer creates 60 fps
         self.render()
 
     def screenshot(self, filename=None):
@@ -57,6 +72,22 @@ class VtkPipeline:
         writer.SetInputData(w2if.GetOutput())
         writer.Write()
 
+    def timer_tick(self):
+        import imageio
+        self.timer_count += 1
+
+        if self.timer_count >= self.total_time_steps:
+            self.iren.DestroyTimer()
+            if self.gif_file is not None:
+                assert len(self.gif_data) > 0
+                imageio.mimsave(self.gif_file + '.gif', self.gif_data)
+                return
+
+        if self.gif_file is not None:
+            if (self.timer_count % 60) == 0:
+                self.screenshot(self.gif_file)
+                path = self.gif_file + str(self.screenshot_count-1)+'.png'
+                self.gif_data.append(imageio.imread(path))
 
 def axesUniversal():
     axes_uni = vtk.vtkAxesActor()
