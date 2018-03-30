@@ -736,7 +736,7 @@ class SO3(SuperPose):
         from .util import ctraj
         from .common import ishomog
         from .transforms import r2t
-        assert ishomog(T1, 3) or ishomog(T1, 4) or (type(self) == type(T1))
+        assert ishomog(T1, (3, 3)) or ishomog(T1, (4, 4)) or (type(self) == type(T1))
 
         T0 = self.data
         if type(T1) is SO3 or type(T1) is SE3:
@@ -753,6 +753,11 @@ class SO3(SuperPose):
 
             for i in range(len(T1)):
                 T1[i] = r2t(T1[i])
+
+        if len(T0) == 1:
+            T0 = T0[0]
+        if len(T1) == 1:
+            T1 = T1[0]
 
         return ctraj(T0, T1, N)
 
@@ -851,6 +856,29 @@ class SE3(SO3):
     def Rz(cls, theta, unit="rad", x=None, y=None, z=None):
         so3 = SO3.Rz(theta, unit)
         return cls(x=x, y=y, z=z, so3=so3)
+
+    @classmethod
+    def se3(cls, args_in):
+        assert (type(args_in) is SE3)
+        pose_se3 = cls(null=True)
+        for each in args_in:
+            pose_se3.append(each)
+
+        return pose_se3
+
+    @classmethod
+    def np(cls, arg_in):
+        from .common import ishomog
+        assert (type(arg_in) is np.matrix) or (type(arg_in) is list)
+        se3 = cls(null=True)
+        if type(arg_in) is list:
+            for each in arg_in:
+                assert ishomog(each, (4, 4))
+                se3.append(each)
+        else:
+            assert ishomog(arg_in, (4, 4))
+            se3.append(arg_in)
+        return se3
 
     @staticmethod
     def form_trans_matrix(rot, transl):
