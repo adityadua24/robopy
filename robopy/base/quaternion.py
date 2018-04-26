@@ -334,10 +334,13 @@ class UnitQuaternion(Quaternion):
         Algorithm source: https://en.wikipedia.org/wiki/Slerp
         :param qr: UnitQuaternion
         :param shortest: Take the shortest path along the great circle
-        :param r:
+        :param r: interpolation point
         :return: interpolated UnitQuaternion
         """
         assert type(qr) is UnitQuaternion
+        if self == qr:
+            return self
+
         q1 = self.double()
         q2 = qr.double()
         dot = q1*np.transpose(q2)
@@ -353,6 +356,7 @@ class UnitQuaternion(Quaternion):
         dot = np.clip(dot, -1, 1)  # Clip within domain of acos()
         theta_0 = math.acos(dot)  # theta_0 = angle between input vectors
         theta = theta_0 * r  # theta = angle between v0 and result
+        print(math.cos(theta), dot, math.sin(theta), math.sin(theta_0), theta, theta_0)
         s1 = float(math.cos(theta) - dot * math.sin(theta) / math.sin(theta_0))
         s2 = math.sin(theta) / math.sin(theta_0)
         out = (q1 * s1) + (q2 * s2)

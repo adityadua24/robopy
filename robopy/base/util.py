@@ -43,17 +43,13 @@ def ctraj(T0, T1, N):
 
     if ishomog(T0, (4, 4)):
         if ishomog(T1, (4, 4)):
-            print("Executing one to one")
             return SE3.np(one_to_one(T0, T1))
         elif type(T1) is list:
-            print("Executing one to many")
             return [SE3.np(one_to_one(T0, each)) for each in T1]
     elif type(T0) is list:
         if ishomog(T1, (4, 4)):
-            print("Executing many to one")
             return [SE3.np(one_to_one(each, T1)) for each in T0]
         elif type(T1) is list:
-            print("Executing many to many")
             assert len(T0) == len(T1), "For many to many trajectory computation, both lists should be of same length"
             return [SE3.np(one_to_one(T0[i], T1[i])) for i in range(len(T0))]
 
