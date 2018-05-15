@@ -4,7 +4,7 @@ import pkg_resources
 import vtk
 import math
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QToolTip, QPushButton, QApplication
+from PyQt5.QtWidgets import QWidget, QToolTip, QPushButton, QApplication, QHBoxLayout, QVBoxLayout, QLabel
 from PyQt5.QtGui import QIcon
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
@@ -109,7 +109,15 @@ class PyQtGUI:
         self.app = QApplication(['QVTKRenderWindowInteractor'])
         self.main_window = self.create_main_window()
         self.qt_iren_widget = QVTKRenderWindowInteractor(self.main_window)
+        # self.qt_iren_widget.setGeometry(100, 100, 1000, 700)
         self.ren = ren
+        self.layout_main = QHBoxLayout()
+        self.layout_main.addWidget(self.qt_iren_widget)
+        self.panel_right = QWidget(self.main_window)
+        self.label = QLabel(self.panel_right)
+        self.label.setText("RIGHT CONTROL PANEL")
+        self.main_window.setLayout(self.layout_main)
+        self.layout_main.addWidget(self.label)
 
     def start(self):
         self.main_window.show()
@@ -119,11 +127,11 @@ class PyQtGUI:
         print('Using QT')
         self.app.exec_()
 
-    def create_main_window(self):
+    @staticmethod
+    def create_main_window():
         window = QWidget()
         window.setWindowTitle("Robopy")
-        window.setWindowIcon(
-            QIcon(pkg_resources.resource_filename(__name__, '/'.join(('media', 'imgs', 'logo_small.png')))))
+        window.setWindowIcon(QIcon(pkg_resources.resource_filename('robopy', 'media/imgs/logo_small.png')))
         return window
 
 
