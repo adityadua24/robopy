@@ -6,7 +6,7 @@ from .common import ishomog
 from math import sqrt
 from numpy import trace
 from .transforms import *
-from .tests.test_common import *
+from ..tests.test_common import *
 from .graphics import *
 
 

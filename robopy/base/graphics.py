@@ -3,6 +3,7 @@
 import pkg_resources
 import vtk
 import math
+import numpy as np
 
 
 class VtkPipeline:
@@ -107,9 +108,9 @@ def axesUniversal():
     return axes_uni
 
 
-def axesCube(ren):
+def axesCube(ren, x_bound=np.matrix([[-1.5, 1.5]]), y_bound=np.matrix([[-1.5, 1.5]]), z_bound=np.matrix([[-1.5, 1.5]])):
     cube_axes_actor = vtk.vtkCubeAxesActor()
-    cube_axes_actor.SetBounds(-1.5, 1.5, -1.5, 1.5, -1.5, 1.5)
+    cube_axes_actor.SetBounds(x_bound[0, 0], x_bound[0, 1], y_bound[0, 0], y_bound[0, 1], z_bound[0, 0], z_bound[0, 1])
     cube_axes_actor.SetCamera(ren.GetActiveCamera())
     cube_axes_actor.GetTitleTextProperty(0).SetColor(1.0, 0.0, 0.0)
     cube_axes_actor.GetLabelTextProperty(0).SetColor(1.0, 0.0, 0.0)
@@ -164,7 +165,7 @@ def vtk_named_colors(colors):
 def floor():
     plane = vtk.vtkPlaneSource()
     reader = vtk.vtkJPEGReader()
-    reader.SetFileName(pkg_resources.resource_filename(__name__, '/'.join(('media', 'imgs', 'floor.jpg'))))
+    reader.SetFileName(pkg_resources.resource_filename("robopy", "media/imgs/floor.jpg"))
     texture = vtk.vtkTexture()
     texture.SetInputConnection(reader.GetOutputPort())
     map_to_plane = vtk.vtkTextureMapToPlane()
@@ -178,11 +179,14 @@ def floor():
     return actor
 
 
-def axesCubeFloor(ren):
-    axes = axesCube(ren)
+def axesCubeFloor(ren, x_bound=np.matrix([[-1.5, 1.5]]),
+                  y_bound=np.matrix([[-1.5, 1.5]]),
+                  z_bound=np.matrix([[-1.5, 1.5]]),
+                  position=np.matrix([[0, -1.5, 0]])):
+    axes = axesCube(ren, x_bound=x_bound, y_bound=y_bound, z_bound=z_bound)
     flr = floor()
     flr.RotateX(90)
-    flr.SetPosition(0, -1.5, 0)
+    flr.SetPosition(position[0, 0], position[0, 1], position[0, 2])
     flr.SetScale(3)
     assembly = vtk.vtkAssembly()
     assembly.AddPart(flr)

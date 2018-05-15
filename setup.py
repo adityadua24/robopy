@@ -22,7 +22,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.5.1',
+    version='1.0.5.2',
 
     description='A Python 3 implementation of Peter Corke\'s Robotics Toolbox',
     long_description='ROBOPY is a python implimentation of The Robotics Toolbox (RTB) (The brainchild of Peter Corke) '
@@ -58,7 +58,6 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
@@ -90,7 +89,7 @@ setup(
     #     'dev': ['check-manifest'],
     #     'test': ['coverage'],
     # },
-    python_requires='>=3',
+    python_requires='>=3.2',
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.

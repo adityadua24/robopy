@@ -20,7 +20,7 @@ class SerialLink:
     SerialLink object class.
     """
 
-    def __init__(self, links, name=None, base=None, tool=None, stl_files=None, q=None, colors=None):
+    def __init__(self, links, name=None, base=None, tool=None, stl_files=None, q=None, colors=None, param=None):
         """
         Creates a SerialLink object.
         :param links: a list of links that will constitute SerialLink object.
@@ -58,6 +58,16 @@ class SerialLink:
             self.colors = vtk_named_colors(["Grey"] * len(stl_files))
         else:
             self.colors = colors
+        if param is None:
+            # If model deosn't pass params, then use these default ones
+            self.param = {
+                "cube_axes_x_bounds": np.matrix([[-1.5, 1.5]]),
+                "cube_axes_y_bounds": np.matrix([[-1.5, 1.5]]),
+                "cube_axes_z_bounds": np.matrix([[-1.5, 1.5]]),
+                "floor_position": np.matrix([[0, -1.5, 0]])
+            }
+        else:
+            self.param = param
 
     def __iter__(self):
         return (each for each in self.links)
@@ -141,7 +151,12 @@ class SerialLink:
 
         self.fkine(stance, apply_stance=True, actor_list=self.pipeline.actor_list)
 
-        cube_axes = axesCubeFloor(self.pipeline.ren)
+        cube_axes = axesCubeFloor(self.pipeline.ren,
+                                  self.param.get("cube_axes_x_bounds"),
+                                  self.param.get("cube_axes_y_bounds"),
+                                  self.param.get("cube_axes_z_bounds"),
+                                  self.param.get("floor_position"))
+
         self.pipeline.add_actor(cube_axes)
 
         for each in self.pipeline.actor_list:
@@ -159,7 +174,7 @@ class SerialLink:
         mapper_list = [0] * len(self.stl_files)
         for i in range(len(self.stl_files)):
             reader_list[i] = vtk.vtkSTLReader()
-            loc = pkg_resources.resource_filename(__name__, '/'.join(('media', self.name, self.stl_files[i])))
+            loc = pkg_resources.resource_filename("robopy", '/'.join(('media', self.name, self.stl_files[i])))
             reader_list[i].SetFileName(loc)
             mapper_list[i] = vtk.vtkPolyDataMapper()
             mapper_list[i].SetInputConnection(reader_list[i].GetOutputPort())
@@ -191,8 +206,7 @@ class SerialLink:
         self.pipeline = VtkPipeline(total_time_steps=stances.shape[0] - 1, gif_file=gif)
         self.pipeline.reader_list, self.pipeline.actor_list, self.pipeline.mapper_list = self.__setup_pipeline_objs()
         self.fkine(stances, apply_stance=True, actor_list=self.pipeline.actor_list)
-        cube_axes = axesCube(self.pipeline.ren)
-        self.pipeline.add_actor(cube_axes)
+        self.pipeline.add_actor(axesCube(self.pipeline.ren))
 
         def execute(obj, event):
             nonlocal stances

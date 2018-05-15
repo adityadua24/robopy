@@ -5,7 +5,7 @@ import math
 import numpy as np
 from scipy.linalg import expm
 from . import check_args
-from .tests import test_transforms
+from ..tests import test_transforms
 from . import common
 import unittest
 import vtk

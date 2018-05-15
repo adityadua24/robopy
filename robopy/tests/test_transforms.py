@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 from math import pi
 from .test_common import matrices_equal, matrix_mismatch_string_builder
-from .. import transforms
+from ..base import transforms
 
 
 # ---------------------------------------------------------------------------------------#
