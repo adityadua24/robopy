@@ -558,7 +558,7 @@ class SO3(SuperPose):
         pose_se3 = self
         if type(self) is SO3:
             pose_se3 = self.to_se3()
-        pipeline = VtkPipeline()
+        pipeline = VtkPipeline(qt_gui=True)
         axes = [vtk.vtkAxesActor() for i in range(self.length)]
         vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
         for i in range(len(axes)):
@@ -567,10 +567,7 @@ class SO3(SuperPose):
             pipeline.add_actor(axes[i])
 
         pipeline.add_actor(graphics.axesCube(pipeline.ren))
-        pipeline.render(ui=False)
-        pipeline.screenshot()
-        pipeline.iren.Initialize()
-        pipeline.iren.Start()
+        pipeline.render()
 
     def animate(self, other=None, duration=5, gif=None):
         from .quaternion import UnitQuaternion

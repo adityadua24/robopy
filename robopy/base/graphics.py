@@ -4,12 +4,18 @@ import pkg_resources
 import vtk
 import math
 import numpy as np
+from PyQt5.QtWidgets import QWidget, QToolTip, QPushButton, QApplication
+from PyQt5.QtGui import QIcon
+from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
 class VtkPipeline:
-    def __init__(self, background=(0.15, 0.15, 0.15), total_time_steps=None, timer_rate=60, gif_file=None):
+    def __init__(self, background=(0.15, 0.15, 0.15), total_time_steps=None, timer_rate=60, gif_file=None,
+                 qt_gui=False):
         self.ren = vtk.vtkRenderer()
         self.ren.SetBackground(background[0], background[1], background[2])
+        self.GUI = PyQtGUI(self.ren)
+        self.qt_gui = qt_gui
         self.ren_win = vtk.vtkRenderWindow()
         self.ren_win.AddRenderer(self.ren)
         self.iren = vtk.vtkRenderWindowInteractor()
@@ -39,10 +45,14 @@ class VtkPipeline:
         for each in self.actor_list:
             self.ren.AddActor(each)
         self.ren.ResetCamera()
-        self.ren_win.Render()
-        if ui:
-            self.iren.Initialize()
-            self.iren.Start()
+
+        if self.qt_gui:
+            self.GUI.start()
+        else:
+            self.ren_win.Render()
+            if ui:
+                self.iren.Initialize()
+                self.iren.Start()
 
     def add_actor(self, actor):
         self.actor_list.append(actor)
@@ -92,6 +102,29 @@ class VtkPipeline:
                 self.screenshot(self.gif_file)
                 path = self.gif_file + '%d.png' % (self.screenshot_count - 1)
                 self.gif_data.append(imageio.imread(path))
+
+
+class PyQtGUI:
+    def __init__(self, ren):
+        self.app = QApplication(['QVTKRenderWindowInteractor'])
+        self.main_window = self.create_main_window()
+        self.qt_iren_widget = QVTKRenderWindowInteractor(self.main_window)
+        self.ren = ren
+
+    def start(self):
+        self.main_window.show()
+        self.qt_iren_widget.Initialize()
+        self.qt_iren_widget.Start()
+        self.qt_iren_widget.GetRenderWindow().AddRenderer(self.ren)
+        print('Using QT')
+        self.app.exec_()
+
+    def create_main_window(self):
+        window = QWidget()
+        window.setWindowTitle("Robopy")
+        window.setWindowIcon(
+            QIcon(pkg_resources.resource_filename(__name__, '/'.join(('media', 'imgs', 'logo_small.png')))))
+        return window
 
 
 def axesUniversal():
