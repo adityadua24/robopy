@@ -231,7 +231,6 @@ class UnitQuaternion(Quaternion):
     def qt(cls, arg_in):
         if type(arg_in) is Quaternion:
             arg_in = arg_in.unit()
-            print(type(arg_in.s))
         else:
             assert type(arg_in) is UnitQuaternion
         return cls(arg_in.s, arg_in.v)
@@ -356,7 +355,6 @@ class UnitQuaternion(Quaternion):
         dot = np.clip(dot, -1, 1)  # Clip within domain of acos()
         theta_0 = math.acos(dot)  # theta_0 = angle between input vectors
         theta = theta_0 * r  # theta = angle between v0 and result
-        print(math.cos(theta), dot, math.sin(theta), math.sin(theta_0), theta, theta_0)
         s1 = float(math.cos(theta) - dot * math.sin(theta) / math.sin(theta_0))
         s2 = math.sin(theta) / math.sin(theta_0)
         out = (q1 * s1) + (q2 * s2)
