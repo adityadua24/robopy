@@ -37,6 +37,10 @@ _Click on the image to see UnitQuaternion animation_
 
 <img src="./docs/images/transforms.png" width="600">
 
+**Make a gif:-**
+
+<img src="./docs/images/make_gif.png" width="600">
+
 **Pose plot:-**
 
 <img src="./docs/images/plot_pose.png" width="600" height="500">
