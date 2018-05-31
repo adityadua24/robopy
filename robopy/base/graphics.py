@@ -4,18 +4,21 @@ import pkg_resources
 import vtk
 import math
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QToolTip, QPushButton, QApplication, QHBoxLayout, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QToolTip, QPushButton, QApplication, QHBoxLayout, QVBoxLayout, QLabel, QSlider
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
 class VtkPipeline:
     def __init__(self, background=(0.15, 0.15, 0.15), total_time_steps=None, timer_rate=60, gif_file=None,
-                 qt_gui=False):
+                 qt_gui=None):
         self.ren = vtk.vtkRenderer()
         self.ren.SetBackground(background[0], background[1], background[2])
-        self.GUI = PyQtGUI(self.ren)
-        self.qt_gui = qt_gui
+        if qt_gui is not None:
+            self.qt_gui = PyQtGUI(self, qt_gui)
+        else:
+            self.qt_gui = None
         self.ren_win = vtk.vtkRenderWindow()
         self.ren_win.AddRenderer(self.ren)
         self.iren = vtk.vtkRenderWindowInteractor()
@@ -41,16 +44,17 @@ class VtkPipeline:
             self.timer_count = 0
             self.total_time_steps = total_time_steps
 
-    def render(self, ui=True):
-        for each in self.actor_list:
-            self.ren.AddActor(each)
+    def render(self, interactor=True):
+        for actor in self.actor_list:
+            self.ren.AddActor(actor)
+
         self.ren.ResetCamera()
 
-        if self.qt_gui:
-            self.GUI.start()
+        if self.qt_gui is not None:
+            self.qt_gui.start()
         else:
             self.ren_win.Render()
-            if ui:
+            if interactor:
                 self.iren.Initialize()
                 self.iren.Start()
 
@@ -105,19 +109,21 @@ class VtkPipeline:
 
 
 class PyQtGUI:
-    def __init__(self, ren):
+    def __init__(self, vtk_pipeline, right_panel=None):
+        self.vtk_pipeline = vtk_pipeline
+        self.ren = self.vtk_pipeline.ren
         self.app = QApplication(['QVTKRenderWindowInteractor'])
         self.main_window = self.create_main_window()
-        self.qt_iren_widget = QVTKRenderWindowInteractor(self.main_window)
-        # self.qt_iren_widget.setGeometry(100, 100, 1000, 700)
-        self.ren = ren
         self.layout_main = QHBoxLayout()
+        self.layout_main.setContentsMargins(0, 0, 0, 0)
+        self.qt_iren_widget = QVTKRenderWindowInteractor()
         self.layout_main.addWidget(self.qt_iren_widget)
-        self.panel_right = QWidget(self.main_window)
-        self.label = QLabel(self.panel_right)
-        self.label.setText("RIGHT CONTROL PANEL")
+        # self.panel_right = self.CreateRightPanel(right_panel)
+        self.panel_right = PyQtGUI.create_right_panel(right_panel)
+        self.layout_main.addWidget(self.panel_right)
+        self.layout_main.setStretch(0, 7)
+        self.layout_main.setStretch(1, 3)
         self.main_window.setLayout(self.layout_main)
-        self.layout_main.addWidget(self.label)
 
     def start(self):
         self.main_window.show()
@@ -132,7 +138,69 @@ class PyQtGUI:
         window = QWidget()
         window.setWindowTitle("Robopy")
         window.setWindowIcon(QIcon(pkg_resources.resource_filename('robopy', 'media/imgs/logo_small.png')))
+        window.setGeometry(200, 200, 1200, 600)  # Main window position and dimensions
         return window
+
+    # class CreateRightPanel:
+    #     def __init__(self, panel_style=None):
+    #         self.panel = QWidget()
+    #         self.layout = QVBoxLayout()
+    #         self.label = QLabel("ROBOPY RIGHT PANEL")
+    #         self.layout.addWidget(self.label)
+    #         self.panel.setLayout(self.layout)
+
+    @staticmethod
+    def create_right_panel(panel_style=None):
+        panel = QWidget()
+        if panel_style is None:
+            layout = QVBoxLayout()
+            label = QLabel("ROBOPY RIGHT PANEL")
+            layout.addWidget(label)
+            panel.setLayout(layout)
+            return panel
+        elif panel_style == 'teach':
+
+            def header():
+                label = QLabel("Move sliders to rotate the joints")
+                label.setAlignment(Qt.AlignHCenter)
+                return label
+
+            def slider_stack():
+                sliders = [QSlider(Qt.Horizontal) for _ in range(7)]
+                sliders_labels = [QLabel('Q%i' % i) for i in range(1, 8)]
+                sliders_values = [QLabel('0') for _ in range(7)]
+                sliders_layout = QVBoxLayout()
+                slider_sub_layouts = [QHBoxLayout() for _ in range(7)]
+
+                for slider in sliders:
+                    slider.setMinimum(1)
+                    slider.setMaximum(120)
+                    slider.setValue(60)
+                    slider.setTickInterval(10)
+                    slider.setTickPosition(QSlider.TicksBelow)
+
+                for index, sub_layout in enumerate(slider_sub_layouts):
+                    sub_layout.addWidget(sliders_labels[index])
+                    sub_layout.addWidget(sliders[index])
+                    sub_layout.addWidget(sliders_values[index])
+                    sub_layout.setStretch(0, 1)
+                    sub_layout.setStretch(1, 8)
+                    sub_layout.setStretch(2, 1)
+                    sliders_layout.addLayout(sub_layout)
+
+                return sliders_layout
+
+            def teach_labels():
+                pass
+            # Write code to check if panel is being called by right object. For instance, object must be Puma560
+            layout = QVBoxLayout()
+            layout.addWidget(header())
+            layout.addLayout(slider_stack())
+            layout.addStretch()
+            panel.setLayout(layout)
+            return panel
+        else:
+            raise AttributeError('Invalid mode value passed')
 
 
 def axesUniversal():
@@ -233,3 +301,46 @@ def axesCubeFloor(ren, x_bound=np.matrix([[-1.5, 1.5]]),
     assembly.AddPart(flr)
     assembly.AddPart(axes)
     return assembly
+
+#
+# class GimbalLock:
+#     """
+#     Creates Gimbal Lock model using VTK geometric objects.
+#     """
+#     def __init__(self):
+#         self.disks = [vtk.vtkDiskSource() for _ in range(3)]
+#         self.mappers = [vtk.vtkPolyDataMapper() for _ in range(3)]
+#         self.actors = [vtk.vtkActor() for _ in range(3)]
+#         ring_colors = vtk_named_colors(['Blue', 'Green', 'Red'])
+#
+#         for i in range(3):
+#             self.disks[i].SetCircumferentialResolution(100)
+#             self.disks[i].SetInnerRadius(5 + i / 2)
+#             self.disks[i].SetOuterRadius(self.disks[i].GetInnerRadius() + 0.25)
+#             self.mappers[i].SetInputConnection(self.disks[i].GetOutputPort())
+#             self.actors[i].SetMapper(self.mappers[i])
+#             self.actors[i].GetProperty().SetColor(ring_colors[i])
+#
+#         self.rx = self.actors[0]
+#         self.ry = self.actors[1]
+#         self.rz = self.actors[2]
+#
+#     def __iter__(self):
+#         return (actor for actor in self.actors)
+
+
+def GimbalLock():
+    disks = [vtk.vtkDiskSource() for _ in range(3)]
+    mappers = [vtk.vtkPolyDataMapper() for _ in range(3)]
+    actors = [vtk.vtkActor() for _ in range(3)]
+    ring_colors = vtk_named_colors(['Blue', 'Green', 'Red'])
+
+    for i in range(3):
+        disks[i].SetCircumferentialResolution(100)
+        disks[i].SetInnerRadius(5 + i / 2)
+        disks[i].SetOuterRadius(disks[i].GetInnerRadius() + 0.25)
+        mappers[i].SetInputConnection(disks[i].GetOutputPort())
+        actors[i].SetMapper(mappers[i])
+        actors[i].GetProperty().SetColor(ring_colors[i])
+
+    return actors

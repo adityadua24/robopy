@@ -208,7 +208,6 @@ class SO2(SuperPose):
         return new_pose
 
     def plot(self):
-
         angles = self.angle
         if type(angles) == int or type(angles) == float:
             angles = [angles]
@@ -558,7 +557,7 @@ class SO3(SuperPose):
         pose_se3 = self
         if type(self) is SO3:
             pose_se3 = self.to_se3()
-        pipeline = VtkPipeline(qt_gui=True)
+        pipeline = VtkPipeline()
         axes = [vtk.vtkAxesActor() for i in range(self.length)]
         vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
         for i in range(len(axes)):

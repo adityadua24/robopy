@@ -133,7 +133,7 @@ class SerialLink:
         else:
             return np.asmatrix(sol.x)
 
-    def plot(self, stance, unit='rad'):
+    def plot(self, stance, unit='rad', mode=None):
         """
         Plots the SerialLink object in a desired stance.
         :param stance: list of joint angles for SerialLink object.
@@ -146,7 +146,8 @@ class SerialLink:
         if unit == 'deg':
             stance = stance * (pi / 180)
 
-        self.pipeline = VtkPipeline()
+        self.pipeline = VtkPipeline(qt_gui=mode)
+
         self.pipeline.reader_list, self.pipeline.actor_list, self.pipeline.mapper_list = self.__setup_pipeline_objs()
 
         self.fkine(stance, apply_stance=True, actor_list=self.pipeline.actor_list)

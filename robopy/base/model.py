@@ -16,12 +16,12 @@ class Puma560(SerialLink):
         self.qr = np.matrix([[0, pi / 2, -pi / 2, 0, 0, 0]])
         self.qz = np.matrix([[0, 0, 0, 0, 0, 0]])
         self.qs = np.matrix([[0, 0, -pi / 2, 0, 0, 0]])
-        self.scale = 1
+        self.scale = 1  # Use to scale size of rendered stl objects
         param = {
             "cube_axes_x_bounds": np.matrix([[-1.5, 1.5]]),
-            "cube_axes_y_bounds": np.matrix([[-0.7, 1.5]]),
+            "cube_axes_y_bounds": np.matrix([[-0.68, 1.5]]),
             "cube_axes_z_bounds": np.matrix([[-1.5, 1.5]]),
-            "floor_position": np.matrix([[0, -0.7, 0]])
+            "floor_position": np.matrix([[0, -0.68, 0]]),
         }
 
         links = [Revolute(d=0, a=0, alpha=pi / 2, j=0, theta=0, offset=0, qlim=(-160 * pi / 180, 160 * pi / 180)),
