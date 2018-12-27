@@ -442,7 +442,7 @@ class SO3(SuperPose):
         elif type(args_in) is SO3:
             SO3.so3(args_in)
         elif type(args_in) is np.matrix:
-            self.np(args_in)
+            SO3.np(args_in)
         else:
             raise AttributeError("\n INVALID instantiation. Valid scenarios:\n"
                                  "- SO3()\n"
