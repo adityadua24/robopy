@@ -56,21 +56,18 @@ class TestSO3(unittest.TestCase):
                 output_str = matrix_mismatch_string_builder(
                     obj2.data[i], obj1.data[i])
                 self.fail(output_str)
-
     """
     def test_pose_so3_constructor_so3_list(self):
         so3_list = []
         for i in range(5):
             so3_list.append(pose.SO3())
-        obj = pose.SO3.np(so3_list)
-        print(obj.data[0])
+        obj = pose.SO3(so3_list)
         for i in range(obj.length):
             if not matrices_equal(obj.data[i], so3_list[i], ):
                 output_str = matrix_mismatch_string_builder(
                     obj.mat[i], so3_list[i])
                 self.fail(output_str)
     """
-
     def test_pose_so3_constructor_rot_matrix(self):
         rot = tr.rotx(uniform(0, 360), 'deg')
         obj = pose.SO3(rot)
@@ -247,10 +244,15 @@ class TestSO3(unittest.TestCase):
         if not matrices_equal(obj.t_matrix(), mat, decimal=4):
             output_str = matrix_mismatch_string_builder(obj.t_matrix(), mat)
             self.fail(output_str)
-"""
-    def test_pose_so3_inv(self):
-        self.fail("Not implemented yet")
 
+    def test_pose_so3_inv(self):
+        mat = pose.SO3()
+        obj1 = mat.inv()
+        obj2 = np.linalg.inv(mat.mat)
+        if not matrices_equal(obj1.mat, obj2, decimal=4):
+            output_str = matrix_mismatch_string_builder(obj1.mat, obj2)
+            self.fail(output_str)
+"""
     def test_pose_so3_eig(self):
         self.fail("Not implemented yet")
 
