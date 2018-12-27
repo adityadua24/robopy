@@ -166,22 +166,25 @@ class TestSO3(unittest.TestCase):
 #        self.fail("Not implemented yet")
 
     def test_pose_so3_constructor_rpy(self):
-        mat = np.matrix([[0.7259, 0.4803, 0.4924], [
-            0.3536, 0.3536, -0.8660], [-0.5900, 0.8027, 0.0868]])
+        mat = np.matrix([[0.7259, 0.4803, 0.4924],
+                         [0.3536, 0.3536, -0.8660],
+                         [-0.5900, 0.8027, 0.0868]])
         obj = pose.SO3.rpy(thetas=[45, 60, 80], order='camera', unit='deg')
-        if not matrices_equal(obj.data[0], mat, decimal=4):
-            output_str = matrix_mismatch_string_builder(obj.data[0], mat)
+        if not matrices_equal(obj.mat, mat, decimal=4):
+            output_str = matrix_mismatch_string_builder(obj.mat, mat)
             self.fail(output_str)
 
     def test_pose_so3_constructor_rpy_list(self):
         mat = [0, 0]
         mat[0] = np.matrix([[-0.2248, 0.3502, 0.9093],
-                            [-0.7637, -0.6429, 0.0587], [0.6051, -0.6812, 0.4120]])
+                            [-0.7637, -0.6429, 0.0587],
+                            [0.6051, -0.6812, 0.4120]])
         mat[1] = np.matrix([[-0.1854, 0.2147, -0.9589],
-                            [-0.9018, -0.4248, 0.0793], [-0.3904, 0.8794, 0.2724]])
+                            [-0.9018, -0.4248, 0.0793],
+                            [-0.3904, 0.8794, 0.2724]])
         obj = pose.SO3.rpy([[1, 2, 3], [4, 5, 6]], order='arm')
         for i in range(obj.length):
-            if not matrices_equal(obj.data[i], mat[i], decimal=4):
+            if not matrices_equal(obj.mat[i], mat[i], decimal=4):
                 output_str = matrix_mismatch_string_builder(
                     obj.data[i], mat[i])
                 self.fail(output_str)
