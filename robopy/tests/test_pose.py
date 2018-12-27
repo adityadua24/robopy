@@ -57,8 +57,16 @@ class TestSO3(unittest.TestCase):
                     obj2.data[i], obj1.data[i])
                 self.fail(output_str)
 
-#    def test_pose_so3_constructor_so3_list(self):
-#        self.fail("Yet to be implemented")
+    def test_pose_so3_constructor_so3_list(self):
+        so3_list = []
+        for i in range(5):
+            so3_list.append(pose.SO3())
+        obj = pose.SO3(so3_list)
+        for i in range(obj.length):
+            if not matrices_equal(obj.data[i], so3_list[i], ):
+                output_str = matrix_mismatch_string_builder(
+                    obj.data[i], so3_list[i])
+                self.fail(output_str)
 
     def test_pose_so3_constructor_rot_matrix(self):
         rot = tr.rotx(uniform(0, 360), 'deg')
