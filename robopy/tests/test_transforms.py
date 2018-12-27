@@ -849,16 +849,15 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_pi_by2_rad(self):
-        expected_mat = np.matrix([[0, -1, ], [1, 0]])
+        expected_mat = np.matrix([[0, -1], [1, 0]])
         received_mat = transforms.rot2(pi / 2)
-
         if not matrices_equal(received_mat, expected_mat, ):
             output_str = matrix_mismatch_string_builder(
                 expected_mat, received_mat)
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_pi_rad(self):
-        expected_mat = np.matrix([[-1, -0, ], [0, -1]])
+        expected_mat = np.matrix([[-1, -0], [0, -1]])
         received_mat = transforms.rot2(pi)
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -867,7 +866,7 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_three_pi_by2_rad(self):
-        expected_mat = np.matrix([[-0, 1, ], [-1, -0]])
+        expected_mat = np.matrix([[-0, 1], [-1, -0]])
         received_mat = transforms.rot2(3 * pi / 2)
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -876,7 +875,7 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_2pi_rad(self):
-        expected_mat = np.matrix([[1, 0, ], [-0, 1]])
+        expected_mat = np.matrix([[1, 0], [-0, 1]])
         received_mat = transforms.rot2(2 * pi)
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -885,7 +884,7 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_0_deg(self):
-        expected_mat = np.matrix([[1, -0, ], [0, 1]])
+        expected_mat = np.matrix([[1, -0], [0, 1]])
         received_mat = transforms.rot2(0, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -894,7 +893,7 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_360_deg(self):
-        expected_mat = np.matrix([[1, 0, ], [-0, 1]])
+        expected_mat = np.matrix([[1, 0], [-0, 1]])
         received_mat = transforms.rot2(360, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -903,7 +902,7 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_90_deg(self):
-        expected_mat = np.matrix([[0, -1, ], [1, 0]])
+        expected_mat = np.matrix([[0, -1], [1, 0]])
         received_mat = transforms.rot2(90, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -912,7 +911,7 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_180_deg(self):
-        expected_mat = np.matrix([[-1, -0, ], [0, -1]])
+        expected_mat = np.matrix([[-1, -0], [0, -1]])
         received_mat = transforms.rot2(180, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -921,7 +920,7 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_270_deg(self):
-        expected_mat = np.matrix([[-0, 1, ], [-1, -0]])
+        expected_mat = np.matrix([[-0, 1], [-1, -0]])
         received_mat = transforms.rot2(270, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -930,7 +929,7 @@ class Testrot2(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_2d_rot2_validData_boundaryCondition_450_deg(self):
-        expected_mat = np.matrix([[0, -1, ], [1, 0]])
+        expected_mat = np.matrix([[0, -1], [1, 0]])
         received_mat = transforms.rot2(450, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
