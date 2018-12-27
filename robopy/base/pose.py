@@ -436,13 +436,13 @@ class SO3(SuperPose):
         elif args_in is None and null is False:
             self._list.append(np.asmatrix(np.eye(3, 3)))
         elif type(args_in) is list:
-            SO3.np(args_in)
+            self._list = SO3.np(args_in).data
         elif type(args_in) is SE3:
-            SO3.se3(args_in)
+            self._list = SO3.se3(args_in).data
         elif type(args_in) is SO3:
-            SO3.so3(args_in)
+            self._list = SO3.so3(args_in).data
         elif type(args_in) is np.matrix:
-            SO3.np(args_in)
+            self._list = SO3.np(args_in).data
         else:
             raise AttributeError("\n INVALID instantiation. Valid scenarios:\n"
                                  "- SO3()\n"

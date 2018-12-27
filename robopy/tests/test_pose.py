@@ -45,12 +45,12 @@ class TestSO3(unittest.TestCase):
 
     def test_pose_so3_constructor_so3_object_length(self):
         obj1 = pose.SO3()  # TODO
-        obj2 = pose.SO3.so3(obj1)
+        obj2 = pose.SO3(obj1)
         self.assertEqual(obj1.length, obj2.length)
 
     def test_pose_so3_constructor_so3_object_data(self):
         obj1 = pose.SO3()  # TODO
-        obj2 = pose.SO3.so3(obj1)
+        obj2 = pose.SO3(obj1)
         for i in range(obj2.length):
             if not np.array_equal(obj1.data[i], obj2.data[i]):
                 output_str = matrix_mismatch_string_builder(
@@ -73,7 +73,7 @@ class TestSO3(unittest.TestCase):
 
     def test_pose_so3_constructor_rot_matrix(self):
         rot = tr.rotx(uniform(0, 360), 'deg')
-        obj = pose.SO3.np(rot)
+        obj = pose.SO3(rot)
         if not matrices_equal(rot, obj.data[0], ):
             output_str = matrix_mismatch_string_builder(obj.data[0], rot)
             self.fail(output_str)
@@ -82,7 +82,7 @@ class TestSO3(unittest.TestCase):
         rot_list = []
         for i in range(5):
             rot_list.append(tr.rotx(uniform(0, 360), unit='deg'))
-        obj = pose.SO3.np(rot_list)
+        obj = pose.SO3(rot_list)
         for i in range(obj.length):
             if not matrices_equal(obj.data[i], rot_list[i], ):
                 output_str = matrix_mismatch_string_builder(
@@ -91,12 +91,12 @@ class TestSO3(unittest.TestCase):
 
     def test_pose_so3_constructor_se3_length(self):
         objse3 = pose.SE3()
-        objso3 = pose.SO3.se3(objse3)
+        objso3 = pose.SO3(objse3)
         self.assertEqual(objse3.length, objso3.length)
 
     def test_pose_so3_constructor_se3_data(self):
         objse3 = pose.SE3()
-        objso3 = pose.SO3.se3(objse3)
+        objso3 = pose.SO3(objse3)
         rot_mats = []
         for each in objse3:
             rot_mats.append(tr.t2r(each))
@@ -168,11 +168,12 @@ class TestSO3(unittest.TestCase):
         obj2 = pose.SO3.rand()
         if matrices_equal(obj1.data[0], obj2.data[0], ):
             self.fail("SO3.rand() show produces random poses.")
-
-#    def test_pose_so3_constructor_eul(self):
-#       # obj = pose.SO3.eul([uniform(0, 360), uniform(0, 360), uniform(0, 360)], unit='deg')
-#        self.fail("Test not defined")
-
+    """
+    def test_pose_so3_constructor_eul(self):
+        thetas = [uniform(0, 360), uniform(0, 360), uniform(0, 360)]
+        obj = pose.SO3.eul(thetas, unit='deg')
+        self.fail("Test not defined")
+    """
 #    def test_pose_so3_constructor_oa(self):
 #        self.fail("Not implemented yet")
 
