@@ -5,6 +5,7 @@ Test module for poses: SO2, SE2, SO3 and SE3
 """
 import unittest
 import numpy as np
+import numpy.testing as npt
 from .. import pose
 from .test_common import matrix_mismatch_string_builder
 from .test_common import matrices_equal
@@ -215,9 +216,9 @@ class TestSO3(unittest.TestCase):
     def test_pose_so3_det(self):
         obj = pose.SO3.Rx(theta=80, unit='deg')
         det = obj.det()
-        if not np.isclose(det, 1):
-            self.fail("Expected determinant value: 1.\n"
-                      "Received determinant value: %f" % det)
+        npt.assert_almost_equal(det, 1,
+            err_msg="Expected determinant value: 1.\n"
+                    "Received determinant value: %f" % det)
 
     def test_pose_so3_rotation(self):
         obj = pose.SO3.Rx(theta=45, unit='deg')
@@ -253,13 +254,13 @@ class TestSO3(unittest.TestCase):
             output_str = matrix_mismatch_string_builder(obj1.mat, obj2)
             self.fail(output_str)
 """
+    def test_pose_so3_interp(self):
+        self.fail("Not implemented yet")
+
     def test_pose_so3_eig(self):
         self.fail("Not implemented yet")
 
     def test_pose_so3_log(self):
-        self.fail("Not implemented yet")
-
-    def test_pose_so3_interp(self):
         self.fail("Not implemented yet")
 
     def test_pose_so3_simplify(self):
