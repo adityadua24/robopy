@@ -79,11 +79,7 @@ class Quaternion:
         @rtype: quaternion
         @return: equivalent unit quaternion
         """
-        qr = UnitQuaternion()
-        nm = self.norm()
-        qr.s = float(self.s / nm)
-        qr.v = self.v / nm
-        return qr
+        return UnitQuaternion(self.s, self.v)
 
     def r(self):
         """Return an equivalent rotation matrix.
@@ -221,6 +217,9 @@ class UnitQuaternion(Quaternion):
         if v is None:
             v = np.matrix([[0, 0, 0]])
         super().__init__(s, v)
+        nm = self.norm()
+        self.s = float(self.s / nm)
+        self.v = self.v / nm
 
     @classmethod
     def rot(cls, arg_in):
