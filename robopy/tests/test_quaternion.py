@@ -94,6 +94,99 @@ class TestQuaternion(unittest.TestCase):
                 rec_vec, exp_vec)
             self.fail(output_str)
 
+    def test_quaternion_add_zero(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q2 = Quaternion()
+        q3 = q1 + q2
+        self.assertEqual(vec1[0, 0], q3.s)
+        if not matrices_equal(q3.v, vec1[0, 1:]):
+            output_str = matrix_mismatch_string_builder(
+                q3.v, vec1[0, 1:])
+            self.fail(output_str)
+
+    def test_quaternion_add_random(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        vec2 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        exp_sum = vec1 + vec2
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q2 = Quaternion(float(vec2[0, 0]), vec2[0, 1:])
+        q3 = q1 + q2
+        self.assertEqual(exp_sum[0, 0], q3.s)
+        if not matrices_equal(q3.v, exp_sum[0, 1:]):
+            output_str = matrix_mismatch_string_builder(
+                q3.v, exp_sum[0, 1:])
+            self.fail(output_str)
+
+    def test_quaternion_subtract_zero(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q2 = Quaternion()
+        q3 = q1 - q2
+        self.assertEqual(vec1[0, 0], q3.s)
+        if not matrices_equal(q3.v, vec1[0, 1:]):
+            output_str = matrix_mismatch_string_builder(
+                q3.v, vec1[0, 1:])
+            self.fail(output_str)
+
+    def test_quaternion_subtract_random(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        vec2 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        exp_sum = vec1 - vec2
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q2 = Quaternion(float(vec2[0, 0]), vec2[0, 1:])
+        q3 = q1 - q2
+        self.assertEqual(exp_sum[0, 0], q3.s)
+        if not matrices_equal(q3.v, exp_sum[0, 1:]):
+            output_str = matrix_mismatch_string_builder(
+                q3.v, exp_sum[0, 1:])
+            self.fail(output_str)
+
+    def test_quaternion_multiplication_by_zero_quaternion(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q2 = Quaternion()
+        q3 = q1 * q2
+        self.assertEqual(q3.s, 0)
+        exp_vec = np.matrix([[0, 0, 0]])
+        if not matrices_equal(q3.v, exp_vec):
+            output_str = matrix_mismatch_string_builder(
+                q3.v, exp_vec)
+            self.fail(output_str)
+
+    def test_quaternion_multiplication_by_random_quaternion(self):
+        s1 = uniform(-1, 1)
+        v1 = np.matrix([[uniform(-1, 1) for _ in range(3)]])
+        s2 = uniform(-1, 1)
+        v2 = np.matrix([[uniform(-1, 1) for _ in range(3)]])
+        q1 = Quaternion(s1, v1)
+        q2 = Quaternion(s2, v2)
+        q3 = q1 * q2
+        exp_s = float(s1 * s2 - v1 * v2.T)
+        exp_v = s1 * v2 + s2 * v1 + np.cross(v1, v2)
+        self.assertEqual(q3.s, exp_s)
+        if not matrices_equal(q3.v, exp_v):
+            output_str = matrix_mismatch_string_builder(
+                q3.v, exp_v)
+            self.fail(output_str)
+
+    def test_quaternion_multiplication_by_zero(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q2 = q1 * 0
+        self.assertEqual(q2.s, 0)
+        exp_vec = np.matrix([[0, 0, 0]])
+        if not matrices_equal(q2.v, exp_vec):
+            output_str = matrix_mismatch_string_builder(
+                q2.v, exp_vec)
+            self.fail(output_str)
+
+    def test_quaternion_multiplication_by_random_int(self):
+        self.fail("Not yet implemented")
+
+    def test_quaternion_multiplication_by_random_float(self):
+        self.fail("Not yet implemented")
+
 class TestUnitQuaternion(unittest.TestCase):
     def test_unit_quaternion_constructor(selff):
         pass
