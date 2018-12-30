@@ -63,6 +63,28 @@ class TestQuaternion(unittest.TestCase):
                 q.v, exp_vec)
             self.fail(output_str)
 
+    def test_quaternion_conj(self):
+        s = uniform(-1, 1)
+        v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
+        q1 = Quaternion(s, v)
+        q2 = q1.conj()
+        self.assertEqual(s, q2.s)
+        if not matrices_equal(-v, q2.v):
+            output_str = matrix_mismatch_string_builder(
+                q2.v, -v)
+            self.fail(output_str)
+
+    def test_quaternion_inv(self):
+        s = uniform(-1, 1)
+        v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
+        q1 = Quaternion(s, v)
+        q2 = q1.inv()
+        self.assertEqual(s, q2.s)
+        if not matrices_equal(-v, q2.v):
+            output_str = matrix_mismatch_string_builder(
+                q2.v, -v)
+            self.fail(output_str)
+
     def test_quaternion_double(self):
         exp_vec = np.matrix([[uniform(-1, 1) for _ in range(4)]])
         q = Quaternion(float(exp_vec[0, 0]), exp_vec[0, 1:])
@@ -71,6 +93,10 @@ class TestQuaternion(unittest.TestCase):
             output_str = matrix_mismatch_string_builder(
                 rec_vec, exp_vec)
             self.fail(output_str)
+
+class TestUnitQuaternion(unittest.TestCase):
+    def test_unit_quaternion_constructor(selff):
+        pass
 
 
 if __name__ == '__main__':
