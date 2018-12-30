@@ -108,9 +108,10 @@ class Quaternion:
                           [z, -y, x, s]])
 
     def __mul__(self, other):
-        assert isinstance(other, Quaternion) \
-               or isinstance(other, int) \
-               or isinstance(other, float), "Can be multiplied with Quaternion, int or a float. "
+        assert isinstance(other, Quaternion) or \
+               isinstance(other, int) or \
+               isinstance(other, float), \
+               "Can be multiplied with Quaternion, int or a float. "
         if type(other) is Quaternion:
             qr = Quaternion()
         else:
@@ -174,10 +175,10 @@ class Quaternion:
         return Quaternion(s=self.s - other.s, v=self.v - other.v)
 
     def __truediv__(self, other):
-        assert isinstance(other, Quaternion) or isinstance(other, int) or isinstance(other,
-                                                                                     float), "Can be divided by a " \
-                                                                                             "Quaternion, " \
-                                                                                             "int or a float "
+        assert isinstance(other, Quaternion) or \
+               isinstance(other, int) or \
+               isinstance(other, float), \
+               "Can only be divided by a Quaternion, int, or a float"
         qr = Quaternion()
         if type(other) is Quaternion:
             qr = self * other.inv()
