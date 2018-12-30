@@ -203,7 +203,7 @@ class Quaternion:
             return True
 
     def __repr__(self):
-        return "%f <%f, %f, %f>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
+        return "%f <<%f, %f, %f>>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
 
     def __str__(self):
         return self.__repr__()
@@ -466,3 +466,6 @@ class UnitQuaternion(Quaternion):
     def __floordiv__(self, other):
         assert type(other) is UnitQuaternion
         return (self / other).unit()
+
+    def __repr__(self):
+        return "%f <%f, %f, %f>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
