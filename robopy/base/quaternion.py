@@ -116,7 +116,7 @@ class Quaternion:
         else:
             qr = UnitQuaternion()
         if isinstance(other, Quaternion):
-            qr.s = self.s * other.s - self.v * np.transpose(other.v)
+            qr.s = float(self.s * other.s - self.v * np.transpose(other.v))
             qr.v = self.s * other.v + other.s * self.v + np.cross(self.v, other.v)
         elif type(other) is int or type(other) is float:
             qr.s = self.s * other
