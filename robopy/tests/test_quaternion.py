@@ -211,6 +211,13 @@ class TestQuaternion(unittest.TestCase):
                 q2.v, exp_v)
             self.fail(output_str)
 
+    def test_quaternion_unit(self):
+        s = uniform(-1, 1)
+        v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
+        q1 = Quaternion(s, v)
+        q2 = q1.unit()
+        np.testing.assert_almost_equal(q2.norm(), 1)
+
     def test_quaternion_division_by_itself(self):
         s = uniform(-1, 1)
         v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
@@ -220,6 +227,18 @@ class TestQuaternion(unittest.TestCase):
         if not matrices_equal(q2.v, np.matrix([[0, 0, 0]])):
             output_str = matrix_mismatch_string_builder(
                 q2.v, np.matrix([[0, 0, 0]]))
+            self.fail(output_str)
+
+    def test_quaternion_division_by_unit_quaternion(self):
+        s = uniform(-1, 1)
+        v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
+        q1 = Quaternion(s, v)
+        q2 = Quaternion(1)
+        q3 = q1 / q2
+        self.assertEqual(q1.s, q3.s)
+        if not matrices_equal(q1.v, q3.v):
+            output_str = matrix_mismatch_string_builder(
+                q1.v, q3.v)
             self.fail(output_str)
 
 class TestUnitQuaternion(unittest.TestCase):
