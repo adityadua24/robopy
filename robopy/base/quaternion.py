@@ -134,15 +134,16 @@ class Quaternion:
         :return:
         """
         assert type(power) is int, "Power must be an integer"
-        qr = Quaternion()
+        if power == 0:
+            return Quaternion(1)
         q = Quaternion.qt(self)
-        for i in range(0, abs(power)):
-            qr = qr * q
+        for i in range(1, abs(power)):
+            q = self * q
 
         if power < 0:
-            qr = qr.inv()
+            q = q.inv()
 
-        return qr
+        return q
 
     def __imul__(self, other):
         """
