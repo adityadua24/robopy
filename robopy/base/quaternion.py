@@ -49,8 +49,7 @@ class Quaternion:
         return Quaternion(s=self.s, v=-self.v)
 
     def inv(self):
-        d = self.double()
-        n2 = float(np.sum(np.multiply(d, d)))
+        n2 = float(self.norm() * self.norm())
         return Quaternion(s=self.s, v=-self.v) / n2
 
     def tr(self):
