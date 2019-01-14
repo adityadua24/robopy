@@ -572,7 +572,7 @@ class SO3(SuperPose):
         pipeline.iren.Initialize()
         pipeline.iren.Start()
 
-    def animate(self, other=None, duration=5, gif=None):
+    def animate(self, other=None, duration=5, gif=None, frame_rate=20):
         from .quaternion import UnitQuaternion
         assert duration > 0
         q1 = []
@@ -588,7 +588,7 @@ class SO3(SuperPose):
                 q1.append(UnitQuaternion())
                 q2.append(UnitQuaternion.rot(self.data[i]))
 
-        self.pipeline = VtkPipeline(total_time_steps=duration*60, gif_file=gif)
+        self.pipeline = VtkPipeline(total_time_steps=duration*60, gif_file=gif, frame_rate=frame_rate)
         axis_list = []
         for i in range(self.length):
             axis_list.append(vtk.vtkAxesActor())

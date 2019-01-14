@@ -14,6 +14,8 @@ def main():
 
     pose.SE2(theta=[45, 80], x=[0, 2], y=[0, 1], unit='deg').plot()
 
+    other = pose.SO3.Rx(theta=45, unit='deg').plot()
+    pose.SO3.Rx(theta=90, unit='deg').animate(other=other, duration=5, gif="pose_SO3", frame_rate=25)
 
 if __name__ == '__main__':
     main()
