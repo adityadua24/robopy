@@ -4,10 +4,12 @@ import pkg_resources
 import vtk
 import math
 import numpy as np
+import PIL.Image
+from . import images2gif as img2gif
 
 
 class VtkPipeline:
-    def __init__(self, background=(0.15, 0.15, 0.15), total_time_steps=None, timer_rate=60, gif_file=None):
+    def __init__(self, background=(0.15, 0.15, 0.15), total_time_steps=None, timer_rate=60, gif_file=None, frame_rate=20):
         self.ren = vtk.vtkRenderer()
         self.ren.SetBackground(background[0], background[1], background[2])
         self.ren_win = vtk.vtkRenderWindow()
@@ -15,12 +17,17 @@ class VtkPipeline:
         self.iren = vtk.vtkRenderWindowInteractor()
         self.iren.SetRenderWindow(self.ren_win)
         self.iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
+
         self.actor_list = []
         self.mapper_list = []
         self.source_list = []
         self.screenshot_count = 0
         self.timer_rate = timer_rate
+        self.timer_step_msec = math.floor(1000.0 / self.timer_rate)
+        self.frame_rate = frame_rate
+        self.frame_step_msec = math.floor(1000.0 / self.frame_rate)
         self.gif_data = []
+
         if gif_file is not None:
             try:
                 assert type(gif_file) is str
@@ -66,32 +73,40 @@ class VtkPipeline:
         w2if.Update()
         if filename is None:
             filename = 'screenshot'
-        filename = filename + '%d.png' % self.screenshot_count
+        filename = filename + '-%04d.png' % (self.screenshot_count)
         writer = vtk.vtkPNGWriter()
         writer.SetFileName(filename)
         self.screenshot_count += 1
         writer.SetInputData(w2if.GetOutput())
         writer.Write()
+        return filename
 
     def timer_tick(self):
-        import imageio
+        ###import imageio
         self.timer_count += 1
 
         if self.timer_count >= self.total_time_steps:
             self.iren.DestroyTimer()
             if self.gif_file is not None:
                 assert len(self.gif_data) > 0
-                imageio.mimsave(self.gif_file + '.gif', self.gif_data)
+                imgfile = self.gif_file + '.gif'
+                ###imageio.mimsave(imgfile, self.gif_data)
+                img2gif.writeGif(imgfile, self.gif_data,
+                                 duration=self.frame_step_msec/1000.0, 
+                                 repeat=False, dither=False,
+                                 nq=0, subRectangles=True, dispose=None)
                 import os
                 for i in range(self.screenshot_count):
-                    os.remove(self.gif_file + '%d.png' % i)
+                    os.remove(self.gif_file + '-%04d.png' % (i))
                 return
 
         if self.gif_file is not None:
-            if (self.timer_count % 60) == 0:
-                self.screenshot(self.gif_file)
-                path = self.gif_file + '%d.png' % (self.screenshot_count - 1)
-                self.gif_data.append(imageio.imread(path))
+            if ((self.timer_count*self.timer_step_msec) % self.frame_step_msec) == 0:
+                self.screenshot(filename=self.gif_file)
+                imgfile = self.screenshot(filename=self.gif_file)
+                ### im = imageio.imread(imgfile)
+                im = PIL.Image.open(imgfile)
+                self.gif_data.append(im)
 
 
 def axesUniversal():
