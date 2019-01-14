@@ -602,7 +602,6 @@ class SO3(SuperPose):
         def execute(obj, event):
             nonlocal axis_list
             self.pipeline.timer_tick()
-            print(self.pipeline.timer_count)
 
             for i in range(len(axis_list)):
                 axis_list[i].SetUserMatrix(
