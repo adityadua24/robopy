@@ -192,18 +192,21 @@ class SerialLink:
 
         return file_names
 
-    def animate(self, stances, unit='rad', frame_rate=25, gif=None):
+    def animate(self, stances, unit='rad', timer_rate=25, gif=None, frame_rate=25):
         """
         Animates SerialLink object over nx6 dimensional input matrix, with each row representing list of 6 joint angles.
         :param stances: nx6 dimensional input matrix.
         :param unit: unit of input angles. Allowed values: 'rad' or 'deg'
-        :param frame_rate: frame_rate for animation. Could be any integer more than 1. Higher value runs through stances faster.
+        :param timer_rate: timer_rate for stances. 1000/timer_rate msecs per stance step
+        :param gif: name for animated GIF file of save render images.
+        :param frame_rate: frame_rate for animation.  1000/frame_rate msecs per frame step
         :return: null
         """
         if unit == 'deg':
             stances = stances * (pi / 180)
 
-        self.pipeline = VtkPipeline(total_time_steps=stances.shape[0] - 1, gif_file=gif)
+        self.pipeline = VtkPipeline(total_time_steps=stances.shape[0] - 1,
+                                    timer_rate=timer_rate, gif_file=gif, frame_rate=frame_rate)
         self.pipeline.reader_list, self.pipeline.actor_list, self.pipeline.mapper_list = self.__setup_pipeline_objs()
         self.fkine(stances, apply_stance=True, actor_list=self.pipeline.actor_list)
         self.pipeline.add_actor(axesCube(self.pipeline.ren))
