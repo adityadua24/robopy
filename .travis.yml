@@ -1,7 +1,7 @@
 language: python
 dist: xenial
 python:
-- '3.6'
+- '3.5.2'
 virtualenv:
   system_site_packages: true
 script: true
