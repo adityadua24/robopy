@@ -9,24 +9,17 @@ A Python 3 implementation of Peter Corke's Robotics Toolbox
 - **Bug reports:** https://github.com/adityadua24/robopy/issues
 
 **Dependencies:**
-- [VTK](https://www.vtk.org/)
-- [MatplotLib](https://matplotlib.org/)
-- [NumPy](http://www.numpy.org/)
-- [numpy-stl](https://pypi.org/project/numpy-stl/)
-- [Pillow](https://python-pillow.org/)
-- [Scipy](https://www.scipy.org/) (for NumPy, Matplotlib and IPython)
+- [VTK](https://www.vtk.org/) 
+- Numpy
+- Scipy
 
-**Supporting:**
-- [IPython](http://ipython.org/)
-- [Jupyter](http://ipython.org/)
+**To install:** 
 
-**To install:**
-
-*This is an RTB for Python Porting Project development version derived
-from RoboPy v1.0.8 and should only be installed and run in a cloned repository workspace.*
 ```
-python setup.py install
+pip install robopy
 ```
+
+Unofficial windows binaries available from: https://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 **Puma 560 simulation:-**
 
