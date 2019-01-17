@@ -10,7 +10,7 @@ A Python 3 implementation of Peter Corke's Robotics Toolbox
 
 **Dependencies:**
 - [VTK](https://www.vtk.org/)
-- [MatplotLib](https://matplotlib.org/)
+- [Matplotlib](https://matplotlib.org/)
 - [NumPy](http://www.numpy.org/)
 - [numpy-stl](https://pypi.org/project/numpy-stl/)
 - [Pillow](https://python-pillow.org/)
@@ -19,11 +19,15 @@ A Python 3 implementation of Peter Corke's Robotics Toolbox
 **Supporting:**
 - [IPython](http://ipython.org/)
 - [Jupyter](https://jupyter.org/index.html)
+- [Spyder](https://www.spyder-ide.org/)
 
 **To install:**
 
-*This is an RTB for Python Porting Project development version derived
-from RoboPy v1.0.8 and should only be installed and run in a cloned repository workspace.*
+*<font color="red">
+This is an RTB for Python Porting Project development version derived from
+RoboPy v1.0.8 and should only be installed and run in a cloned repository workspace.
+</font>*
+
 ```
 python3 setup.py install
 ```
