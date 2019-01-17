@@ -18,7 +18,7 @@ A Python 3 implementation of Peter Corke's Robotics Toolbox
 
 **Supporting:**
 - [IPython](http://ipython.org/)
-- [Jupyter](http://ipython.org/)
+- [Jupyter](https://jupyter.org/index.html)
 
 **To install:**
 
