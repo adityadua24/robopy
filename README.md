@@ -25,8 +25,12 @@ A Python 3 implementation of Peter Corke's Robotics Toolbox
 *This is an RTB for Python Porting Project development version derived
 from RoboPy v1.0.8 and should only be installed and run in a cloned repository workspace.*
 ```
-python setup.py install
+python3 setup.py install
 ```
+
+**Jupyter Notebook Example:**
+
+Jupyter [nbviewer](https://nbviewer.jupyter.org/github/gedeschaines/robopy/blob/ipynb/notebooks/poseVTK/poseVTK.ipynb)
 
 **Puma 560 simulation:-**
 
