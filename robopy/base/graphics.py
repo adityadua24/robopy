@@ -1,209 +1,403 @@
-# Created by: Aditya Dua
-# 18 August 2017
-import pkg_resources
-import vtk
-import math
-import numpy as np
-import PIL.Image
-from . import images2gif as img2gif
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+FILE: graphics.py
+DATE: Tue Jan  8 17:34:00 2019
+
+@author: garyd
+"""
+
+import sys
+from abc import ABCMeta, abstractmethod
+
+__all__ = ('Graphics', 'Gtransform', 'GraphicsRenderer',
+           'rgb_named_colors',
+           'plot', 'qplot', 'trplot', 'trplot2',
+           'animate', 'panimate', 'qanimate', 'tranimate', 'tranimate2')
+
+###
+### MODULE CLASS DEFINITIONS
+###
+
+class Graphics(metaclass=ABCMeta):
+    """ 
+    Graphics interface for RTB.
+    
+    This Abstract Base Class (ABC) presents the graphical interface 
+    between Robotics Toolbox (RTB) and graphics package(s) which 
+    provide needed plotting, animation and rendering functionality.
+    
+    Implementation Notes:
+        
+      1) Graphics modules must provide, as a minimum, methods 
+         denoted in this class.
+         
+      2) This class object should act as a factory for specific
+         graphics rendering, animation and transform objects.
+         
+      3) Must be able to keep track of multiple rendering windows
+         and in the case of Matplotlib, not block on show() and
+         permit multiple poses rendered to a given figure.
+    
+    """
+    def __init__(self):
+        self._gRenderer = None
+        self._gTransform = self._Gtransform()
+    
+    def _Gtransform(self):
+        """ Instantiates and returns a graphics transform.
+        """
+        gxobj = Gtransform()
+        return gxobj
+    
+    ### Instance property setters/getters
+    
+    """    
+      _gRenderer = property(fset=setGraphicsRenderer, fget=getGraphicsRenderer)
+      _gTransform = property(fset=None, fget=getGtransform)
+    """
+    
+    def setGraphicsRenderer(self, gRenderer):
+        self._gRenderer = gRenderer
+        
+    def getGraphicsRenderer(self):
+        return self._gRenderer
+        
+    def getGtransform(self):
+        return self._gTransform
+    
+    ### Graphics package interface methods (presented in alphabetical order)
+           
+    @abstractmethod
+    def draw_axes2(self, *args, **kwargs):
+        """ Graphics package draw plot axes for 2D space.
+        """ 
+        raise NotImplementedError('Need to define draw_axes2 emethod.')
+        
+    @abstractmethod
+    def draw_axes3(self, *args, **kwargs):
+        """ Graphics package draw plot axes for 3D space.
+        """ 
+        raise NotImplementedError('Need to define draw_axes3 emethod.')
+        
+    @abstractmethod
+    def draw_cube(self):
+        """ Graphics package draw a blue cube method.
+        """
+        raise NotImplementedError('Need to define draw_cube emethod.')
+        
+    @abstractmethod
+    def draw_sphere(self):
+        """ Graphics package draw a red sphere method.
+        """
+        raise NotImplementedError('Need to define draw_sphere emethod.')
+        
+    @abstractmethod  # forces definition of a graphics module scope routine
+    def rgb_named_colors(cls, *args, **kwarg):
+        """ Graphics package returns RGB values for named colors.
+        """ 
+        raise NotImplementedError('Need to define rgb_named_colors method.')
+        
+    @abstractmethod
+    def setGtransform(self, *args, **kwargs):
+        """ Graphics package set graphics transform method.
+        """
+        raise NotImplementedError('Need to define setGtransform emethod.')
+        
+    @abstractmethod
+    def view(self, *args, **kwargs):
+        """ Graphics package set view space method.
+        """
+        raise NotImplementedError('Need to define view emethod.')
+        
+    ## RTB interface methods (presented in alphabetical order)
+    
+    @abstractmethod
+    def animate(self, *args, **kwargs):
+        """ RTB interface method.
+        """
+        raise NotImplementedError('Need to define animate method.')
+        
+    @abstractmethod
+    def plot(self, *args, **kwargs):
+        """ RTB interface method.
+        """
+        raise NotImplementedError('Need to define plot method.')
+        
+    @abstractmethod
+    def qplot(self, *args, **kwargs):
+        """ RTB interface method. 
+        """ 
+        raise NotImplementedError('Need to define qplot method.')
+
+    @abstractmethod
+    def render(self, *args, **kwargs):
+        """ VTk interface method
+        """
+        raise NotImplementedError('Need to define render method.')
+    
+    @abstractmethod
+    def show(self, *args, **kwargs):
+        """ Matplotlib interface method
+        """
+        raise NotImplementedError('Need to define show method.')
+        abstractmethod
+        
+    @abstractmethod
+    def tranimate(self, *args, **kwargs):
+        """ RTB interface method.
+        """
+        raise NotImplementedError('Need to define tranimate method.')
+        
+    @abstractmethod
+    def tranimate2(self, *args, **kwargs):
+        """ RTB interface method.
+        """
+        raise NotImplementedError('Need to define tranimate2 method.')
+        
+    @abstractmethod
+    def trplot(self, *args, **kwargs):
+        """ RTB interface method.
+        """
+        raise NotImplementedError('Need to define trplot method.')
+        
+    @abstractmethod        
+    def trplot2(self, *args, **kwargs):
+        """ RTB interface method.
+        """ 
+        raise NotImplementedError('Need to define trplot2 method.')
 
 
-class VtkPipeline:
-    def __init__(self, background=(0.15, 0.15, 0.15), total_time_steps=None, timer_rate=60, gif_file=None, frame_rate=20):
-        self.ren = vtk.vtkRenderer()
-        self.ren.SetBackground(background[0], background[1], background[2])
-        self.ren_win = vtk.vtkRenderWindow()
-        self.ren_win.AddRenderer(self.ren)
-        self.iren = vtk.vtkRenderWindowInteractor()
-        self.iren.SetRenderWindow(self.ren_win)
-        self.iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
+class Gtransform(Graphics):
+    """
+    Graphics transform for RTB.
+    
+    This Abstract Base Class (ABC) presents the graphical interface 
+    between Robotics Toolbox (RTB) and graphics package(s) which 
+    provide needed graphics transform functionality.
+    
+    Graphics modules must provide, as a minimum, methods denoted 
+    in this class
+    """
+    def __init__(self):
+        return None
+    
+    def setGtransform(self, *args, **kwargs):
+        """ Set graphics transform.
+        """
+        raise NotImplementedError('Need to define setGtransform emethod.')
+        
+###
+### MODULE PUBLIC INTERFACE ROUTINES
+###
 
-        self.actor_list = []
-        self.mapper_list = []
-        self.source_list = []
-        self.screenshot_count = 0
-        self.timer_rate = timer_rate
-        self.timer_step_msec = math.floor(1000.0 / self.timer_rate)
-        self.frame_rate = frame_rate
-        self.frame_step_msec = math.floor(1000.0 / self.frame_rate)
-        self.gif_data = []
+""" These routines comprise the external interface to RTB plotting and 
+    animation functions. They preclude the need to instantiate graphics 
+    objects in the RTB manipulator and math modules such as pose, 
+    serial_link, quaternion and transforms.
 
-        if gif_file is not None:
-            try:
-                assert type(gif_file) is str
-            except AssertionError:
-                gif_file = str(gif_file)
-            self.gif_file = gif_file
+    Implementation Notes:
+        
+      1) These functions are generally not invoked by the user, but 
+         by the corresponding calling function in RTB modules which 
+         are exposed to the user.
+
+      2) The header documentation for called functions herein should
+         match that of corresponding calling functions in RTB modules. 
+         See graphics_vtk.VtkPipeline.animate(), animate() below and 
+         serial_link.SerialLink.animate() as a pertinent example.
+         
+      3) The function argument list keyword/value validity checking
+         of RTB specific parameters should be done in the RTB modules
+         before these functions are called. While graphing, rendering
+         and plotting parameters validity should be checked in this
+         graphics module, or dedicated submodules, with exceptions
+         returned to RTB for resolution. It is possible that all data
+         unit conversion could be done in RTB before the values are
+         passed here (i.e., use only 'rad' herein for numerical 
+         computation, but allow for user's desire for data values to
+         be graphically displayed in 'deg' units).
+         
+      4) Though there may be historical and mathematical precedence
+         involved in the preservation of RTB for MATLAB matrix data
+         structures, there is no meaningful reason to force the NumPy
+         matrix type class on graphics processing. The more appropriate
+         data type class commonly used is the NumPy ndarray. Note the 
+         effort to convert x, y z bounds from matrices to arrays which 
+         can then be accessed using just one index as in VtkPipeline
+         qplot() and animate() methods in the graphics_vtk module.
+"""
+
+from . import tb_parseopts as tbpo
+from . import graphics_vtk as gVtk
+from . import graphics_mpl as gMpl
+
+gRenderer = None  # the instantiated graphics rendering object
+
+def GraphicsRenderer(renderer):
+    """ 
+    Instantiates and returns a graphics renderer.
+    
+    :param renderer: renderer descriptor string
+    :return gRenderer: graphics rendering object      
+    """
+    global gRenderer
+    
+    if renderer == 'VTK':
+        gRenderer = gVtk.VtkPipeline()
+    elif renderer == 'MPL':
+        gRenderer = gMpl.Mpl3dArtist(1)
+    else:
+        print("The %s renderer is not supported." % renderer)
+        print("Renderer must be VTK or MPL (Matplotlib).")
+        sys.exit()
+    return gRenderer
+    
+def rgb_named_colors(colors):
+    global gRenderer
+    if type(gRenderer) is type(gVtk.VtkPipeline()):
+        return gVtk.rgb_named_colors(colors)
+    elif type(gRenderer) is type(gMpl.Mpl3dArtist()):
+        return gMpl.rgb_named_colors(colors)
+
+def plot(obj, **kwargs):
+    global gRenderer
+    if type(gRenderer) is type(gVtk.VtkPipeline()):
+        opts = { 'dispMode' : 'VTK',
+               }
+        opt = tbpo.asSimpleNs(opts)
+        (opt, args) = tbpo.tb_parseopts(opt, **kwargs)
+        pobj = gVtk.VtkPipeline(dispMode=opt.dispMode)
+        pobj.plot(obj, **args)
+    elif type(gRenderer) is type(gMpl.Mpl3dArtist()):
+        pobj = gMpl.Mpl3dArtist(1)
+        pobj.plot(obj, **kwargs)
+    
+def qplot(obj, stance, unit='rad', dispMode='VTK', **kwargs):
+    global gRenderer
+    if type(gRenderer) is type(gVtk.VtkPipeline()):
+        opts = { 'dispMode' : 'VTK',
+               }
+        opt = tbpo.asSimpleNs(opts)
+        (opt, args) = tbpo.tb_parseopts(opt, **kwargs)
+        gobj = gVtk.VtkPipeline(dispMode=dispMode)
+        gobj.qplot(obj, stance, unit='rad', dispMode=dispMode, **kwargs)
+    else:
+        gobj = gMpl.Mpl3dArtist(1)
+        gobj.qplot(obj, stance, unit='rad', **kwargs)
+    
+def tranimate(T):
+    global gRenderer
+    pass 
+
+def tranimate2(R):
+    global gRenderer
+    pass
+    
+def trplot(T, handle=None, dispMode='VTK'):
+    global gRenderer
+    if handle is not None:
+        if type(handle) is type(VtkPipeline()):
+             handle.trplot(T)
+        elif type(handle) is type(Hgtransform()):
+             pass  # do Hgtransform stuff
         else:
-            self.gif_file = None
+             pass  # do error stuff   
+    pobj = gVtk.VtkPipeline(dispMode=dispMode)
+    pobj.trplot(T)
 
-        if total_time_steps is not None:
-            assert type(total_time_steps) is int
-            self.timer_count = 0
-            self.total_time_steps = total_time_steps
-
-    def render(self, ui=True):
-        for each in self.actor_list:
-            self.ren.AddActor(each)
-        self.ren.ResetCamera()
-        self.ren_win.Render()
-        if ui:
-            self.iren.Initialize()
-            self.iren.Start()
-
-    def add_actor(self, actor):
-        self.actor_list.append(actor)
-
-    def set_camera(self):
-        cam = self.ren.GetActiveCamera()
-        cam.Roll(-90)
-        cam.Elevation(-90)
-        cam.Zoom(0.6)
-
-    def animate(self):
-        self.ren.ResetCamera()
-        self.ren_win.Render()
-        self.iren.Initialize()
-        self.iren.CreateRepeatingTimer(math.floor(1000 / self.timer_rate))  # Timer creates 60 fps
-        self.render()
-
-    def screenshot(self, filename=None):
-        w2if = vtk.vtkWindowToImageFilter()
-        w2if.SetInput(self.ren_win)
-        w2if.Update()
-        if filename is None:
-            filename = 'screenshot'
-        filename = filename + '-%04d.png' % (self.screenshot_count)
-        writer = vtk.vtkPNGWriter()
-        writer.SetFileName(filename)
-        self.screenshot_count += 1
-        writer.SetInputData(w2if.GetOutput())
-        writer.Write()
-        return filename
-
-    def timer_tick(self):
-        ###import imageio
-        self.timer_count += 1
-
-        if self.timer_count >= self.total_time_steps:
-            self.iren.DestroyTimer()
-            if self.gif_file is not None:
-                assert len(self.gif_data) > 0
-                imgfile = self.gif_file + '.gif'
-                ###imageio.mimsave(imgfile, self.gif_data)
-                img2gif.writeGif(imgfile, self.gif_data,
-                                 duration=self.frame_step_msec/1000.0, 
-                                 repeat=False, dither=False,
-                                 nq=0, subRectangles=True, dispose=None)
-                import os
-                for i in range(self.screenshot_count):
-                    os.remove(self.gif_file + '-%04d.png' % (i))
-                return
-
-        if self.gif_file is not None:
-            if ((self.timer_count*self.timer_step_msec) % self.frame_step_msec) == 0:
-                self.screenshot(filename=self.gif_file)
-                imgfile = self.screenshot(filename=self.gif_file)
-                ### im = imageio.imread(imgfile)
-                im = PIL.Image.open(imgfile)
-                self.gif_data.append(im)
-
-
-def axesUniversal():
-    axes_uni = vtk.vtkAxesActor()
-    axes_uni.SetXAxisLabelText("x'")
-    axes_uni.SetYAxisLabelText("y'")
-    axes_uni.SetZAxisLabelText("z'")
-    axes_uni.SetTipTypeToSphere()
-    axes_uni.SetShaftTypeToCylinder()
-    axes_uni.SetTotalLength(2, 2, 2)
-    axes_uni.SetCylinderRadius(0.02)
-    axes_uni.SetAxisLabels(0)
-
-    return axes_uni
-
-
-def axesCube(ren, x_bound=np.matrix([[-1.5, 1.5]]), y_bound=np.matrix([[-1.5, 1.5]]), z_bound=np.matrix([[-1.5, 1.5]])):
-    cube_axes_actor = vtk.vtkCubeAxesActor()
-    cube_axes_actor.SetBounds(x_bound[0, 0], x_bound[0, 1], y_bound[0, 0], y_bound[0, 1], z_bound[0, 0], z_bound[0, 1])
-    cube_axes_actor.SetCamera(ren.GetActiveCamera())
-    cube_axes_actor.GetTitleTextProperty(0).SetColor(1.0, 0.0, 0.0)
-    cube_axes_actor.GetLabelTextProperty(0).SetColor(1.0, 0.0, 0.0)
-
-    cube_axes_actor.GetTitleTextProperty(1).SetColor(0.0, 1.0, 0.0)
-    cube_axes_actor.GetLabelTextProperty(1).SetColor(0.0, 1.0, 0.0)
-
-    cube_axes_actor.GetTitleTextProperty(2).SetColor(0.0, 0.0, 1.0)
-    cube_axes_actor.GetLabelTextProperty(2).SetColor(0.0, 0.0, 1.0)
-
-    cube_axes_actor.XAxisMinorTickVisibilityOff()
-    cube_axes_actor.YAxisMinorTickVisibilityOff()
-    cube_axes_actor.ZAxisMinorTickVisibilityOff()
-
-    cube_axes_actor.SetFlyModeToStaticTriad()
-
-    return cube_axes_actor
-
-
-def axes_x_y(ren):
-    axis_x_y = axesCube(ren)
-    axis_x_y.SetUse2DMode(1)
-    axis_x_y.ZAxisLabelVisibilityOff()
-    axis_x_y.SetAxisOrigin(-3, -3, 0)
-    axis_x_y.SetUseAxisOrigin(1)
-
-    return axis_x_y
-
-
-def axesActor2d():
-    axes = vtk.vtkAxesActor()
-    axes.SetTotalLength(1, 1, 0)
-    axes.SetZAxisLabelText("")
-
-    return axes
-
-
-def vtk_named_colors(colors):
+def trplot2(R, handle=None, dispMode='VTk'):
+    global gRenderer
+    if handle is not None:
+        if type(handle) is type(VtkPipeline()):
+            handle.trplot2(R)
+        elif type(handle) is type(Hgtransform()):
+            pass  # do Hgtransform stuff
+        else:
+            pass  # do error stuff
+    gobj = gVtk.VtkPipeline(dispMode=dispMode)
+    gobj.trplot2(T)
+        
+def animate(obj, stances, 
+                 unit='rad', timer_rate=60, gif=None, frame_rate=30, 
+                 dispMode='VTK', **kwargs):
     """
-    Returns a list of vtk colors
-    :param colors: List of color names supported by vtk
-    :return: A list of vtk colors
+    Animates SerialLink object over nx6 dimensional input matrix, with each row representing list of 6 joint angles.
+    :param obj: a SerialLink object.
+    :param stances: nx6 dimensional input matrix.
+    :param unit: unit of input angles. Allowed values: 'rad' or 'deg'
+    :param timer_rate: time_rate for motion. Could be any integer more than 1. Higher value runs through stances faster.
+    :param gif: name for the written animated GIF image file.
+    :param frame_rate: frame_rate for animation.
+    :dispMode: display mode; one of ['VTK', 'IPY', 'PIL'].
+    :return: null
     """
-    if type(colors) is not list:
-        colors = [colors]
-    colors_rgb = [0] * len(colors)
-    for i in range(len(colors)):
-        colors_rgb[i] = list(vtk.vtkNamedColors().GetColor3d(colors[i]))
-    return colors_rgb
+    global gRenderer
+    
+    opts = { 'unit'       : unit,
+             'timer_rate' : timer_rate,
+             'gif'        : gif,
+             'frame_rate' : frame_rate,
+             'dispMode'   : dispMode,
+           }
+    
+    opt = tbpo.asSimpleNs(opts)
+    
+    (opt, args) = tbpo.tb_parseopts(opt, **kwargs)
+    
+    if type(gRenderer) is type(gVtk.VtkPipeline()):
+        gobj = gVtk.VtkPipeline(dispMode=opt.dispMode,
+                                total_time_steps= stances.shape[0] - 1,
+                                timer_rate=opt.timer_rate,
+                                gif_file=opt.gif,
+                                frame_rate=opt.frame_rate)
+        gobj.animate(obj, stances, 
+                          unit=opt.unit, frame_rate=opt.frame_rate, gif=opt.gif, 
+                          dispMode=opt.dispMode, **args)
+    else:
+        gobj = gMpl.Mpl3dArtist(1)
+        gobj.animate(obj, stances, 
+                          unit=opt.unit, frame_rate=opt.frame_rate, gif=opt.gif, 
+                          dispMode=opt.dispMode, **args)
+        
+def panimate(pose, other=None, duration=5, timer_rate=60, 
+                   gif=None, frame_rate=10, **kwargs):
+    global gRenderer
+    
+    opts = { 'other'      : other,
+             'duration'   : duration,
+             'timer_rate' : timer_rate,
+             'gif'        : gif,
+             'frame_rate' : frame_rate,
+             'dispMode'   : 'VTK',
+           }
+    
+    opt = tbpo.asSimpleNs(opts)
+    
+    (opt, args) = tbpo.tb_parseopts(opt, **kwargs)
+    
+    if type(gRenderer) is type(gVtk.VtkPipeline()):
+        gobj = gVtk.VtkPipeline(dispMode=opt.dispMode,
+                  total_time_steps=opt.duration*opt.timer_rate,
+                  timer_rate = opt.timer_rate,
+                  gif_file=opt.gif, 
+                  frame_rate=opt.frame_rate)
+        gobj.panimate(pose, other=opt.other, duration=opt.duration, **args)
+    else:
+        gobj = gMpl.Mpl3dArtist(1)
+        gobj.panimate(pose, other=opt.other, duration=opt.duration, **args)
 
-
-def floor():
-    plane = vtk.vtkPlaneSource()
-    reader = vtk.vtkJPEGReader()
-    reader.SetFileName(pkg_resources.resource_filename("robopy", "media/imgs/floor.jpg"))
-    texture = vtk.vtkTexture()
-    texture.SetInputConnection(reader.GetOutputPort())
-    map_to_plane = vtk.vtkTextureMapToPlane()
-    map_to_plane.SetInputConnection(plane.GetOutputPort())
-    mapper = vtk.vtkPolyDataMapper()
-
-    mapper.SetInputConnection(map_to_plane.GetOutputPort())
-    actor = vtk.vtkActor()
-    actor.SetMapper(mapper)
-    actor.SetTexture(texture)
-    return actor
-
-
-def axesCubeFloor(ren, x_bound=np.matrix([[-1.5, 1.5]]),
-                  y_bound=np.matrix([[-1.5, 1.5]]),
-                  z_bound=np.matrix([[-1.5, 1.5]]),
-                  position=np.matrix([[0, -1.5, 0]])):
-    axes = axesCube(ren, x_bound=x_bound, y_bound=y_bound, z_bound=z_bound)
-    flr = floor()
-    flr.RotateX(90)
-    flr.SetPosition(position[0, 0], position[0, 1], position[0, 2])
-    flr.SetScale(3)
-    assembly = vtk.vtkAssembly()
-    assembly.AddPart(flr)
-    assembly.AddPart(axes)
-    return assembly
+def qanimate(obj, stances, unit='rad', dispMode='VTK', frame_rate=25, gif=None, **kwargs):
+    global gRenderer
+    gobj = gVtk.VtkPipeline(dispMode=dispMode)
+    gobj.qanimate(obj, stances, unit=unit, frame_rate=frame_rate, gif=gif)
+    
+def tranimate(obj, stances, unit='rad', dispMode='VTK', frame_rate=25, gif=None, **anim_params):
+    global gRenderer
+    gobj = gVtk.VtkPipeline(dispMode=dispMode)
+    gobj.tranimate(obj, stances, unit=unit, frame_rate=frame_rate, gif=gif, **anim_params)
+    
+def tranimate2(obj, stances, unit='rad', dispMode='VTK', frame_rate=25, gif=None, **anim_params):
+    global gRenderer
+    gobj = gVtk.VtkPipeline(dispMode=dispMode)
+    gobj.tranimate2(obj, stances, unit=unit, frame_rate=frame_rate, gif=gif, **anim_params)

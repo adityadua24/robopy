@@ -93,7 +93,7 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    include_package_data=True, install_requires=['numpy', 'scipy', 'Pillow']
+    include_package_data=True, install_requires=['vtk', 'matplotlib', 'numpy', 'numpy-stl','scipy', 'Pillow']
     # packages=find_packages('robopy'),
     # package_dir={'':'robopy'},
     # package_data={

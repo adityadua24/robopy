@@ -7,8 +7,9 @@ from math import sqrt
 from numpy import trace
 from .transforms import *
 from ..tests.test_common import *
-from .graphics import *
 
+###from .graphics import *
+from . import graphics
 
 class Quaternion:
     def __init__(self, s=None, v=None):
@@ -294,10 +295,17 @@ class UnitQuaternion(Quaternion):
         qd = -self.v * omega
         return 0.5 * np.r_[qd, E*omega]
 
-    def plot(self):
+    def plot(self, dispMode='VTK'):
         from .pose import SO3
-        SO3.np(self.r()).plot()
-
+        SO3.np(self.r()).plot(dispMode=dispMode)
+                
+    def animate(self, qr=None, dispMode='VTK', duration=5, gif=None):
+        graphics.qanimate(self, qr=qr, 
+                                dispMode=dispMode, duration=duration, 
+                                gif=gif, **kwargs)
+    
+    '''
+    ### moved to graphics_vtk module
     def animate(self, qr=None, duration=5, gif=None):
         self.pipeline = VtkPipeline(total_time_steps=duration*60, gif_file=gif)
         axis = vtk.vtkAxesActor()
@@ -324,7 +332,9 @@ class UnitQuaternion(Quaternion):
 
         self.pipeline.iren.AddObserver('TimerEvent', execute)
         self.pipeline.animate()
-
+    ### moved to graphics_vtk module
+    '''
+    
     def matrix(self):
         pass
 

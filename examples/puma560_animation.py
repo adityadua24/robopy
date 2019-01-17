@@ -1,3 +1,4 @@
+from robopy.base.graphics import GraphicsRenderer
 import robopy.base.model as model
 import numpy as np
 
@@ -12,7 +13,8 @@ def main():
     e = np.asmatrix(np.zeros((500, 1)))
     f = np.concatenate((d, b, a, e, c, d), axis=1)
 
-    robot.animate(stances=f, timer_rate=60, gif="Puma560", frame_rate=30, unit='deg')
+    robot.animate(stances=f, unit='deg', timer_rate=60, gif="Puma560", 
+                             frame_rate=30, dispMode='VTK')
 
 
 if __name__ == '__main__':

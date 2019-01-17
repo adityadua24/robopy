@@ -8,8 +8,7 @@ from . import check_args
 from ..tests import test_transforms
 from . import common
 import unittest
-import vtk
-
+###import vtk
 
 # ---------------------------------------------------------------------------------------#
 def rotx(theta, unit="rad"):
@@ -718,6 +717,7 @@ def tr2angvec(tr, unit='rad'):
                 if unit == 'deg':
                     theta[i, 0] = theta[i, 0] * 180 / math.pi
                 print('Rotation: ', theta[i, 0], unit, 'x', '[', n[i, :], ']')
+           
             else:
                 raise TypeError('Matrix in not orthonormal.')
     else:
@@ -1219,7 +1219,8 @@ def eul2tr(phi, theta=None, psi=None, unit='rad'):
     R = eul2r(phi, theta, psi, unit)
     return r2t(R)
 
-
+'''
+### moved to graphics_vtk module
 # ---------------------------------------------------------------------------------------#
 def np2vtk(mat):
     if mat.shape == (4, 4):
@@ -1228,8 +1229,9 @@ def np2vtk(mat):
             for j in range(4):
                 obj.SetElement(i, j, mat[i, j])
         return obj
-
-
+### moved to graphics_vtk module       
+'''
+    
 # ---------------------------------------------------------------------------------------#
 if __name__ == '__main__':
     # When run as main, initialise test cases in test_classes_to_tun and runs them
