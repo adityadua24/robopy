@@ -143,6 +143,7 @@ class GraphicsVTK(Graphics):
         return rgb_named_colors(colors)
     
     ### Instance property setters/getters
+
     
     """    
       _dispMode = property(fset=setDispMode, fget=getDispMode)

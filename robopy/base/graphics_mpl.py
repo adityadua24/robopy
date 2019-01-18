@@ -135,6 +135,7 @@ class GraphicsMPL(Graphics):
         return rgb_named_colors
     
     ### Instance property setters/getters
+
     
     """
       _dispMode = property(fset=setDispMode, fget=getDispMode)
@@ -492,7 +493,7 @@ class GraphicsMPL(Graphics):
     def close(self):
         plt.close()
 
-    ### Abstract methods
+    ### Abstract methods for RTB interface
     
     @abstractmethod
     def view(self, *args, **kwargs):
