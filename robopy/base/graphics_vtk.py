@@ -39,7 +39,7 @@ import math
 import numpy as np
 
 __all__ = ('GraphicsVTK', 'VtkPipeline', 
-           'np2vtk', 'rbg_named_colors')
+           'np2vtk', 'rgb_named_colors')
 
 ###
 ### Utility routines which do not require VtkPipeline class instances.
@@ -673,7 +673,7 @@ class GraphicsVTK(Graphics):
         else:
             self.vtk_show(renderer=self.getRenderer())
     
-    ### Abstract methods
+    ### Abstract methods for RTB interface
         
     @abstractmethod
     def view(self, *args, **kwargs):
