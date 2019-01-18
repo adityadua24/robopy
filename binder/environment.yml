@@ -1,6 +1,6 @@
 name: robopy
 channels:
- - conda-forge
+  - conda-forge
 dependencies:
   - mesalib>=17
   - vtk>=7
