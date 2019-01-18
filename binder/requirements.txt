@@ -1,6 +1,0 @@
-vtk>=7
-matplotlib>=3
-numpy
-numpy-stl
-scipy
-Pillow>=3
