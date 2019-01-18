@@ -2,8 +2,7 @@ name: robopy
 channels:
   - conda-forge
 dependencies:
-  - mesalib>=17.3.9
-  - vtk>=8.1.1
+  - 'vtk[version>=7 build=py36_mesalib*]'
   - ipyvolume==0.5.1
   - ipywidgets>=7.4.0
   - ipywebrtc>=0.4
