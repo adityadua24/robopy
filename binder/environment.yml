@@ -2,15 +2,17 @@ name: robopy
 channels:
  - conda-forge
 dependencies:
- - vtk>=7
- - ipyvolume==0.5.1
- - ipywidgets>=7.4.0
- - ipywebrtc>=0.4
- - pip:
-   - matplotlib
-   - Pillow
-   - scipy
-   - numpy
-   - requests
-   - scikit-image>=0.13
- - notebook>=5.3
+  - mesalib>=17
+  - vtk>=7
+  - ipyvolume==0.5.1
+  - ipywidgets>=7.4.0
+  - ipywebrtc>=0.4
+  - pip:
+      -
+      - matplotlib
+      - Pillow
+      - scipy
+      - numpy
+      - requests
+      - scikit-image>=0.13
+      - notebook>=5.3
