@@ -1,29 +1,53 @@
-""" Imports RoboPy module
+"""
+Imports RoboPy module
 
-    This file is a temporary component of the ipynb branch of RoboPy for the 
-    porting RTB to Python development effort used to facilitate execution of 
-    Python scripts from within an unpacked robopy-ipynb distribution directory
-    work space. If the robopy-ipynb robopy module is installed then use of
-    of 'import _robopy' statements in Python scripts may be replaced with 
-    'import robopy'.
+This file is a temporary component of the ipynb branch of RoboPy for the
+porting RTB to Python development effort used to facilitate execution of
+Python scripts from within the directory hierarchy for a cloned robopy
+repository or unpacked robopy-ipynb repository source distribution work
+space.
 
-    To avoid cluttering a repository's root directory with non package files,
-    it's common practice to perform development and test efforts in work and 
-    and temp directories adjacent to the package directory as shown in the 
-    following directory hierarchy for a RoboPy robopy-ipynb repository clone
-    or source distribution. 
+If this robopy module version is installed, then use of 'import _robopy'
+statements in Python scripts within work space subdirectories containing
+this file may be replaced with 'import robopy'.
 
-       +- binder          - configuration files for MyBinder installation
-       +- build           - created by 'python setup.py [build|install]'
-       +- docs            - robopy documentation
-       +- examples        - robopy example scripts
-       +- notebooks       - robopy Jupyter/IPython notebooks
-       +- robopy          - robopy module source
-       +- robopy.egg-info - created by 'python setup.py install'
-       +- temp            - workspace temporary files
-       +- test            - test scripts
-       +- (venv)          - possible virtual environment created by an IDE
-       +- work            - workspace
+To avoid cluttering a repository's root directory with non package files,
+it's common practice to perform development work and test efforts in work,
+test and temp directories adjacent to the package module directory as
+shown in the following directory hierarchy for a cloned robopy repository
+or unpacked robopy-ipynb repository source distribution.
+
+  +- robopy or robopy-ipynb
+     +- binder            - configuration files for MyBinder installation
+     +- docs              - documentation
+     +- examples          - example scripts
+     +- notebooks         - Jupyter/IPython notebooks
+     |  +- (folder)       - notebook folder
+     |     |- _robopy.py  - copy of ../../robopy/_robopy.py
+     |
+     +- robopy            - robopy module and package sources
+     |  +- base           - base module source
+     |  +- media          - package media data files
+     |  +- tests          - test module scripts
+     |  |- _robopy.py     - this file
+     |
+     |- setup.py          - build and install script for robopy module
+     |                      and distribution package
+     |
+    --- ^^^ Package ^^^ | vvv Development Test Scripts/Data vvv
+     |
+     +- test              - development test scripts
+     |  |- _robopy.py     - copy of, or symbolic link to ../robopy/_robopy.py
+     |
+    --- ^^^ Development Test Scipts/Data ^^^ | vvv Development Workspace vvv
+     |
+     +- build             - created by 'python setup.py [build|install]'
+     +- robopy.egg-info   - created by 'python setup.py install'
+     +- temp              - development work temporary files
+     |
+     +- (venv)            - possible virtual environment created by an IDE
+     +- work              - development work scripts/data
+        |- _robopy.py     - copy of, or symbolic link to ../robopy/_robopy.py
 """
 
 import os, sys
@@ -31,19 +55,21 @@ import os, sys
 if 'BINDER_SERVICE_HOST' in os.environ:
         # Must be on MyBinder.org site; robopy should be installed!
         import robopy
+        print('Using installed RoboPy module version %s.', robopy.__version__)
 else:
     try:
         import robopy as robopy
-        print('Using installed RoboPy module.')
+        print('Using installed RoboPy module version %s.', robopy.__version__)
 
     except ImportError:
         thisdir = os.path.dirname(__file__)
         libdir = None
     
         # The following assumes this file is in a subdirectory adjacent
-        # to ./robopy or in a ./notebooks subdirectory for an unpacked 
-        # RoboPy robopy-ipynb distribution directory hierarchy on an 
-        # Ubuntu like platform with Python 3.
+        # to ./robopy or in a ./notebooks subdirectory of the RoboPy
+        # directory hierarchy for a cloned robopy repository or unpacked
+        # robopy-ipynb repository source distribution on an Ubuntu like
+        # platform with Python 3 (see file header comment block above).
 
         # Determine if in the root directory tree of a cloned robopy 
         # repository or ropopy-ipynb respository source distribution. 
@@ -55,7 +81,7 @@ else:
         elif 'robopy-ipynb' in dirs:
             root = 'robopy-ipynb'
         else:
-            print("Could not locate RoboPy module.")
+            print("Could not locate RoboPy root.")
             sys.exit(1); 
 
         # find prefix to the root.
@@ -79,7 +105,7 @@ else:
         #       source to be utilized.
         #
         # Note: Be sure to run 'python setup.py clean', or delete the
-        #       ./build directory if (2) is intended. 
+        #       ./build directory if (2) is intended.
 
         libdir = os.path.join(thisdir, prefix, 'build', 'lib')
     
@@ -106,5 +132,5 @@ else:
                     print("Could not locate RoboPy module.")
                     sys.exit(1);
         else:
-            print("Could not locate RoboPy module")
+            print("Could not locate RoboPy module.")
             sys.exit(1);
