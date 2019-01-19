@@ -10,4 +10,4 @@ from robopy.base import *
 
 ### Note: This is a temporary method to set module version number.
 ### TODO: Identify means to extract from version control system.
-__version__ = 1.0.8.0
+__version__ = '1.0.8.0'
