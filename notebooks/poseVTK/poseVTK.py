@@ -8,12 +8,8 @@
 #
 # Note: For development, this is platform and user specific.
 #
-import sys
-
-pth_repo   = '/home/garyd/PycharmProjects/robopy/'
-pth_venv   = 'venv/lib/python3.5/site-packages/'
-pkg_robopy = 'robopy-1.0.8-py3.5.egg'
-sys.path.insert(1,pth_repo + pth_venv + pkg_robopy)
+import os
+import _robopy
 
 
 # In[2]:
@@ -74,7 +70,9 @@ pose.SE3.Rx(theta=[45, 90], unit='deg').plot(dispMode=dMode, z_up=True, limits=l
 
 # Plot SE3 pose using VTK and display in PIL (Imagemagick) window
 
-pose.SE3.Rx(theta=[45, 90], unit='deg').plot(dispMode='PIL', z_up=True, limits=limits)
+if 'BINDER_SERVICE_HOST' not in os.environ:
+    # display this if not on MyBinder
+    pose.SE3.Rx(theta=[45, 90], unit='deg').plot(dispMode='PIL', z_up=True, limits=limits)
 
 
 # In[9]:
@@ -92,7 +90,9 @@ robot.plot(robot.qn, dispMode=dMode, z_up=False, limits=None)
 
 # Puma560 manipulator arm pose plot using VTK and displayed in PIL (Imagemagick) window
 
-robot.plot(robot.qn, dispMode='PIL', z_up=False, limits=None)
+if 'BINDER_SERVICE_HOST' not in os.environ:
+    # display this if not on MyBinder
+    robot.plot(robot.qn, dispMode='PIL', z_up=False, limits=None)
 
 
 # In[ ]:
