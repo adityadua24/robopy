@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.6
-  - vtk>=8
+  - vtk>=8=py36_mesalibhed38e9a_4
   - mesalib>=17
   - ipyvolume==0.5.1
   - ipywidgets>=7.4.0
