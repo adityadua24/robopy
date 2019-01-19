@@ -44,7 +44,6 @@ or unpacked robopy-ipynb repository source distribution.
      +- build             - created by 'python setup.py [build|install]'
      +- robopy.egg-info   - created by 'python setup.py install'
      +- temp              - development work temporary files
-     |
      +- (venv)            - possible virtual environment created by an IDE
      +- work              - development work scripts/data
         |- _robopy.py     - copy of, or symbolic link to ../robopy/_robopy.py
