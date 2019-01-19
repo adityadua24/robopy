@@ -1,35 +1,28 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# **Demonstration of RoboPy Pose.plot() and SerialLink.plot() rendering capability using VTK.**
+
 # In[1]:
 
 
-# Append path to robopy package to sys.path
-#
-# Note: For development, this is platform and user specific.
-#
-import os
+import os  # for checking values of environment variables.
+
+""" Matplotlib imports
+"""
+import matplotlib
+matplotlib.use('Qt4Agg')
+get_ipython().run_line_magic('matplotlib', 'notebook')
+
+""" RoboPy imports
+"""
 import _robopy
-
-
-# In[2]:
-
-
-# import robopy GraphicsRenderer
-
 from robopy.base.graphics import GraphicsRenderer
-
-
-# In[3]:
-
-
-# import robopy pose and model modules
-
 import robopy.base.pose as pose
 import robopy.base.model as model
 
 
-# In[4]:
+# In[2]:
 
 
 # Select a Graphics Rendering package to use.
@@ -37,27 +30,17 @@ import robopy.base.model as model
 gobj = GraphicsRenderer('VTK')  # this sets graphics.gRenderer
 
 
-# In[5]:
+# In[3]:
 
 
-# Define some GraphicsVTK parameters whcich will be used in draw()
-# and plot() function calls in following cells.
+# Define some GraphicsVTK parameters whcich will be used in plot()
+# method calls in following cells.
 
 dMode = 'IPY'
 limits = [-4.0, 4.0, -4.0, 4.0, -4.0, 4.0]
 
 
-# In[6]:
-
-
-# Draw a red sphere using VTK and display below.
-
-gobj.view(z_up=True, axes=True, limits=limits)
-gobj.draw_sphere()
-gobj.show(dispMode=dMode)
-
-
-# In[7]:
+# In[4]:
 
 
 # Plot SE3 pose using VTK and display below.
@@ -65,7 +48,7 @@ gobj.show(dispMode=dMode)
 pose.SE3.Rx(theta=[45, 90], unit='deg').plot(dispMode=dMode, z_up=True, limits=limits)
 
 
-# In[8]:
+# In[5]:
 
 
 # Plot SE3 pose using VTK and display in PIL (Imagemagick) window
@@ -75,7 +58,7 @@ if 'BINDER_SERVICE_HOST' not in os.environ:
     pose.SE3.Rx(theta=[45, 90], unit='deg').plot(dispMode='PIL', z_up=True, limits=limits)
 
 
-# In[9]:
+# In[6]:
 
 
 # Define a Puma506 robot model.
@@ -85,7 +68,7 @@ robot = model.Puma560()
 robot.plot(robot.qn, dispMode=dMode, z_up=False, limits=None)
 
 
-# In[10]:
+# In[7]:
 
 
 # Puma560 manipulator arm pose plot using VTK and displayed in PIL (Imagemagick) window
