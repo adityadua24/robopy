@@ -163,8 +163,8 @@ class Quaternion:
             self.v = s1 * v2 + s2 * v1 + np.cross(v1, v2)
 
         elif type(other) is int or type(other) is float:
-            self.s *= other
-            self.v *= other
+            self.s = self.s * other
+            self.v = self.v * other
 
         return self
 
