@@ -136,7 +136,7 @@ class GraphicsVTK(Graphics):
   
     @classmethod
     def isDispMode(cls, dmode):
-        return dmode in theDispModes 
+        return dmode in cls.theDispModes
        
     @classmethod  # simply call a module scope routine
     def rgb_named_colors(cls, colors):
