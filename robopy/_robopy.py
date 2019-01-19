@@ -34,6 +34,7 @@ if 'BINDER_SERVICE_HOST' in os.environ:
 else:
     try:
         import robopy as robopy
+        print('Using installed RoboPy module.')
 
     except ImportError:
         thisdir = os.path.dirname(__file__)
@@ -54,7 +55,7 @@ else:
         elif 'robopy-ipynb' in dirs:
             root = 'robopy-ipynb'
         else:
-            print("Could not locate RoboPy module")
+            print("Could not locate RoboPy module.")
             sys.exit(1); 
 
         # find prefix to the root.
@@ -86,7 +87,7 @@ else:
             # first try to find robopy module in build/lib directory
             if os.path.isdir(os.path.join(libdir,'robopy')):
                 if libdir not in sys.path:
-                    print('Using RoboPy module %s/robopy' % libdir)
+                    print('Using RoboPy module %s/robopy.' % libdir)
                     if sys.path[0] == '' or sys.path[0] == '.':
                         sys.path.insert(1, libdir)
                     else:
@@ -96,7 +97,7 @@ else:
                 libdir = os.path.join(thisdir, prefix)
                 if os.path.isdir(os.path.join(libdir,'robopy')):
                     if libdir not in sys.path:
-                        print('Using RoboPy module %s/robopy' % libdir)
+                        print('Using RoboPy module %s/robopy.' % libdir)
                         if sys.path[0] == '' or sys.path[0] == '.':
                             sys.path.insert(1, libdir)
                         else:
@@ -107,4 +108,3 @@ else:
         else:
             print("Could not locate RoboPy module")
             sys.exit(1);
-        
