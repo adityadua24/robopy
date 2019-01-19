@@ -697,9 +697,8 @@ class SO3(SuperPose):
         # TODO - maybe a static method
         pass
 
-    def torpy(self):
-        # TODO
-        pass
+    def torpy(self, unit='rad', order='zyx'):
+        return transforms.tr2rpy(self.rotation(), unit, order)
 
     def toeul(self):
         # TODO
