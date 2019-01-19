@@ -8,6 +8,7 @@ from . import check_args
 from .super_pose import SuperPose
 from random import uniform, randint
 from . import transforms
+from .quaternion import Quaternion, UnitQuaternion
 import vtk
 from . import graphics
 from .graphics import VtkPipeline
@@ -759,6 +760,21 @@ class SO3(SuperPose):
             T1 = T1[0]
 
         return ctraj(T0, T1, N)
+
+    def ros_msg(self):
+        try:
+            from geometry_msgs.msg import Transform
+        except ImportError as e:
+            print("ROS must be installed to use this method. "
+                  "If ROS is installed, run 'sudo apt install python3-yaml'")
+            raise e
+        msg = Transform()
+        q = UnitQuaternion.rot(self.rotation())
+        msg.rotation.x = q.v[0, 0]
+        msg.rotation.y = q.v[0, 1]
+        msg.rotation.z = q.v[0, 2]
+        msg.rotation.w = q.s
+        return msg
 
 
 # ---------------------------------------------------------------------------------
