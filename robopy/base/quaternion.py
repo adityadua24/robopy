@@ -108,6 +108,18 @@ class Quaternion:
                           [y, z, s, -x],
                           [z, -y, x, s]])
 
+    def ros_msg(self):
+        try:
+            from geometry_msgs.msg import Quaternion
+        except ImportError as e:
+            print("ROS must be installed to use this method. "
+                  "If ROS is installed, run 'sudo apt install python3-yaml'")
+            raise e
+        msg = Quaternion()
+        msg.x, msg.y, msg.z = self.v[0, 0], self.v[0, 1], self.v[0, 2]
+        msg.w = self.s
+        return msg
+
     def __mul__(self, other):
         assert isinstance(other, Quaternion) or \
                isinstance(other, int) or \
