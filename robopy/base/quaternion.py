@@ -182,6 +182,12 @@ class Quaternion:
         assert isinstance(other, Quaternion), "Both objects should be of type: Quaternion"
         return Quaternion(s=self.s - other.s, v=self.v - other.v)
 
+    def __isub__(self, other):
+        assert isinstance(other, Quaternion), "Both objects should be of type: Quaternion"
+        self.s = self.s - other.s
+        self.v = self.v - other.v
+        return self
+
     def __truediv__(self, other):
         assert isinstance(other, Quaternion) or \
                isinstance(other, int) or \

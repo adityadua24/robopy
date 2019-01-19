@@ -168,6 +168,30 @@ class TestQuaternion(unittest.TestCase):
                 q3.v, exp_sum[0, 1:])
             self.fail(output_str)
 
+    def test_quaternion_in_place_subtract_zero(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q2 = Quaternion()
+        q1 -= q2
+        self.assertEqual(vec1[0, 0], q1.s)
+        if not matrices_equal(q1.v, vec1[0, 1:]):
+            output_str = matrix_mismatch_string_builder(
+                q1.v, vec1[0, 1:])
+            self.fail(output_str)
+
+    def test_quaternion_in_place_subtract_random(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        vec2 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        exp_sum = vec1 - vec2
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q2 = Quaternion(float(vec2[0, 0]), vec2[0, 1:])
+        q1 -= q2
+        self.assertEqual(exp_sum[0, 0], q1.s)
+        if not matrices_equal(q1.v, exp_sum[0, 1:]):
+            output_str = matrix_mismatch_string_builder(
+                q1.v, exp_sum[0, 1:])
+            self.fail(output_str)
+
     def test_quaternion_multiplication_by_zero_quaternion(self):
         vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
         q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
