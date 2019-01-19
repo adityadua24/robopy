@@ -141,7 +141,6 @@ class Graphics(metaclass=ABCMeta):
         """ Matplotlib interface method
         """
         raise NotImplementedError('Need to define show method.')
-        abstractmethod
         
     @abstractmethod
     def tranimate(self, *args, **kwargs):
@@ -223,7 +222,7 @@ class Gtransform(Graphics):
          structures, there is no meaningful reason to force the NumPy
          matrix type class on graphics processing. The more appropriate
          data type class commonly used is the NumPy ndarray. Note the 
-         effort to convert x, y z bounds from matrices to arrays which 
+         effort to convert x, y & z bounds from matrices to arrays which 
          can then be accessed using just one index as in VtkPipeline
          qplot() and animate() methods in the graphics_vtk module.
 """
