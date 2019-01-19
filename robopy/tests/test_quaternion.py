@@ -211,6 +211,45 @@ class TestQuaternion(unittest.TestCase):
                 q2.v, exp_v)
             self.fail(output_str)
 
+    def test_quaternion_in_place_multiplication_by_zero(self):
+        vec1 = np.matrix([[uniform(-1, 1) for _ in range(4)]])
+        q1 = Quaternion(float(vec1[0, 0]), vec1[0, 1:])
+        q1 *= 0
+        self.assertEqual(q1.s, 0)
+        exp_vec = np.matrix([[0, 0, 0]])
+        if not matrices_equal(q1.v, exp_vec):
+            output_str = matrix_mismatch_string_builder(
+                q1.v, exp_vec)
+            self.fail(output_str)
+
+    def test_quaternion_in_place_multiplication_by_random_int(self):
+        s = uniform(-1, 1)
+        v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
+        num = randint(-100, 100)
+        q1 = Quaternion(s, v)
+        q1 *= num
+        exp_s = s * num
+        exp_v = v * num
+        self.assertEqual(q1.s, exp_s)
+        if not matrices_equal(q1.v, exp_v):
+            output_str = matrix_mismatch_string_builder(
+                q1.v, exp_v)
+            self.fail(output_str)
+
+    def test_quaternion_in_place_multiplication_by_random_float(self):
+        s = uniform(-1, 1)
+        v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
+        num = uniform(-100, 100)
+        q1 = Quaternion(s, v)
+        q1 *= num
+        exp_s = num * s
+        exp_v = num * v
+        self.assertEqual(q1.s, exp_s)
+        if not matrices_equal(q1.v, exp_v):
+            output_str = matrix_mismatch_string_builder(
+                q1.v, exp_v)
+            self.fail(output_str)
+
     def test_quaternion_unit(self):
         s = uniform(-1, 1)
         v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
@@ -263,6 +302,18 @@ class TestQuaternion(unittest.TestCase):
         if not matrices_equal(q2.v, v):
             output_str = matrix_mismatch_string_builder(
                 q2.v, v)
+            self.fail(output_str)
+
+    def test_quaternion_pow_negative_one(self):
+        s = uniform(-1, 1)
+        v = np.matrix([[uniform(-50, 50) for _ in range(3)]])
+        q1 = Quaternion(s, v)
+        q2 = q1**-1
+        q3 = q1.inv();
+        self.assertEqual(q2.s, q3.s)
+        if not matrices_equal(q2.v, q3.v):
+            output_str = matrix_mismatch_string_builder(
+                q2.v, q3.v)
             self.fail(output_str)
 
 class TestUnitQuaternion(unittest.TestCase):
