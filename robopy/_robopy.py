@@ -54,11 +54,11 @@ import os, sys
 if 'BINDER_SERVICE_HOST' in os.environ:
         # Must be on MyBinder.org site; robopy should be installed!
         import robopy
-        print('Using installed RoboPy module version %s.', robopy.__version__)
+        print('Using installed RoboPy module version %s.' % robopy.__version__)
 else:
     try:
         import robopy as robopy
-        print('Using installed RoboPy module version %s.', robopy.__version__)
+        print('Using installed RoboPy module version %s.' % robopy.__version__)
 
     except ImportError:
         thisdir = os.path.dirname(__file__)
