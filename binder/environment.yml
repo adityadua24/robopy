@@ -9,10 +9,11 @@ dependencies:
   - ipywidgets>=7.4.0
   - ipywebrtc>=0.4
   - pip:
+      - xvfbwrapper
       - matplotlib>=3
       - Pillow
-      - scipy
       - numpy
+      - scipy
       - requests
       - scikit-image>=0.13
-  - notebook>=5.3
+      - notebook>=5.3
