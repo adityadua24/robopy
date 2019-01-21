@@ -8,6 +8,11 @@ from numpy import trace
 from .transforms import *
 from ..tests.test_common import *
 from .graphics import *
+try:
+    from geometry_msgs.msg import Quaternion
+    ROS_INSTALLED = True
+except ImportError:
+    ROS_INSTALLED = False
 
 
 class Quaternion:
@@ -109,12 +114,9 @@ class Quaternion:
                           [z, -y, x, s]])
 
     def ros_msg(self):
-        try:
-            from geometry_msgs.msg import Quaternion
-        except ImportError as e:
-            print("ROS must be installed to use this method. "
-                  "If ROS is installed, run 'sudo apt install python3-yaml'")
-            raise e
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
         msg = Quaternion()
         msg.x, msg.y, msg.z = self.v[0, 0], self.v[0, 1], self.v[0, 2]
         msg.w = self.s
