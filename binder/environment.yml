@@ -1,19 +1,20 @@
-name: robopy-ipynb
+name: py35_ipynb
 channels:
   - conda-forge
 dependencies:
-  - python=3.6
-  - vtk>=8=py36_mesalibhed38e9a_4
-  - mesalib>=17
+  - python=3.5
   - ipyvolume==0.5.1
   - ipywidgets>=7.4.0
   - ipywebrtc>=0.4
   - pip:
-      - xvfbwrapper
       - matplotlib>=3
       - Pillow
+      - imageio
       - numpy
+      - numpy-stl
       - scipy
-      - requests
       - scikit-image>=0.13
+      - requests
       - notebook>=5.3
+      - vtk
+      - xvfbwrapper
