@@ -25,6 +25,10 @@ except ImportError:
     print("* Error: vtk package required.")
     sys.exit()
 
+#### To support X server virtual framebuffer
+###
+###from xvfbwrapper import Xvfb
+
 # To produce animated GIFs
 ###import imageio
 from . import images2gif as img2gif
@@ -616,12 +620,24 @@ class GraphicsVTK(Graphics):
         Takes vtkRenderer instance and returns an IPython Image with 
         the given rendering.
         """
+        ### Implemenation Note:
+        ###
+        ### Attempts to utilize an X virtual framebuffer server
+        ### (Xvfb) to capture VTK rendered images for display in
+        ### Jupyter/IPython notebooks have been unsuccesful as of
+        ### 20 Jan. 2019.
+        ###
+        ### 1) Using xvfbwrapper
+        ###
+        ###vdisplay = Xvfb()
+        ###vdisplay.start()
+
         rendWin = vtk.vtkRenderWindow()
         rendWin.SetOffScreenRendering(1)
         rendWin.AddRenderer(renderer)
         rendWin.SetSize(width, height)
         rendWin.Render()
-     
+
         winToImgFilter = vtk.vtkWindowToImageFilter()
         winToImgFilter.SetInput(rendWin)
         winToImgFilter.Update()
@@ -630,8 +646,11 @@ class GraphicsVTK(Graphics):
         writer.SetWriteToMemory(1)
         writer.SetInputConnection(winToImgFilter.GetOutputPort())
         writer.Write()
+
         png_data = memoryview(writer.GetResult()).tobytes()
-        
+
+        ###vdisplay.stop()
+
         return IPython.display.Image(png_data)
     
     @staticmethod
@@ -640,12 +659,19 @@ class GraphicsVTK(Graphics):
         Takes vtkRenderer instance and returns an PIL Image with 
         the given rendering.
         """
+        ### Implementation Note: (see ipy_show() above)
+        ###
+        ###vdisplay = Xvfb()
+        ###vdisplay.start()
+
         rendWin = vtk.vtkRenderWindow()
         rendWin.SetOffScreenRendering(1)
         rendWin.AddRenderer(renderer)
         rendWin.SetSize(width, height)
         rendWin.Render()
-     
+
+        ###vdisplay.stop()
+
         winToImgFilter = vtk.vtkWindowToImageFilter()
         winToImgFilter.SetInput(rendWin)
         winToImgFilter.SetInputBufferTypeToRGB()
@@ -656,10 +682,10 @@ class GraphicsVTK(Graphics):
         writer.SetInputConnection(winToImgFilter.GetOutputPort())
         writer.Write()
         bgr_data = memoryview(writer.GetResult()).tobytes()
-        
+    
         return PIL.Image.frombytes('RGB', (width, height), bgr_data,
                                    'raw', 'BGR', 0, -1)
-    
+
     def show(self, renderer=None, dispMode='VTK'):
         if dispMode == 'IPY' :
             for actor in self.getActors():
@@ -897,7 +923,12 @@ class VtkPipeline(GraphicsVTK):
             actor_list[i].GetProperty().SetColor(obj.colors[i])  # (R,G,B)
 
         return (reader_list, actor_list, mapper_list)
-    
+
+    ### Implementation Note:
+    ###
+    ### Is pose rendering/animation performance adversely impacted by applying
+    ### stance transforms to vtkActors here instead of in SerialLink.fkine()?
+
     @staticmethod
     def fkine(obj, stances, unit='rad', apply_stance=False, actor_list=None, timer=None):
         """
