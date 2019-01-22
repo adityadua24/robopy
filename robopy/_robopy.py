@@ -42,7 +42,8 @@ or unpacked robopy-ipynb repository source distribution.
     --- ^^^ Development Test Scipts/Data ^^^ | vvv Development Workspace vvv
      |
      +- build             - created by 'python setup.py [build|install]'
-     +- robopy.egg-info   - created by 'python setup.py install'
+     +- dist              - created by 'python setup.py install'
+     +- robopy.egg-info   - created by 'python setup.py [build|install]'
      +- temp              - development work temporary files
      +- (venv)            - possible virtual environment created by an IDE
      +- work              - development work scripts/data
