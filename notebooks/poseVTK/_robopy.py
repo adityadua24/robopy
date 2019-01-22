@@ -42,6 +42,7 @@ or unpacked robopy-ipynb repository source distribution.
     --- ^^^ Development Test Scipts/Data ^^^ | vvv Development Workspace vvv
      |
      +- build             - created by 'python setup.py [build|install]'
+     +- dist              - created by 'python setup.py install'
      +- robopy.egg-info   - created by 'python setup.py install'
      +- temp              - development work temporary files
      +- (venv)            - possible virtual environment created by an IDE
@@ -54,11 +55,11 @@ import os, sys
 if 'BINDER_SERVICE_HOST' in os.environ:
         # Must be on MyBinder.org site; robopy should be installed!
         import robopy
-        print('Using installed RoboPy module version %s.', robopy.__version__)
+        print('Using installed RoboPy module version %s.' % robopy.__version__)
 else:
     try:
         import robopy as robopy
-        print('Using installed RoboPy module version %s.', robopy.__version__)
+        print('Using installed RoboPy module version %s.' % robopy.__version__)
 
     except ImportError:
         thisdir = os.path.dirname(__file__)
