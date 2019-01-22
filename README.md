@@ -14,7 +14,7 @@ A Python 3 implementation of Peter Corke's Robotics Toolbox
 - [NumPy](http://www.numpy.org/)
 - [numpy-stl](https://pypi.org/project/numpy-stl/)
 - [Pillow](https://python-pillow.org/)
-- [Scipy](https://www.scipy.org/) (for NumPy, Matplotlib and IPython)
+- [Scipy](https://www.scipy.org/)
 
 **Supporting:**
 - [IPython](http://ipython.org/)
@@ -28,9 +28,9 @@ This is an RTB for Python Porting Project development version derived from
 RoboPy v1.0.8 and should only be installed and run in a cloned repository workspace.
 </font>*
 
-```
+````
 python3 setup.py install
-```
+````
 
 **Jupyter Notebook Example:**
 
