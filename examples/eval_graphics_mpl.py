@@ -7,6 +7,7 @@ DATE: Tue Jan  8 07:56:00 2019
 @author: garyd
 """
 
+import _robopy
 from robopy.base.graphics import GraphicsRenderer
 import robopy.base.pose as pose
 import robopy.base.model as model

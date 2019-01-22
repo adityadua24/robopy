@@ -1,3 +1,4 @@
+import _robopy
 from robopy.base.graphics import GraphicsRenderer
 import robopy.base.pose as pose
 

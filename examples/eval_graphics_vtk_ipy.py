@@ -10,6 +10,7 @@ DATE: Wed Jan  9 07:46:46 2019
 ### Run this in Spyder IDE IPython Console
 ###
 
+import _robopy
 from robopy.base.graphics import GraphicsRenderer
 import robopy.base.pose as pose
 import robopy.base.model as model
