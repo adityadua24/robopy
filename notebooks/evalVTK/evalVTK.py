@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env ipython
 # coding: utf-8
 
 # **Evaluation of capturing VTK rendered image for display in notebook cell.**

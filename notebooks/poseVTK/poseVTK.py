@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env ipython
 # coding: utf-8
 
 # **Demonstration of RoboPy Pose.plot() and SerialLink.plot() rendering capability using VTK.**
