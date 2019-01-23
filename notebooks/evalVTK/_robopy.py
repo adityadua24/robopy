@@ -9,13 +9,14 @@ space.
 
 If this robopy module version is installed, then use of 'import _robopy'
 statements in Python scripts within work space subdirectories containing
-this file may be replaced with 'import robopy'.
+this file may be removed or replaced with 'import robopy' depending upon
+usage context.
 
 To avoid cluttering a repository's root directory with non package files,
 it's common practice to perform development work and test efforts in work,
 test and temp directories adjacent to the package module directory as
-shown in the following directory hierarchy for a cloned robopy repository
-or unpacked robopy-ipynb repository source distribution.
+shown in the following directory tree for a cloned robopy repository or
+unpacked robopy-ipynb repository source distribution.
 
   +- robopy or robopy-ipynb
      +- binder            - configuration files for MyBinder installation
@@ -31,6 +32,8 @@ or unpacked robopy-ipynb repository source distribution.
      |  +- tests          - test module scripts
      |  |- _robopy.py     - this file
      |
+     +- util              - repository configuraton management scripts
+     |
      |- setup.py          - build and install script for robopy module
      |                      and distribution package
      |
@@ -43,7 +46,7 @@ or unpacked robopy-ipynb repository source distribution.
      |
      +- build             - created by 'python setup.py [build|install]'
      +- dist              - created by 'python setup.py install'
-     +- robopy.egg-info   - created by 'python setup.py install'
+     +- robopy.egg-info   - created by 'python setup.py [build|install]'
      +- temp              - development work temporary files
      +- (venv)            - possible virtual environment created by an IDE
      +- work              - development work scripts/data
@@ -67,7 +70,7 @@ else:
     
         # The following assumes this file is in a subdirectory adjacent
         # to ./robopy or in a ./notebooks subdirectory of the RoboPy
-        # directory hierarchy for a cloned robopy repository or unpacked
+        # directory tree for a cloned robopy repository or unpacked
         # robopy-ipynb repository source distribution on an Ubuntu like
         # platform with Python 3 (see file header comment block above).
 
@@ -82,7 +85,7 @@ else:
             root = 'robopy-ipynb'
         else:
             print("Could not locate RoboPy root.")
-            sys.exit(1); 
+            sys.exit(-1)
 
         # find prefix to the root.
 
@@ -104,8 +107,9 @@ else:
         #   (2) Otherwise, it's intended for the pre-build robopy module
         #       source to be utilized.
         #
-        # Note: Be sure to run 'python setup.py clean', or delete the
-        #       ./build directory if (2) is intended.
+        # Note: Be sure to run 'pip uninstall robopy' if (1) is intended
+        #       and 'python setup.py clean', or delete ./build directory
+        #       if (2) is intended.
 
         libdir = os.path.join(thisdir, prefix, 'build', 'lib')
     
@@ -130,7 +134,7 @@ else:
                             sys.path.insert(0, libdir)
                 else:
                     print("Could not locate RoboPy module.")
-                    sys.exit(1);
+                    sys.exit(-1)
         else:
             print("Could not locate RoboPy module.")
-            sys.exit(1);
+            sys.exit(-1)
