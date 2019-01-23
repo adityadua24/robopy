@@ -76,7 +76,7 @@ def rgb_named_colors(colors):
     
 class GraphicsMPL(Graphics):
     """ 
-    Graphics rendering interface for the MPLrendering package.
+    Graphics rendering interface for the MPL rendering package.
       
     This class acts as the interface between RTB drawing and plotting
     routines and the Matplotlib (MPL) graphics library. Its attributes
@@ -93,15 +93,15 @@ class GraphicsMPL(Graphics):
         # Instantiate a matplotlib pyplot figure.
         
         #self.setFigure()
-        #self.setFigureAxis(self.getFigure())
+        #self.setFigureAxes(self.getFigure())
         
         # plotting (graphing) properties
         
-        self.getFigureAxis().set_aspect("equal")
+        self.getFigureAxes().set_aspect("equal")
         self.setAxesLimits(-1.5, 1.5, -1.5, 1.5, -1.5, 1.5)
-        self.getFigureAxis().set_xlabel('X')
-        self.getFigureAxis().set_ylabel('Y')
-        self.getFigureAxis().set_zlabel('Z')
+        self.getFigureAxes().set_xlabel('X')
+        self.getFigureAxes().set_ylabel('Y')
+        self.getFigureAxes().set_zlabel('Z')
         
         # rendered artist properties
         
@@ -128,7 +128,7 @@ class GraphicsMPL(Graphics):
           
     @classmethod
     def isDispMode(cls, dmode):
-        return dmode in theDispModes 
+        return dmode in cls.theDispModes
        
     @staticmethod  # simply call a module scope routine
     def rgb_named_colors(cls, colors):           
@@ -136,11 +136,10 @@ class GraphicsMPL(Graphics):
     
     ### Instance property setters/getters
 
-    
     """
       _dispMode = property(fset=setDispMode, fget=getDispMode)
       _fig = property(fset=setFigure, fget=getFigure)
-      _ax = property(fset=setFigureAxis, fget=getFiguresAxis)
+      _ax = property(fset=setFigureAxes, fget=getFiguresAxis)
       mesh_list = property(fset=setMeshes, fget=getMeshes, fdel=delMeshes)
       poly_list = property(fset=setPolys, fget=getPolys, fdel=delPolys)
     """
@@ -157,13 +156,13 @@ class GraphicsMPL(Graphics):
     def getFigure(self):
         return self._fig
     
-    def setFigureAxis(self, fig):
+    def setFigureAxes(self, fig):
         self._ax = fig.add_subplot(111, projection='3d')
         ###self._ax = mplot3d.Axes3D(fig)
         self._ax.view_init(elev=2.0, azim=-35.0)  # a hardcoded dev convenience
         self._ax.set_frame_on(b=True)
         
-    def getFigureAxis(self):
+    def getFigureAxes(self):
         return self._ax
     
     def setAxesLimits(self, xlim, *args):
@@ -176,13 +175,13 @@ class GraphicsMPL(Graphics):
             return  # no warning given
 
         # Assume x and y ranges are equal, but z's range may be less
-        self.getFigureAxis().set_aspect('auto')
+        self.getFigureAxes().set_aspect('auto')
         scale = math.fabs(xmax-xmin)/math.fabs(zmax-zmin)
-        self.getFigureAxis().auto_scale_xyz(1.0, 1,0, scale)
+        self.getFigureAxes().auto_scale_xyz(1.0, 1, 0, scale)
         
-        self.getFigureAxis().set_xlim([xmin, xmax])
-        self.getFigureAxis().set_ylim([ymin, ymax])
-        self.getFigureAxis().set_zlim([zmin, zmax])
+        self.getFigureAxes().set_xlim([xmin, xmax])
+        self.getFigureAxes().set_ylim([ymin, ymax])
+        self.getFigureAxes().set_zlim([zmin, zmax])
         self._axesLimits = [xmin, xmax, ymin, ymax, zmin, zmax]
     
     def getAxesLimits(self):
@@ -398,7 +397,7 @@ class GraphicsMPL(Graphics):
 
         (xr, yr, zr) = self.shape_xform(x, y, z, Tr)
 
-        ax = self.getFigureAxis()
+        ax = self.getFigureAxes()
 
         if shape == 'frame':
             tail = 0
@@ -463,11 +462,11 @@ class GraphicsMPL(Graphics):
         
     def draw_cube(self):
         (x, y, z) = self.parametric_box(1.0, 5)
-        self.getFigureAxis().plot_surface(x, y, z, rstride=1, cstride=1, color='b')
+        self.getFigureAxes().plot_surface(x, y, z, rstride=1, cstride=1, color='b')
     
     def draw_sphere(self):
         (x, y, z) = self.parametric_sphere(1.0, 32)
-        self.getFigureAxis().plot_surface(x, y, z, rstride=4, cstride=4, color='r')
+        self.getFigureAxes().plot_surface(x, y, z, rstride=4, cstride=4, color='r')
     
     ### Rendering viewpoint methods
         
@@ -548,7 +547,7 @@ class Mpl3dArtist(GraphicsMPL):
         mpl.style.use('dark_background')
         
         self.setFigure()
-        self.setFigureAxis(self.getFigure())
+        self.setFigureAxes(self.getFigure())
         
         super(Mpl3dArtist, self).__init__(self.getFigure())
         
@@ -688,13 +687,13 @@ class Mpl3dArtist(GraphicsMPL):
         a_poly = mplot3d.art3d.Poly3DCollection(white_tiles.vectors)
         a_poly.set_facecolor("white")
         a_poly.set_edgecolor("white")
-        self.getFigureAxis().add_collection3d(a_poly)
+        self.getFigureAxes().add_collection3d(a_poly)
         
         green_tiles.z += position[1]
         a_poly = mplot3d.art3d.Poly3DCollection(green_tiles.vectors)
         a_poly.set_facecolor("green")
         a_poly.set_edgecolor("green")
-        self.getFigureAxis().add_collection3d(a_poly)
+        self.getFigureAxes().add_collection3d(a_poly)
     
     def _render_stl_pose(self, obj, stance, unit, limits=None):
         """
@@ -736,7 +735,7 @@ class Mpl3dArtist(GraphicsMPL):
             a_poly = mplot3d.art3d.Poly3DCollection(a_mesh.vectors)
             a_poly.set_facecolor(obj.colors[i])
             self.setPolyI(i, a_poly)
-            self.getFigureAxis().add_collection3d(a_poly)
+            self.getFigureAxes().add_collection3d(a_poly)
             mesh_poly3d.append(a_poly)
             
         # preserve reference pose
@@ -851,7 +850,7 @@ class Mpl3dArtist(GraphicsMPL):
         tx = limits[1]*1.2
         ty = limits[2]*1.2
         tz = limits[5]*1.2
-        time_text = self.getFigureAxis().text3D(tx, ty, tz, '', ha='center', va='bottom')
+        time_text = self.getFigureAxes().text3D(tx, ty, tz, '', ha='center', va='bottom')
         anim_text3d = time_text        
 
         # set animation parameters, then instantiate an animator
