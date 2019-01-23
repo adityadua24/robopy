@@ -1,4 +1,4 @@
-#!/usr/bin/env ipython
+#!/usr/bin/env python
 # coding: utf-8
 
 # **Evaluation of capturing VTK rendered image for display in notebook cell.**
@@ -116,7 +116,7 @@ ldd_args = [vtk_dir + '/vtkRenderingCorePython.so']
 
 
 exe_cmd  = 'python'
-exe_args = ['-v', '-u', 'draw_sphere.py']
+exe_args = ['-u', 'draw_sphere.py']
 exec_long_running_proc(exe_cmd, exe_args)
 
 
