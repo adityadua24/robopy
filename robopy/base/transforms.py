@@ -97,6 +97,7 @@ def trotx(theta, unit="rad", xyz=[0, 0, 0]):
     check_args.unit_check(unit)
     if unit == "deg":
         theta = theta * math.pi / 180
+        unit = "rad"
     tm = rotx(theta, unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     mat = np.c_[tm, np.array([[xyz[0]], [xyz[1]], [xyz[2]], [1]])]
@@ -122,6 +123,7 @@ def troty(theta, unit="rad", xyz=[0, 0, 0]):
     check_args.unit_check(unit)
     if unit == "deg":
         theta = theta * math.pi / 180
+        unit = "rad"
     tm = roty(theta, unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     mat = np.c_[tm, np.array([[xyz[0]], [xyz[1]], [xyz[2]], [1]])]
@@ -147,6 +149,7 @@ def trotz(theta, unit="rad", xyz=[0, 0, 0]):
     check_args.unit_check(unit)
     if unit == "deg":
         theta = theta * math.pi / 180
+        unit = "rad"
     tm = rotz(theta, unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     mat = np.c_[tm, np.array([[xyz[0]], [xyz[1]], [xyz[2]], [1]])]
