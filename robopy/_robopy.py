@@ -18,9 +18,14 @@ test and temp directories adjacent to the package module directory as
 shown in the following directory tree for a cloned robopy repository or
 unpacked robopy-ipynb repository source distribution.
 
+Package directories such as eval and util are for development purposes
+and it's not anticipated they would be included in user oriented source
+distribution one would expect to install from PyPI or Conda-Forge.
+
   +- robopy or robopy-ipynb
      +- binder            - configuration files for MyBinder installation
      +- docs              - documentation
+     +- eval              - development capability evaluation scripts
      +- examples          - example scripts
      +- notebooks         - Jupyter/IPython notebooks
      |  +- (folder)       - notebook folder

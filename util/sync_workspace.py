@@ -18,7 +18,7 @@ import shutil
 REF_FILE = '_robopy.py'
 
 IGNORE_SDIR = ['.git', '.idea']
-IGNORE_SDIR = IGNORE_SDIR + ['binder', 'docs', 'examples', 'notebooks', 'robopy', 'utils']
+IGNORE_SDIR = IGNORE_SDIR + ['binder', 'docs', 'eval', 'examples', 'notebooks', 'robopy', 'utils']
 IGNORE_SDIR = IGNORE_SDIR + ['build', 'dist', 'robopy.egg-info', 'venv']
 IGNORE_PATH = []
 

@@ -8,7 +8,7 @@
 #       subdirectory and is used to synchronize all copies of ../_robopy.py located
 #       within the repository robopy package subdirectories specified in PDIR_LIST.
 
-PDIR_LIST="examples notebooks"
+PDIR_LIST="eval examples notebooks"
 
 if [ -e ../robopy/_robopy.py ]
 then
