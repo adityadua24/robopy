@@ -166,6 +166,32 @@ class Graphics(metaclass=ABCMeta):
         """ 
         raise NotImplementedError('Need to define trplot2 method.')
 
+    # Display List Interface - These methods must be defined in Graphics Rendering Classes
+
+    @abstractmethod
+    def renderDisplayListItem(self, *args, **kwargs):
+        """ Graphics package renderDisplayListItem
+        """
+        raise NotImplementedError('Need to define renderDisplayListItem method.')
+
+    @abstractmethod
+    def renderDisplayList(self, *args, **kwargs):
+        """ Graphics package renderDisplayList
+        """
+        raise NotImplementedError('Need to define renderDisplayList method.')
+
+    @abstractmethod
+    def plotDisplayList(self, *args, **kwargs):
+        """ Graphics package plotDisplayList
+        """
+        raise NotImplementedError('Need to define plotDisplayList method.')
+
+    @abstractmethod
+    def animateDisplayList(self, *args, **kwargs):
+        """ Graphics package animateDisplayList
+        """
+        raise NotImplementedError('Need to define animateDisplayList method.')
+
 
 class Gtransform(Graphics):
     """
@@ -179,7 +205,7 @@ class Gtransform(Graphics):
     in this class
     """
     def __init__(self):
-        return None
+        super(Graphics,self).__init__()
     
     def setGtransform(self, *args, **kwargs):
         """ Set graphics transform.
@@ -230,6 +256,7 @@ class Gtransform(Graphics):
 from . import tb_parseopts as tbpo
 from . import graphics_vtk as gVtk
 from . import graphics_mpl as gMpl
+from . import display_list as dList
 
 gRenderer = None  # the instantiated graphics rendering object
 
@@ -296,9 +323,9 @@ def tranimate2(R):
 def trplot(T, handle=None, dispMode='VTK'):
     global gRenderer
     if handle is not None:
-        if type(handle) is type(VtkPipeline()):
+        if type(handle) is type(gVtk.VtkPipeline()):
              handle.trplot(T)
-        elif type(handle) is type(Hgtransform()):
+        elif type(handle) is type(super(gVtk).Hgtransform()):
              pass  # do Hgtransform stuff
         else:
              pass  # do error stuff   
@@ -308,15 +335,22 @@ def trplot(T, handle=None, dispMode='VTK'):
 def trplot2(R, handle=None, dispMode='VTk'):
     global gRenderer
     if handle is not None:
-        if type(handle) is type(VtkPipeline()):
+        if type(handle) is type(gVtk.VtkPipeline()):
             handle.trplot2(R)
-        elif type(handle) is type(Hgtransform()):
+        elif type(handle) is type(super(gVtk).Hgtransform()):
             pass  # do Hgtransform stuff
         else:
             pass  # do error stuff
     gobj = gVtk.VtkPipeline(dispMode=dispMode)
     gobj.trplot2(T)
-        
+
+### Implementation Note:
+###
+### To much detail about a SerialLink or DisplayList has been brought into
+### this interface. The Graphics class should just call the appropriate
+### Graphics Renderer animate() method and let that class determine how to
+### handle the details. See how plot() is handled in Mpl3dArtist.
+
 def animate(obj, stances, 
                  unit='rad', timer_rate=60, gif=None, frame_rate=30, 
                  dispMode='VTK', **kwargs):
