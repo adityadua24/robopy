@@ -34,9 +34,9 @@ class DisplayListItem:
 
         if type == 'surface':
             # plot_surface data, 3 NxN meshes
-            Xc = copy.deepcopy(data[0])
-            Yc = copy.deepcopy(data[1])
-            Zc = copy.deepcopy(data[2])
+            Xc = copy.deepcopy(data[0])  ### The use of deepcopy here may likely be
+            Yc = copy.deepcopy(data[1])  ### superfluous, but this is being done to
+            Zc = copy.deepcopy(data[2])  ### resolve DisplayList animation issues.
 
             self.shape = Xc.shape
             self.data = np.vstack((Xc.flatten(), Yc.flatten(), Zc.flatten()))  # create 3xN array
@@ -48,7 +48,7 @@ class DisplayListItem:
 
         self.args = args
         self.transform = np.identity(4)
-        self.poly3Dc = None
+        self.poly3Dc = None   ### See dev. comment above on use of deepcopy.
 
     def xform(self):
         ## transform the points
