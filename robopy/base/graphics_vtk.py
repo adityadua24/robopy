@@ -92,7 +92,7 @@ class GraphicsVTK(Graphics):
     """
     def __init__(self, gRenderer, dispMode, rend, rendWin, irend,
                        total_time_steps, timer_rate, gif_file, frame_rate):
-        
+
         ## Instance properties
         
         # Graphics environment properties
@@ -123,7 +123,9 @@ class GraphicsVTK(Graphics):
         self.setTotalTimeSteps(total_time_steps)
         self.setGIFfile(gif_file)
         self.setGraphicsRenderer(gRenderer)
-            
+
+        ##super(Graphics, self).__init__()
+
     def setGraphicsRenderer(self, gRenderer):
         """ Sets graphic renderer for this VTK pipeline.
         """
@@ -738,7 +740,33 @@ class GraphicsVTK(Graphics):
     def tranimate2(self, *args, **kwargs):
         raise NotImplementedError('Need to define tranimate2 method.')
         
-        
+    # Display List Interface - These methods must be defined in Mpl3dArtist Class
+
+    def renderDisplayListItem(self, *args, **kwargs):
+        """ GraphicsMPL class renderDisplayListItem
+        """
+        print("* Not yet implemented.")
+        return None
+
+    def renderDisplayList(self, *args, **kwargs):
+        """ GraphicsMPL class renderDisplayList
+        """
+        print("* Not yet implemented.")
+        return None
+
+    def plotDisplayList(self, *args, **kwargs):
+        """ GraphicsMPL class plotDisplayList
+        """
+        print("* Not yet implemented.")
+        return None
+
+    def animateDisplayList(self, *args, **kwargs):
+        """ GraphicsMPL class animateDisplayList
+        """
+        print("* Not yet implemented.")
+        return None
+
+
 class VtkPipeline(GraphicsVTK):
     """ Vtk rendering pipeline for RTB plotting and animation.
      
