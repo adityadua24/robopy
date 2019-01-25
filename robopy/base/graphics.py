@@ -256,7 +256,6 @@ class Gtransform(Graphics):
 from . import tb_parseopts as tbpo
 from . import graphics_vtk as gVtk
 from . import graphics_mpl as gMpl
-from . import display_list as dList
 
 gRenderer = None  # the instantiated graphics rendering object
 
