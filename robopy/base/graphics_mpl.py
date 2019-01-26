@@ -9,11 +9,13 @@ DATE: Tue Jan  9 11:53:00 2019
 
 import sys
 import pkg_resources
+from types import *
 from abc import abstractmethod
 
 # RoboPy modules
 from robopy.base.tb_parseopts import *
 from robopy.base.graphics import Graphics
+from robopy.base.display_list import *
 from . import check_args
 from . import transforms
 from . import pose as Pose
@@ -48,8 +50,8 @@ import PIL.Image
 import math
 import numpy as np
 
-__all__ = ('GraphicsMPL', 'Mpl3dArtist',
-           'rgb_named_colors')
+__all__ = ('GraphicsMPL', 'Mpl3dArtist',   # classes
+           'rgb_named_colors',)            # functions
 
 ###
 ### Utility routines which do not require Mpl3dArtist class instances.
@@ -84,7 +86,9 @@ class GraphicsMPL(Graphics):
     modeling object methods and data structures.
     """
     def __init__(self, fig):
-                
+
+        ##super(Graphics, self).__init__()
+
         # Graphics environment properties
         
         self._dispMode = 'IPY'
@@ -105,12 +109,12 @@ class GraphicsMPL(Graphics):
         
         # rendered artist properties
         
-        self.mesh_list = []
-        self.poly_list = []
+        self.mesh_list = []  # list of numpy-stl.mesh.Mesh from STL files
+        self.poly_list = []  # list of mpl_toolkit.mplot3d.art3d.Poly3DCollection(Mesh.vectors)
+        self.axes_list = []  # list of Poly3DCollection from Axes3D.ax.plot_surface()
 
         self.shapes = ['frame', 'box', 'beam', 'sphere', 
                        'cylinder', 'cone', 'disk', 'plane']
-        return None
     
     def setGraphicsRenderer(self, gRenderer):
         """ Sets graphic renderer for this MPL 3dArtists.
@@ -150,8 +154,11 @@ class GraphicsMPL(Graphics):
     def getDispMode(self):
         return self._dispMode
     
-    def setFigure(self):
-        self._fig = plt.figure(figsize=(6,6), dpi=80)
+    def setFigure(self, fign):
+        if fign is None:
+           self._fig = plt.figure(figsize=(8,8), dpi=80)
+        else:
+           self._fig = plt.figure(num=fign)
         
     def getFigure(self):
         return self._fig
@@ -469,7 +476,8 @@ class GraphicsMPL(Graphics):
         self.getFigureAxes().plot_surface(x, y, z, rstride=4, cstride=4, color='r')
     
     ### Rendering viewpoint methods
-        
+
+    ### ...
     
     ### Animation display methods
     
@@ -505,7 +513,7 @@ class GraphicsMPL(Graphics):
     @abstractmethod
     def fkine(*args, **kwargs):
         raise NotImplementedError('Need to define fkine method.')
-          
+
     @abstractmethod
     def plot(self, *args, **kwargs):
         raise NotImplementedError('Need to define plot method!')
@@ -529,28 +537,233 @@ class GraphicsMPL(Graphics):
     @abstractmethod
     def tranimate2(self, *args, **kwargs):
         raise NotImplementedError('Need to define tranimate2 method.')
-        
-        
+
+    # DisplayList rendering, plotting and animation methods
+
+    def renderDisplayListItem(self, displayListItem):
+        ax = self.getFigureAxes()
+        if displayListItem.type == 'surface':
+            data = displayListItem.xform()  # get the transformed coordinates
+            # plot surface on the same figure axes as in MATLAB with 'hold on'
+            poly3Dc = ax.plot_surface(data[0], data[1], data[2], **displayListItem.args)
+            '''
+            ### vvv Develoment artifact
+            fig = poly3Dc.get_figure()
+            assert (fig == self.getFigure())
+            assert (poly3Dc.axes == self.getFigureAxes())
+            ### ^^^
+            '''
+            displayListItem.poly3Dc = poly3Dc
+            self.axes_list.append(displayListItem.poly3Dc)  # save Poly3DCollection of each plot
+            '''
+            ### vvv Develoment artifact
+            for p in self.axes_list:
+                assert (p in self.getFigureAxes().collections)
+            ### ^^^
+            '''
+        elif displayListItem.type == 'command':
+            eval(displayListItem.command, globals())  # eval the command in global context
+        elif displayListItem.type == 'line':
+            # TODO
+            pass
+
+    def renderDisplayList(self, displayList):
+        ### print("renderDiplayList")
+        for item in displayList:
+            self.renderDisplayListItem(item)
+        '''
+        ### vvv Development artifact
+        for poly3Dc in self.axes_list:
+            print(poly3Dc)
+        ### ^^^
+        '''
+
+    def clearAxes(self):
+        self.getFigureAxes().cla()
+
+    def plotDisplayList(self, dList, dispMode='IPY', **kwargs):
+        """
+        Plots the DisplayList graphic entities.
+        :param dList: a DisplayList object
+        :param: dispMode: display mode, one of ['VTK', 'IPY', 'PIL'].
+        :return: None.
+        """
+        # parse argument list options
+        opts = {'dispMode': dispMode,  # holdover from GraphicsVTK
+                'z_up': True,          # holdover from GraphicsVTK
+                'limits': self.getAxesLimits(),
+                }
+
+        opt = asSimpleNs(opts)
+
+        (opt, args) = tb_parseopts(opt, **kwargs)
+
+        self.setAxesLimits(opt.limits)
+        self.renderDisplayList(dList)
+        self.show()
+
+    ### Implementation Note:
+    ###
+    ### Use of transFunc as FunctionType is merely a development convenience and
+    ### its type could also be np.matrix, where each column would associate with
+    ### a 'surface' or 'line' item in the DisplayList just as columns of stances
+    ### passed to animateSerialLink associate with joints in a SerialLink.
+
+    def animateDisplayList(self, displayList, transFunc, unit='rad', gif=None, duration=5,
+                           frame_rate=30, **kwargs):
+        """
+        Animates DisplayList object through transformations as a function of time.
+        :param transFunc: homogeneous transformation function of the form Tr(time)
+        :param duration: duration of animation in seconds
+        :param unit: unit of input angles. Allowed values: 'rad' or 'deg'
+        :param gif: name for the written animated GIF image file.
+        :param frame_rate: frame_rate for animation.
+        :return: None
+        """
+        # parse argument list options
+        opts = {'unit': unit,                    # holdover from animateSerialLink
+                'gif': gif,                      # holdover from GraphicsVTK
+                'duration': duration,
+                'frame_rate': frame_rate,
+                'dispMode': self.getDispMode(),  # holdover from GraphicsVTK
+                'z_up': False,                   # holdover from GraphicsVTK
+                'limits': self.getAxesLimits(),
+                }
+
+        opt = asSimpleNs(opts)
+
+        (opt, args) = tb_parseopts(opt, **kwargs)
+
+        # verify transFunc
+        assert type(transFunc) is FunctionType
+
+        self.setAxesLimits(opt.limits)
+
+        def _initFunc():
+            pass
+
+        def _animFunc(nf, self, displayList, transFunc, fps, anim_text3d, iaxes_list):
+            ###print("_animFunc")
+            # update frame time
+            t = float(nf)/fps
+
+            # update display list item's transforms
+            for item in displayList:
+                item.transform = transFunc(t)
+
+            # clear the axes and render display list graphics entities
+            '''
+            ### vvv Development Note:
+            ###
+            ### That this is not working seems to be due to Matplotlib
+            ### mpl_toolkit.mplot3d.Axes3D.plot_surface() method not
+            ### retaining Poly3DCollection artists used in rendering on
+            ### previous invocations as done in the renderDiplayItemList 
+            ### method(). See Mpl3dArtist.animateSerialLink() method for
+            ### recommended technique using 3D artists animation with 
+            ### mplot3d Poly3DCollection artists.
+            ###
+            ax = iaxes_list[0].axes
+            if ax == self.getFigureAxes():
+                for poly3Dc in iaxes_list:
+                    print("remove: %s" % (poly3Dc))
+                    ##poly3Dc.remove()
+                    pass
+            ### ^^^
+            '''
+            ### self.axes_list.clear()
+            self.renderDisplayList(displayList)
+
+            # update list of Poly3D entities to be rendered.
+            axes_list = []
+            i = 0
+            for poly3Dc in self.axes_list[-len(iaxes_list):]:
+                '''
+                ### vvv Development artifact
+                poly3Dc.set_figure(self.getFigure())
+                poly3Dc.axes = self.getFigureAxes()
+                self.axes_list[i] = poly3Dc
+                i += 1
+                ### ^^^
+                '''
+                axes_list.append(poly3Dc)
+
+            # update rendered frame displayed time text
+            time_str = 'time = %.3f' % (t)
+            anim_text3d.set_text(time_str)
+
+            return [anim_text3d] + axes_list
+
+        # render first frame
+        self.renderDisplayList(displayList)
+
+        # get list of Poly3DCollections from last plot for animation
+        axes_list = []
+        for poly3Dc in self.axes_list:
+            ''' 
+            ### vvv Development artifact
+            poly3Dc.set_figure(self.getFigure())
+            poly3Dc.axes = self.getFigureAxes()
+            ##poly3Dc.set_figure(self.getFigure())
+            ##self.getFigureAxes().add_collection3d(poly3Dc)
+            ### ^^^
+            '''
+            axes_list.append(poly3Dc)
+
+        # define text3D artist for rendered frame time display
+        tx = opt.limits[1] + opt.limits[1]*0.2
+        ty = opt.limits[2] - opt.limits[2]*0.2
+        tz = opt.limits[5] + opt.limits[5]*0.2
+        time_text = self.getFigureAxes().text3D(tx, ty, tz, '', ha='center', va='bottom')
+        anim_text3d = time_text
+
+        # set animation parameters, then instantiate an animator
+
+        nframes = int(opt.duration * opt.frame_rate) + 1
+        fps = int(opt.frame_rate)
+        frame_step_msec = 1000.0 / opt.frame_rate
+
+        self.anim = animation.FuncAnimation(self.getFigure(), _animFunc,
+                                            fargs=(self, displayList, transFunc, fps,
+                                                   anim_text3d, axes_list),
+                                            frames=nframes, blit=False,
+                                            interval=frame_step_msec, repeat=False)
+        # initiate display list animation
+        self.show()
+
+
 class Mpl3dArtist(GraphicsMPL):
-    """ Matplotlib (MPL) rendering artists for RTB plotting and animation.
+    """
+    Matplotlib (MPL) rendering artists for RTB plotting and animation.
      
-        This class acts as the interface between RTB plotting and animation
-        routines and the RTB manipulator modeling and simulation code.
-        Its methods must have access to the RTB manipulator model object
-        methods and data structures.
+    This class acts as the interface between RTB plotting and animation
+    routines and the RTB manipulator modeling and simulation code.
+    Its methods must have access to the RTB manipulator model object
+    methods and data structures.
     """
     def __init__(self, *args):
         
         if len(args) < 1 :  # crude method for handling type tests
             return None
-        
+
         mpl.style.use('dark_background')
-        
-        self.setFigure()
+
+        fignums = plt.get_fignums()
+
+        if fignums != [] \
+            and args[0] in fignums \
+            and plt.fignum_exists(args[0]):
+            # use existing figure
+            self.setFigure(args[0])   ### Developers's convenience
+            ### self.setFigure(None)  ### User's convenience
+
+        else:
+            self.setFigure(None)
+
         self.setFigureAxes(self.getFigure())
         
         super(Mpl3dArtist, self).__init__(self.getFigure())
-        
+
         return None
     
     def getAxesLimits(self):
@@ -584,6 +797,16 @@ class Mpl3dArtist(GraphicsMPL):
             self.pose_plot2(obj, **kwargs)
         elif type(obj) in [type(Pose.SO3()), type(Pose.SE3())]:
             self.pose_plot3(obj, **kwargs)
+        elif type(obj) is type(DisplayList()):
+            self.plotDisplayList(obj, **kwargs)
+        else:
+            pass
+
+    def animate(self, obj, stances, **kwargs):
+        if isinstance(obj, SerialLink.SerialLink):
+            self.animateSerialLink(obj, stances, **kwargs)
+        elif isinstance(obj, DisplayList):
+            self.animateDisplayList(obj, stances, **kwargs)
         else:
             pass
         
@@ -620,6 +843,8 @@ class Mpl3dArtist(GraphicsMPL):
             a_mesh = mesh.Mesh.from_file(loc)
             a_poly = mplot3d.art3d.Poly3DCollection(a_mesh.vectors)
             a_poly.set_facecolor(obj.colors[i])  # (R,G,B)
+            a_poly.set_rasterized(True)
+            a_poly.set_zorder(2.0)
             mesh_list[i] = a_mesh
             poly_list[i] = a_poly
             
@@ -687,17 +912,21 @@ class Mpl3dArtist(GraphicsMPL):
         a_poly = mplot3d.art3d.Poly3DCollection(white_tiles.vectors)
         a_poly.set_facecolor("white")
         a_poly.set_edgecolor("white")
+        a_poly.set_rasterized(True)
+        a_poly.set_zorder(1.0)
         self.getFigureAxes().add_collection3d(a_poly)
         
         green_tiles.z += position[1]
         a_poly = mplot3d.art3d.Poly3DCollection(green_tiles.vectors)
         a_poly.set_facecolor("green")
         a_poly.set_edgecolor("green")
+        a_poly.set_rasterized(True)
+        a_poly.set_zorder(1.0)
         self.getFigureAxes().add_collection3d(a_poly)
     
     def _render_stl_pose(self, obj, stance, unit, limits=None):
         """
-        Renderes given SerialLink object defined as STL meshes in desired stance.
+        Renders given SerialLink object defined as STL meshes in desired stance.
         :param obj: a SerialLink object.
         :param stance: list of joint angles for SerialLink object.
         :param unit: unit of input angles.
@@ -734,6 +963,8 @@ class Mpl3dArtist(GraphicsMPL):
             a_mesh.rotate([1.,0.,0.], -np.pi/2)
             a_poly = mplot3d.art3d.Poly3DCollection(a_mesh.vectors)
             a_poly.set_facecolor(obj.colors[i])
+            a_poly.set_rasterized(True)
+            a_poly.set_zorder(2.0)
             self.setPolyI(i, a_poly)
             self.getFigureAxes().add_collection3d(a_poly)
             mesh_poly3d.append(a_poly)
@@ -743,7 +974,7 @@ class Mpl3dArtist(GraphicsMPL):
         
         return(limits, mesh_list, mesh_poly3d)
 
-    def qplot(self, obj, stance, unit='rad', dispMode='VTK', **kwargs):
+    def qplot(self, obj, stance, unit='rad', dispMode='IPY', **kwargs):
         """
         Plots the SerialLink object in a desired stance.
         :param stance: list of joint angles for SerialLink object.
@@ -784,7 +1015,7 @@ class Mpl3dArtist(GraphicsMPL):
         print("* Not yet implemented.")
         return None
     
-    def animate(self, obj, stances, unit='rad', gif=None, frame_rate=25, **kwargs):
+    def animateSerialLink(self, obj, stances, unit='rad', gif=None, frame_rate=25, **kwargs):
         """
         Animates SerialLink object over mx6 dimensional input matrix, with each row representing list of 6 joint angles.
         :param stances: mx6 dimensional input matrix.
@@ -795,7 +1026,7 @@ class Mpl3dArtist(GraphicsMPL):
         """       
         # parse argument list options
         opts = { 'unit'       : unit,
-                 'gif'        : gif,
+                 'gif'        : gif,                 # holdover from GraphicsVTK
                  'frame_rate' : frame_rate,
                  'dispMode'   : self.getDispMode(),  # holdover from GraphicsVTK
                  'z_up'       : False,               # holdover from GraphicsVTK
@@ -822,14 +1053,16 @@ class Mpl3dArtist(GraphicsMPL):
             
             # convert updated SerialLink meshes to artist poly3D collection
             ax = mesh_poly3d[0].axes 
-            if ax is not None:
-                for i in range(0,len(mesh_poly3d)):
+            if ax == self.getFigureAxes():
+                for i in range(0, len(mesh_poly3d)):
                     mesh_poly3d[i].remove()
                 for i in range(0, len(self.getMeshes())):
                     a_mesh = self.getMeshI(i)
                     a_mesh.rotate([1.,0.,0.], -np.pi/2)
                     a_poly = mplot3d.art3d.Poly3DCollection(a_mesh.vectors)
                     a_poly.set_facecolor(obj.colors[i])
+                    a_poly.set_rasterized(None)
+                    a_poly.set_zorder(2.0)
                     self.setPolyI(i, a_poly)
                     ax.add_collection3d(a_poly)
                     mesh_poly3d[i] = a_poly
@@ -884,5 +1117,4 @@ class Mpl3dArtist(GraphicsMPL):
     
     def tranimate2(self, R, **kwargs):
         print("* Not yet implemented.")
-        return None     
-    
+        return None
