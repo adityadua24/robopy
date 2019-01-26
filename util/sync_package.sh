@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# FILE: sync_package.py
+# FILE: sync_package.sh
 # PROG: Synchronizes copies of _robopy.py to version in repository ./robopy subdirectory.
 # DATE: Jan 23 2019
 # AUTH: G. E. Deschaines
