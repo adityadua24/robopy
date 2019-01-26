@@ -766,6 +766,17 @@ class GraphicsVTK(Graphics):
         print("* Not yet implemented.")
         return None
 
+### Implementation Note:
+###
+### Some components of this class still exhibit non-traditional coupling
+### between graphics providers and clients due to preservation of existing
+### RoboPy code base. This coupling can be mitigated or eliminated in some
+### instances by utilizing callback mechanisms as done in most graphical
+### rendering and user interface toolkits. A specific example would be the
+### RTB fkine function that should be passed to the VtkPipeline qplot()
+### and animate() methods for SerialLink objects as a callback routine as
+### one would pass animation update functions to an animator or keypress
+### and mouse event handlers to a GUI manager.
 
 class VtkPipeline(GraphicsVTK):
     """ Vtk rendering pipeline for RTB plotting and animation.
