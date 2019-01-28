@@ -9,6 +9,12 @@ from ..tests import test_transforms
 from . import common
 import unittest
 
+try:
+    from colored import fg, bg, attr
+    _color = True
+except:
+    _color = False
+
 ###import vtk
 
 class RTBMatrix(np.ndarray):
@@ -29,17 +35,23 @@ class RTBMatrix(np.ndarray):
             # sequence case
             for count, X in enumerate(self):
                 # add separator lines and the index
-                output_str += '[{:d}] =\n'.format(count) + str(X)
+                if _color:
+                    output_str += fg('red') + '[{:d}] =\n'.format(count) + attr(0) + str(X)
+                else:
+                    output_str += '[{:d}] =\n'.format(count) + str(X)
         else:
             # single matrix case
-            for i, row in enumerate(self):
-                # add some bracket like thing at the start
-                if i in (0, len(self)-1):
-                    output_str += '+'
-                else:
-                    output_str += '|'
+            for row in self:
                 # format the whole row
-                output_str += ' '.join(['{:=10g}'.format(x) for x in row]) + '\n'
+                s = '  ' + ' '.join(['{:=10g}'.format(x) for x in row]) + '  '
+
+                ## add color if available
+                # see https://pypi.org/project/colored for color codes
+                # grey_XX where XX=0 is black, XX=100 is white
+                if _color:
+                    s = fg('black') + bg('grey_93') + s + attr(0)
+                output_str += s + '\n'
+        
         return output_str
 
 def inputs(arg, func):
@@ -93,7 +105,11 @@ def rotx(theta, unit="rad"):
         theta *= conv
         ct = math.cos(theta)
         st = math.sin(theta)
-        mat = np.array([[1, 0, 0], [0, ct, -st], [0, st, ct]])
+        mat = np.array([
+            [1, 0, 0],
+            [0, ct, -st],
+            [0, st, ct]
+        ])
         return mat.round(15)
 
     return inputs(theta, lambda x: _rotx(x, conv))
