@@ -4,14 +4,23 @@
 
 import numpy as np
 import math
+from random import uniform, randint
+
 from . import check_args
 from .super_pose import SuperPose
-from random import uniform, randint
 from . import transforms
-import vtk
-from . import graphics
-from .graphics import VtkPipeline
 
+try:
+    from geometry_msgs.msg import Pose
+    from geometry_msgs.msg import Pose2D
+    ROS_INSTALLED = True
+except ImportError:
+    ROS_INSTALLED = False
+
+###import vtk
+###from . import graphics
+###from .graphics import VtkPipeline
+from . import graphics
 
 # TODO Implement argument checking for all poses
 # -----------------------------------------------------------------------------------------
@@ -25,7 +34,7 @@ class SO2(SuperPose):
         self._unit = unit
         self._list = []
         angles_deg = []
-
+        
         if null:  # Usually only internally used to create empty objects
             pass
         elif args_in is None:
@@ -207,6 +216,11 @@ class SO2(SuperPose):
             new_pose.append(each_matrix)
         return new_pose
 
+    def plot(self, dispMode='VTK', **kwargs):
+        graphics.plot(self, dispMode=dispMode, **kwargs)
+        
+    '''
+    ### moved to graphics_vtk module
     def plot(self):
 
         angles = self.angle
@@ -235,6 +249,17 @@ class SO2(SuperPose):
 
         pipeline.add_actor(axis_x_y)
         pipeline.render()
+    ### moved to graphics_vtk module
+    '''
+
+
+    def ros_msg(self):
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
+        msg = Pose2D()
+        msg.theta = self.angle
+        return msg
 
 
 # ---------------------------------------------------------------------------------
@@ -413,6 +438,16 @@ class SE2(SO2):
         obj = cls(x=x, y=y, theta=theta, unit='deg')
         return obj
 
+    def ros_msg(self):
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
+        msg = Pose2D()
+        msg.x = self.transl[0][0]
+        msg.y = self.transl[0][1]
+        msg.theta = self.angle
+        return msg
+
 
 # ------------------------------------------------------------------------------------
 
@@ -554,6 +589,11 @@ class SO3(SuperPose):
             pose_se3.append(transforms.r2t(each))
         return pose_se3
 
+    def plot(self, dispMode='VTK', **kwargs):
+        graphics.plot(self, dispMode=dispMode, **kwargs)
+
+    '''
+    ### moved to graphics_vtk module
     def plot(self):
         pose_se3 = self
         if type(self) is SO3:
@@ -571,7 +611,31 @@ class SO3(SuperPose):
         pipeline.screenshot()
         pipeline.iren.Initialize()
         pipeline.iren.Start()
-
+    ### moved to graphics_vtk module
+    '''
+       
+    def animate(self, other=None, duration=5, timer_rate=60, gif=None, **kwargs):
+        """
+        Pose animation of a single pose, or iterpolated between two poses.
+        :param other: other Pose SO3 object to transition towards.
+        :param duration: alloted transition time period (sec).
+        :param timer_rate:
+        :param gif:
+        :param 
+        :param **kwargs: see below
+        :return: None
+        
+        Keyword Arguments
+          z_up   : whether or not the z-axis is upward
+          limits : the plotting boundary x, y and z limits 
+        """
+        graphics.panimate(self, other=other, 
+                                duration=duration, 
+                                timer_rate=timer_rate, gif=gif, **kwargs)
+        pass
+    
+    '''
+    ### moved to graphics_vtk module
     def animate(self, other=None, duration=5, gif=None):
         from .quaternion import UnitQuaternion
         assert duration > 0
@@ -613,7 +677,9 @@ class SO3(SuperPose):
 
         self.pipeline.iren.AddObserver('TimerEvent', execute)
         self.pipeline.animate()
-
+    ### moved to graphics_vtk module
+    '''
+ 
     def rotation(self):
         return self.mat
 
@@ -760,6 +826,18 @@ class SO3(SuperPose):
 
         return ctraj(T0, T1, N)
 
+    def ros_msg(self):
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
+        msg = Pose()
+        q = UnitQuaternion.rot(self.rotation())
+        msg.orientation.x = q.v[0, 0]
+        msg.orientation.y = q.v[0, 1]
+        msg.orientation.z = q.v[0, 2]
+        msg.orientation.w = q.s
+        return msg
+
 
 # ---------------------------------------------------------------------------------
 class SE3(SO3):
@@ -898,5 +976,23 @@ class SE3(SO3):
             return cls.Ry(theta, unit='deg', x=x, y=y, z=z)
         elif ran == 3:
             return cls.Rz(theta, unit='deg', x=x, y=y, z=z)
+
+    def rotation(self):
+        return self.mat[:3, :3]
+
+    def ros_msg(self):
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
+        msg = Pose()
+        q = UnitQuaternion.rot(self.rotation())
+        msg.position.x = self.mat[0, 3]
+        msg.position.y = self.mat[1, 3]
+        msg.position.z = self.mat[2, 3]
+        msg.orientation.x = q.v[0, 0]
+        msg.orientation.y = q.v[0, 1]
+        msg.orientation.z = q.v[0, 2]
+        msg.orientation.w = q.s
+        return msg
 
 # ------------------------------------------------------------------------------------
