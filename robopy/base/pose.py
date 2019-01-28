@@ -4,13 +4,16 @@
 
 import numpy as np
 import math
+from random import uniform, randint
+
 from . import check_args
 from .super_pose import SuperPose
-from random import uniform, randint
 from . import transforms
-import vtk
+
+###import vtk
+###from . import graphics
+###from .graphics import VtkPipeline
 from . import graphics
-from .graphics import VtkPipeline
 
 
 # TODO Implement argument checking for all poses
@@ -25,7 +28,7 @@ class SO2(SuperPose):
         self._unit = unit
         self._list = []
         angles_deg = []
-
+        
         if null:  # Usually only internally used to create empty objects
             pass
         elif args_in is None:
@@ -207,6 +210,11 @@ class SO2(SuperPose):
             new_pose.append(each_matrix)
         return new_pose
 
+    def plot(self, dispMode='VTK', **kwargs):
+        graphics.plot(self, dispMode=dispMode, **kwargs)
+        
+    '''
+    ### moved to graphics_vtk module
     def plot(self):
 
         angles = self.angle
@@ -235,7 +243,8 @@ class SO2(SuperPose):
 
         pipeline.add_actor(axis_x_y)
         pipeline.render()
-
+    ### moved to graphics_vtk module
+    '''
 
 # ---------------------------------------------------------------------------------
 class SE2(SO2):
@@ -554,6 +563,11 @@ class SO3(SuperPose):
             pose_se3.append(transforms.r2t(each))
         return pose_se3
 
+    def plot(self, dispMode='VTK', **kwargs):
+        graphics.plot(self, dispMode=dispMode, **kwargs)
+
+    '''
+    ### moved to graphics_vtk module
     def plot(self):
         pose_se3 = self
         if type(self) is SO3:
@@ -571,7 +585,31 @@ class SO3(SuperPose):
         pipeline.screenshot()
         pipeline.iren.Initialize()
         pipeline.iren.Start()
-
+    ### moved to graphics_vtk module
+    '''
+       
+    def animate(self, other=None, duration=5, timer_rate=60, gif=None, **kwargs):
+        """
+        Pose animation of a single pose, or iterpolated between two poses.
+        :param other: other Pose SO3 object to transition towards.
+        :param duration: alloted transition time period (sec).
+        :param timer_rate:
+        :param gif:
+        :param 
+        :param **kwargs: see below
+        :return: None
+        
+        Keyword Arguments
+          z_up   : whether or not the z-axis is upward
+          limits : the plotting boundary x, y and z limits 
+        """
+        graphics.panimate(self, other=other, 
+                                duration=duration, 
+                                timer_rate=timer_rate, gif=gif, **kwargs)
+        pass
+    
+    '''
+    ### moved to graphics_vtk module
     def animate(self, other=None, duration=5, gif=None):
         from .quaternion import UnitQuaternion
         assert duration > 0
@@ -613,7 +651,9 @@ class SO3(SuperPose):
 
         self.pipeline.iren.AddObserver('TimerEvent', execute)
         self.pipeline.animate()
-
+    ### moved to graphics_vtk module
+    '''
+ 
     def rotation(self):
         return self.mat
 

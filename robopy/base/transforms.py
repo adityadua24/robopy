@@ -8,7 +8,9 @@ from . import check_args
 from ..tests import test_transforms
 from . import common
 import unittest
-# import vtk
+
+###import vtk
+
 
 class RTBMatrix(np.ndarray):
    def __new__(cls, input_array):
@@ -20,6 +22,8 @@ class RTBMatrix(np.ndarray):
 
    def to_ndarray(self):
        return np.asarray(self)
+    
+   ###TODO add a nice __repr__ method
 
 def inputs(arg, func):
     
@@ -129,7 +133,10 @@ def trotx(theta, unit="rad", xyz=[0, 0, 0]):
     trotx(THETA, 'rad', [x,y,z]) as above with translation of [x,y,z]
     """
     check_args.unit_check(unit)
-    tm = rotx(theta, unit)
+    if unit == "deg":
+        theta = theta * math.pi / 180
+        unit = "rad"
+    tm = rotx(theta, unit=unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     mat = np.c_[tm, np.array([[xyz[0]], [xyz[1]], [xyz[2]], [1]])]
     mat = np.asmatrix(mat.round(15))
@@ -152,7 +159,10 @@ def troty(theta, unit="rad", xyz=[0, 0, 0]):
     troty(THETA, 'rad', [x,y,z]) as above with translation of [x,y,z]
     """
     check_args.unit_check(unit)
-    tm = roty(theta, unit)
+    if unit == "deg":
+        theta = theta * math.pi / 180
+        unit = "rad"
+    tm = roty(theta, unit=unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     mat = np.c_[tm, np.array([[xyz[0]], [xyz[1]], [xyz[2]], [1]])]
     mat = np.asmatrix(mat.round(15))
@@ -175,7 +185,10 @@ def trotz(theta, unit="rad", xyz=[0, 0, 0]):
     trotz(THETA, 'rad', [x,y,z]) as above with translation of [x,y,z]
     """
     check_args.unit_check(unit)
-    tm = rotz(theta, unit)
+    if unit == "deg":
+        theta = theta * math.pi / 180
+        unit = "rad"
+    tm = rotz(theta, unit=unit)
     tm = np.r_[tm, np.zeros((1, 3))]
     mat = np.c_[tm, np.array([[xyz[0]], [xyz[1]], [xyz[2]], [1]])]
     mat = np.asmatrix(mat.round(15))
@@ -751,6 +764,7 @@ def tr2angvec(tr, unit='rad'):
                 if unit == 'deg':
                     theta[i, 0] = theta[i, 0] * 180 / math.pi
                 print('Rotation: ', theta[i, 0], unit, 'x', '[', n[i, :], ']')
+           
             else:
                 raise TypeError('Matrix in not orthonormal.')
     else:
@@ -1257,7 +1271,8 @@ def eul2tr(phi, theta=None, psi=None, unit='rad'):
     R = eul2r(phi, theta, psi, unit)
     return r2t(R)
 
-
+'''
+### moved to graphics_vtk module
 # ---------------------------------------------------------------------------------------#
 def np2vtk(mat):
     if mat.shape == (4, 4):
@@ -1266,8 +1281,9 @@ def np2vtk(mat):
             for j in range(4):
                 obj.SetElement(i, j, mat[i, j])
         return obj
-
-
+### moved to graphics_vtk module       
+'''
+    
 # ---------------------------------------------------------------------------------------#
 if __name__ == '__main__':
     # When run as main, initialise test cases in test_classes_to_tun and runs them

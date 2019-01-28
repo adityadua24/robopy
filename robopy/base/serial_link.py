@@ -5,12 +5,15 @@ from abc import ABC
 import math
 from math import pi
 import numpy as np
-import vtk
+
 from . import transforms
-from .graphics import VtkPipeline
-from .graphics import axesCube
-from .graphics import axesCubeFloor
-from .graphics import vtk_named_colors
+
+###from .graphics import VtkPipeline
+###from .graphics import axesCube
+###from .graphics import axesCubeFloor
+###from .graphics import vtk_named_colors
+from . import graphics
+
 import pkg_resources
 from scipy.optimize import minimize
 
@@ -55,16 +58,16 @@ class SerialLink:
         else:
             self.name = name
         if colors is None:
-            self.colors = vtk_named_colors(["Grey"] * len(stl_files))
+            self.colors = graphics.rgb_named_colors(["Grey"] * len(stl_files))
         else:
             self.colors = colors
         if param is None:
-            # If model deosn't pass params, then use these default ones
+            # If model doesn't pass params, then use these default ones
             self.param = {
-                "cube_axes_x_bounds": np.matrix([[-1.5, 1.5]]),
-                "cube_axes_y_bounds": np.matrix([[-1.5, 1.5]]),
-                "cube_axes_z_bounds": np.matrix([[-1.5, 1.5]]),
-                "floor_position": np.matrix([[0, -1.5, 0]])
+                "cube_axes_x_bounds": [-1.5, 1.5],
+                "cube_axes_y_bounds": [-1.5, 1.5],
+                "cube_axes_z_bounds": [-1.5, 1.5],
+                "floor_position": [0, -1.5, 0]
             }
         else:
             self.param = param
@@ -80,6 +83,35 @@ class SerialLink:
         """
         return len(self.links)
 
+    def fkine(self, stances, unit='rad', timer=None):
+        """
+        Calculates forward kinematics for array of joint angles.
+        :param stances: stances is a mxn array of joint angles.
+        :param unit: unit of input angles.
+        :param timer: internal use only (for animation).
+        :return T: list of n+t homogeneous transformation matrices.
+        """
+        if type(stances) is np.ndarray:
+            stances = np.asmatrix(stances)
+        if unit == 'deg':
+            stances = stances * pi / 180
+        if timer is None:
+            timer = 0
+            
+        nT = self.length
+        T = []
+        
+        t = self.base
+        for i in range(0, nT):
+            T.append(t)
+            t = t * self.links[i].A(stances[timer, i]) 
+        t = t * self.tool
+        T.append(t)
+        
+        return T
+    
+    '''
+    ### replaced with above function and same named function in graphics_vtk module
     def fkine(self, stance, unit='rad', apply_stance=False, actor_list=None, timer=None):
         """
         Calculates forward kinematics for a list of joint angles.
@@ -99,13 +131,15 @@ class SerialLink:
         t = self.base
         for i in range(self.length):
             if apply_stance:
-                actor_list[i].SetUserMatrix(transforms.np2vtk(t))
+                actor_list[i].SetUserMatrix(gvtk.np2vtk(t))
             t = t * self.links[i].A(stance[timer, i])
         t = t * self.tool
         if apply_stance:
-            actor_list[self.length].SetUserMatrix(transforms.np2vtk(t))
+            actor_list[self.length].SetUserMatrix(gvtk.np2vtk(t))
         return t
-
+    ### replaced with above function and same named function in graphics_vtk module
+    '''
+    
     def ikine(self, T, q0=None, unit='rad'):
         """
         Calculates inverse kinematics for homogeneous transformation matrix using numerical optimisation method.
@@ -133,6 +167,18 @@ class SerialLink:
         else:
             return np.asmatrix(sol.x)
 
+    def plot(self, stance, unit='rad', dispMode='VTK', **kwargs):
+        """
+        Plots the SerialLink object in a desired stance.
+        :param stance: list of joint angles for SerialLink object.
+        :param unit: unit of input angles.
+        :dispMode: display mode, one of ['VTK', 'IPY', 'PIL']
+        :return: null.
+        """
+        graphics.qplot(self, stance, unit=unit, dispMode=dispMode, **kwargs)
+
+    '''
+    ### moved to graphics_vtk module
     def plot(self, stance, unit='rad'):
         """
         Plots the SerialLink object in a desired stance.
@@ -163,7 +209,7 @@ class SerialLink:
             each.SetScale(self.scale)
 
         self.pipeline.render()
-
+    
     def __setup_pipeline_objs(self):
         """
         Internal function to initialise vtk objects.
@@ -183,7 +229,9 @@ class SerialLink:
             actor_list[i].GetProperty().SetColor(self.colors[i])  # (R,G,B)
 
         return reader_list, actor_list, mapper_list
-
+    ### moved to graphics_vtk module
+    '''
+    
     @staticmethod
     def _setup_file_names(num):
         file_names = []
@@ -192,6 +240,23 @@ class SerialLink:
 
         return file_names
 
+    def animate(self, stances, unit='rad', timer_rate=10, gif=None, frame_rate=10,
+                      dispMode='VTK',  **kwargs):
+        """
+        Animates SerialLink object over nx6 dimensional input matrix, with each row representing list of 6 joint angles.
+        :param stances: nx6 dimensional input matrix.
+        :param unit: unit of input angles. Allowed values: 'rad' or 'deg'
+        :param timer_rate: time_rate for motion. Could be any integer more than 1. Higher value runs through stances faster.
+        :param gif: name for the written animated GIF image file.
+        :param frame_rate: frame_rate for animation.
+        :dispMode: display mode; one of ['VTK', 'IPY', 'PIL'].
+        :return: null
+        """
+        graphics.animate(self, stances, unit=unit, timer_rate=timer_rate, gif=gif,
+                               frame_rate=frame_rate, dispMode=dispMode, **kwargs)
+        
+    '''
+    ### moved to graphics_vtk module
     def animate(self, stances, unit='rad', frame_rate=25, gif=None):
         """
         Animates SerialLink object over nx6 dimensional input matrix, with each row representing list of 6 joint angles.
@@ -218,7 +283,8 @@ class SerialLink:
 
         self.pipeline.iren.AddObserver('TimerEvent', execute)
         self.pipeline.animate()
-
+    ### moved to graphics_vtk module    
+    '''
 
 class Link(ABC):
     """
