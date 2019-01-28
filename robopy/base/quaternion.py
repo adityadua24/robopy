@@ -50,7 +50,8 @@ class Quaternion:
         return Quaternion(s=self.s, v=-self.v)
 
     def inv(self):
-        return Quaternion(s=self.s, v=-self.v)
+        n2 = float(self.norm()**2)
+        return Quaternion(s=self.s, v=-self.v) / n2
 
     def tr(self):
         return t2r(self.r())
@@ -80,11 +81,7 @@ class Quaternion:
         @rtype: quaternion
         @return: equivalent unit quaternion
         """
-        qr = UnitQuaternion()
-        nm = self.norm()
-        qr.s = float(self.s / nm)
-        qr.v = self.v / nm
-        return qr
+        return UnitQuaternion(self.s, self.v)
 
     def r(self):
         """Return an equivalent rotation matrix.
@@ -112,16 +109,29 @@ class Quaternion:
                           [y, z, s, -x],
                           [z, -y, x, s]])
 
+    def ros_msg(self):
+        try:
+            from geometry_msgs.msg import Quaternion
+        except ImportError as e:
+            print("ROS must be installed to use this method. "
+                  "If ROS is installed, run 'sudo apt install python3-yaml'")
+            raise e
+        msg = Quaternion()
+        msg.x, msg.y, msg.z = self.v[0, 0], self.v[0, 1], self.v[0, 2]
+        msg.w = self.s
+        return msg
+
     def __mul__(self, other):
-        assert isinstance(other, Quaternion) \
-               or isinstance(other, int) \
-               or isinstance(other, float), "Can be multiplied with Quaternion, int or a float. "
+        assert isinstance(other, Quaternion) or \
+               isinstance(other, int) or \
+               isinstance(other, float), \
+               "Can be multiplied with Quaternion, int or a float. "
         if type(other) is Quaternion:
             qr = Quaternion()
         else:
             qr = UnitQuaternion()
         if isinstance(other, Quaternion):
-            qr.s = self.s * other.s - self.v * np.transpose(other.v)
+            qr.s = float(self.s * other.s - self.v * np.transpose(other.v))
             qr.v = self.s * other.v + other.s * self.v + np.cross(self.v, other.v)
         elif type(other) is int or type(other) is float:
             qr.s = self.s * other
@@ -137,15 +147,16 @@ class Quaternion:
         :return:
         """
         assert type(power) is int, "Power must be an integer"
-        qr = Quaternion()
+        if power == 0:
+            return Quaternion(1)
         q = Quaternion.qt(self)
-        for i in range(0, abs(power)):
-            qr = qr * q
+        for i in range(1, abs(power)):
+            q = self * q
 
         if power < 0:
-            qr = qr.inv()
+            q = q.inv()
 
-        return qr
+        return q
 
     def __imul__(self, other):
         """
@@ -165,8 +176,8 @@ class Quaternion:
             self.v = s1 * v2 + s2 * v1 + np.cross(v1, v2)
 
         elif type(other) is int or type(other) is float:
-            self.s *= other
-            self.v *= other
+            self.s = self.s * other
+            self.v = self.v * other
 
         return self
 
@@ -174,15 +185,27 @@ class Quaternion:
         assert isinstance(other, Quaternion), "Both objects should be of type: Quaternion"
         return Quaternion(s=self.s + other.s, v=self.v + other.v)
 
+    def __iadd__(self, other):
+        assert isinstance(other, Quaternion), "Both objects should be of type: Quaternion"
+        self.s = self.s + other.s
+        self.v = self.v + other.v
+        return self
+
     def __sub__(self, other):
         assert isinstance(other, Quaternion), "Both objects should be of type: Quaternion"
         return Quaternion(s=self.s - other.s, v=self.v - other.v)
 
+    def __isub__(self, other):
+        assert isinstance(other, Quaternion), "Both objects should be of type: Quaternion"
+        self.s = self.s - other.s
+        self.v = self.v - other.v
+        return self
+
     def __truediv__(self, other):
-        assert isinstance(other, Quaternion) or isinstance(other, int) or isinstance(other,
-                                                                                     float), "Can be divided by a " \
-                                                                                             "Quaternion, " \
-                                                                                             "int or a float "
+        assert isinstance(other, Quaternion) or \
+               isinstance(other, int) or \
+               isinstance(other, float), \
+               "Can only be divided by a Quaternion, int, or a float"
         qr = Quaternion()
         if type(other) is Quaternion:
             qr = self * other.inv()
@@ -208,7 +231,7 @@ class Quaternion:
             return True
 
     def __repr__(self):
-        return "%f <%f, %f, %f>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
+        return "%f <<%f, %f, %f>>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
 
     def __str__(self):
         return self.__repr__()
@@ -222,6 +245,9 @@ class UnitQuaternion(Quaternion):
         if v is None:
             v = np.matrix([[0, 0, 0]])
         super().__init__(s, v)
+        nm = self.norm()
+        self.s = float(self.s / nm)
+        self.v = self.v / nm
 
     @classmethod
     def rot(cls, arg_in):
@@ -477,3 +503,6 @@ class UnitQuaternion(Quaternion):
     def __floordiv__(self, other):
         assert type(other) is UnitQuaternion
         return (self / other).unit()
+
+    def __repr__(self):
+        return "%f <%f, %f, %f>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
