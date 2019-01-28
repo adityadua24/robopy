@@ -5,7 +5,8 @@ from .serial_link import Revolute
 from math import pi
 import numpy as np
 from . import transforms as tr
-from . import graphics
+###from . import graphics
+from .graphics import rgb_named_colors 
 from .common import ishomog
 
 
@@ -37,7 +38,8 @@ class Puma560(SerialLink):
         else:
             assert ishomog(base, (4, 4))
         file_names = SerialLink._setup_file_names(7)
-        colors = graphics.vtk_named_colors(["Red", "DarkGreen", "Blue", "Cyan", "Magenta", "Yellow", "White"])
+        ###graphics.vtk_named_colors(["Red", "DarkGreen", "Blue", "Cyan", "Magenta", "Yellow", "White"])
+        colors = rgb_named_colors(["Red", "DarkGreen", "Blue", "Cyan", "Magenta", "Yellow", "White"])
 
         super().__init__(links=links, base=base, name='puma_560', stl_files=file_names, colors=colors, param=param)
 
@@ -64,7 +66,9 @@ class Orion5(SerialLink):
             assert ishomog(base, (4, 4))
 
         file_names = SerialLink._setup_file_names(7)
-        colors = graphics.vtk_named_colors(
+        ###colors = graphics.vtk_named_colors(
+        ###    ["DimGray", "IndianRed", "DimGray", "IndianRed", "DimGray", "IndianRed", "IndianRed"])
+        colors = rgb_named_colors(
             ["DimGray", "IndianRed", "DimGray", "IndianRed", "DimGray", "IndianRed", "IndianRed"])
 
         super().__init__(links=links, base=base, name='orion5', stl_files=file_names, colors=colors)

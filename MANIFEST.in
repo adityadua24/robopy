@@ -2,3 +2,4 @@ include robopy/media/puma_560/*.stl
 include robopy/media/imgs/*.jpg
 include robopy/media/imgs/*.png
 include robopy/media/orion5/*.stl
+include robopy/media/stl/floor/*.stl

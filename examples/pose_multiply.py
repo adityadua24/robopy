@@ -1,3 +1,4 @@
+import _robopy
 import robopy.base.pose as pose
 
 

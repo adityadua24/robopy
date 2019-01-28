@@ -1,0 +1,4 @@
+ipyvolume==0.5.1
+ipywidgets>=7.4.0
+ipywebrtc>=0.4
+pip
