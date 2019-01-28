@@ -1,0 +1,11 @@
+matplotlib>=3
+Pillow
+imageio
+numpy
+numpy-stl
+scipy
+scikit-image>=0.13
+requests
+notebook>=5.3
+vtk
+xvfbwrapper

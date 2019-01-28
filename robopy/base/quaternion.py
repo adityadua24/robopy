@@ -7,8 +7,15 @@ from math import sqrt
 from numpy import trace
 from .transforms import *
 from ..tests.test_common import *
-from .graphics import *
 
+try:
+    from geometry_msgs.msg import Quaternion
+    ROS_INSTALLED = True
+except ImportError:
+    ROS_INSTALLED = False
+
+###from .graphics import *
+from . import graphics
 
 class Quaternion:
     def __init__(self, s=None, v=None):
@@ -109,12 +116,9 @@ class Quaternion:
                           [z, -y, x, s]])
 
     def ros_msg(self):
-        try:
-            from geometry_msgs.msg import Quaternion
-        except ImportError as e:
-            print("ROS must be installed to use this method. "
-                  "If ROS is installed, run 'sudo apt install python3-yaml'")
-            raise e
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
         msg = Quaternion()
         msg.x, msg.y, msg.z = self.v[0, 0], self.v[0, 1], self.v[0, 2]
         msg.w = self.s
@@ -320,10 +324,17 @@ class UnitQuaternion(Quaternion):
         qd = -self.v * omega
         return 0.5 * np.r_[qd, E*omega]
 
-    def plot(self):
+    def plot(self, dispMode='VTK'):
         from .pose import SO3
-        SO3.np(self.r()).plot()
-
+        SO3.np(self.r()).plot(dispMode=dispMode)
+                
+    def animate(self, qr=None, dispMode='VTK', duration=5, gif=None):
+        graphics.qanimate(self, qr=qr, 
+                                dispMode=dispMode, duration=duration, 
+                                gif=gif, **kwargs)
+    
+    '''
+    ### moved to graphics_vtk module
     def animate(self, qr=None, duration=5, gif=None):
         self.pipeline = VtkPipeline(total_time_steps=duration*60, gif_file=gif)
         axis = vtk.vtkAxesActor()
@@ -350,7 +361,9 @@ class UnitQuaternion(Quaternion):
 
         self.pipeline.iren.AddObserver('TimerEvent', execute)
         self.pipeline.animate()
-
+    ### moved to graphics_vtk module
+    '''
+    
     def matrix(self):
         pass
 
