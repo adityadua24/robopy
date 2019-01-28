@@ -1,16 +1,7 @@
 language: python
+dist: xenial
 python:
-- '3.6'
-install:
-- pip install twine
-- pip install wheel
+- '3.5'
+virtualenv:
+  system_site_packages: true
 script: true
-deploy:
-  provider: pypi
-  user: adityadua24
-  password:
-    secure: O6OmQ4TKkpaY/f4DBqB5owiHeE8At2LQL/rdWYWPMSKQSJObN3h4/+g1kTgr5aboFWXPwiXmRhoWTlT+/XlpYw8Kugxalj6YeEf39bXDhzWD6SFWjPrR7VOCe8ZSEACIl5GCaR3Hs2YhVuBtPBC9Y0rVUJPPijotnl/9+bVOTNaeK6aIf7u89gx0OwIndojzM5OrMkISmZgAJUWx7dbcm1KR5KG9f13McF9eFZuoLE72QagjPEnqKK3RDMY5eApzr4SrvsTVUmUUJGhhcmIn1hkGgsMIuTVWnXD9V0zzZbNBinqwNQ639vWGAo91FCGFJ/pANDD5CZmtx+W8YYRiJ0IVrBDBj1E7OGSs800+E2lRix8sAfBMvgQ2v8J0molErWR29+peTfhUeHGczkUXjKht1wd6WEOOVQxLPMGjKqcdzUK0+znsg+xbVluKCF8WcNKykl26t9Bayf5jlpwryTFHtsE3KUjCrZfxSc3TQoqechHZbdIHyMR1eTln5X+nZyOBdny3/RO8x6Z/4FpfD0AOdwQ7kKAawzQJgk1DfOJ16ltfptK0hkNcYGTIvpH2Ls68S9Dl403nCNaw08TS2un/ThbOzcuYKLmDwRHaj6Yh3iMvOfAsZrrjCydfCx+yljl4H54NH7jn20RHc5bBEopJw9SSLaU4igIJIU1vOYo=
-  distributions: sdist bdist_wheel
-  on:
-    tags: true
-    branch: master

@@ -22,7 +22,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.8',
+    version='1.0.8.0',
 
     description='A Python 3 implementation of Peter Corke\'s Robotics Toolbox',
     long_description='ROBOPY is a python implimentation of The Robotics Toolbox (RTB) (The brainchild of Peter Corke) '
@@ -93,7 +93,7 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    include_package_data=True, install_requires=['imageio', 'numpy', 'scipy']
+    include_package_data=True, install_requires=['vtk', 'matplotlib', 'numpy', 'numpy-stl','scipy', 'Pillow']
     # packages=find_packages('robopy'),
     # package_dir={'':'robopy'},
     # package_data={
