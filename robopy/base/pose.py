@@ -10,11 +10,17 @@ from . import check_args
 from .super_pose import SuperPose
 from . import transforms
 
+try:
+    from geometry_msgs.msg import Pose
+    from geometry_msgs.msg import Pose2D
+    ROS_INSTALLED = True
+except ImportError:
+    ROS_INSTALLED = False
+
 ###import vtk
 ###from . import graphics
 ###from .graphics import VtkPipeline
 from . import graphics
-
 
 # TODO Implement argument checking for all poses
 # -----------------------------------------------------------------------------------------
@@ -246,6 +252,16 @@ class SO2(SuperPose):
     ### moved to graphics_vtk module
     '''
 
+
+    def ros_msg(self):
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
+        msg = Pose2D()
+        msg.theta = self.angle
+        return msg
+
+
 # ---------------------------------------------------------------------------------
 class SE2(SO2):
     # ---------------------------------------------------------------------------------
@@ -421,6 +437,16 @@ class SE2(SO2):
         theta = uniform(0, 360)
         obj = cls(x=x, y=y, theta=theta, unit='deg')
         return obj
+
+    def ros_msg(self):
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
+        msg = Pose2D()
+        msg.x = self.transl[0][0]
+        msg.y = self.transl[0][1]
+        msg.theta = self.angle
+        return msg
 
 
 # ------------------------------------------------------------------------------------
@@ -737,9 +763,8 @@ class SO3(SuperPose):
         # TODO - maybe a static method
         pass
 
-    def torpy(self):
-        # TODO
-        pass
+    def torpy(self, unit='rad', order='zyx'):
+        return transforms.tr2rpy(self.rotation(), unit, order)
 
     def toeul(self):
         # TODO
@@ -800,6 +825,18 @@ class SO3(SuperPose):
             T1 = T1[0]
 
         return ctraj(T0, T1, N)
+
+    def ros_msg(self):
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
+        msg = Pose()
+        q = UnitQuaternion.rot(self.rotation())
+        msg.orientation.x = q.v[0, 0]
+        msg.orientation.y = q.v[0, 1]
+        msg.orientation.z = q.v[0, 2]
+        msg.orientation.w = q.s
+        return msg
 
 
 # ---------------------------------------------------------------------------------
@@ -939,5 +976,23 @@ class SE3(SO3):
             return cls.Ry(theta, unit='deg', x=x, y=y, z=z)
         elif ran == 3:
             return cls.Rz(theta, unit='deg', x=x, y=y, z=z)
+
+    def rotation(self):
+        return self.mat[:3, :3]
+
+    def ros_msg(self):
+        if not ROS_INSTALLED:
+            raise ImportError("ROS must be installed to use this method. "
+                              "If ROS is installed, run 'sudo apt install python3-yaml'")
+        msg = Pose()
+        q = UnitQuaternion.rot(self.rotation())
+        msg.position.x = self.mat[0, 3]
+        msg.position.y = self.mat[1, 3]
+        msg.position.z = self.mat[2, 3]
+        msg.orientation.x = q.v[0, 0]
+        msg.orientation.y = q.v[0, 1]
+        msg.orientation.z = q.v[0, 2]
+        msg.orientation.w = q.s
+        return msg
 
 # ------------------------------------------------------------------------------------
