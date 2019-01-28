@@ -29,8 +29,8 @@ class DisplayListItem:
     """
 
     def __init__(self, type, name, data, args):
-        self.type = type
-        self.name = name
+        self.type = type  # item type
+        self.name = name  # item identifier
 
         if type == 'surface':
             # plot_surface data, 3 NxN meshes
@@ -46,9 +46,12 @@ class DisplayListItem:
             # TODO
             pass
 
-        self.args = args
-        self.transform = np.identity(4)
-        self.poly3Dc = None   ### See dev. comment above on use of deepcopy.
+        self.args = args                   # rendering function arguments
+        self.transform = np.identity(4)    # homogeneous transform matrix
+        self.gentity = None                # rendered graphical entity
+
+    def reset(self):
+        self.gentity = None
 
     def xform(self):
         ## transform the points
@@ -86,9 +89,16 @@ class DisplayList:
         self._displaylist.append(dli)
         return dli
 
+    def reset(self):
+        """
+        Reset graphics entities for each item in display list.
+        :return:
+        """
+        for item in self._displaylist:
+            item.reset()
+
     def clear(self):
         """
         Clear a display list.
         """
         self._displaylist = []
-
