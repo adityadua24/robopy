@@ -3,10 +3,14 @@
 -----------------
 ##### Instructions
 
-Each of these capability evaluation scripts, except eval_graphics_vtk_ipy.py, can
-be run from a command shell (terminal window) using Python 3 as:
+Each of these capability evaluation scripts, except eval_display_list_ipv.py
+and eval_graphics_vtk_ipy.py, can be run from a command shell (terminal window)
+using Python 3 as:
 
 >$ python3 _scriptfile_
+
+The eval_display_list_ipv.py can only be run in a Jupyter notebooks. See the
+Jupyter notebooks sample ./notebooks/dListIPV/dListIPV.ipynb.
 
 The eval_graphics_vtk_ipy.py script must be run using IPython in a
 Jupyter qtconsole as:
@@ -27,7 +31,17 @@ eval_display_list_mpl.py     - Evaluates graphics_mpl module's capability to
                                provide RTB DisplayList plots and animation of
                                graphics entities, such as rendered geometric
                                shapes defined with mesh grid arrays, using
-                               matplotlib graphics package.
+                               matplotlib graphics package. This script is
+                               also provided as the Jupyter notebooks sample
+                               ./notebooks/dListMPL/dListMPL.ipynb
+
+eval_display_list_ipv.py     - Evaluates graphics_ipv module's capability to
+                               provide RTB DisplayList plots and animation of
+                               graphics entities, such as rendered geometric
+                               shapes defined with mesh grid arrays, using
+                               ipyvolume graphics package. This script is
+                               also provided as the Jupyter notebooks sample
+                               ./notebooks/dListIPV/dListIPV.ipynb
 
 eval_graphics_mpl.py         - Evaluates graphics_mpl module's capability to
                                provide RTB SerialLink plots and animation
