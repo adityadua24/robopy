@@ -11,26 +11,51 @@ import unittest
 
 ###import vtk
 
-
 class RTBMatrix(np.ndarray):
-   def __new__(cls, input_array):
-       obj = np.asarray(input_array).view(cls)
-       return obj
+    def __new__(cls, input_array):
+        obj = np.asarray(input_array).view(cls)
+        return obj
 
-   def __mul__(self, other):
-       return self.dot(other)
+    def __mul__(self, other):
+        return self.dot(other)
 
-   def to_ndarray(self):
-       return np.asarray(self)
-    
-   ###TODO add a nice __repr__ method
+    def to_ndarray(self):
+        return np.asarray(self)
+
+    def __str__(self):
+        output_str = ''
+
+        if self.ndim == 3:
+            # sequence case
+            for count, X in enumerate(self):
+                # add separator lines and the index
+                output_str += '[{:d}] =\n'.format(count) + str(X)
+        else:
+            # single matrix case
+            for i, row in enumerate(self):
+                # add some bracket like thing at the start
+                if i in (0, len(self)-1):
+                    output_str += '+'
+                else:
+                    output_str += '|'
+                # format the whole row
+                output_str += ' '.join(['{:=10g}'.format(x) for x in row]) + '\n'
+        return output_str
 
 def inputs(arg, func):
+    ### use np.flatten
+    ### use np.isscalar
     
-    if type(arg) == float or type(arg) == int:
+    if np.isscalar(arg):
         # arg is a numeric scalar
         out = RTBMatrix(func(arg))
     else:
+        # if ndarray, flatten to 1D. Allows us to handle shapes like (N,), (,N), (1,N), (N,1)
+        # for general matrix with shape (N,M) elements are taken in row major order from args
+        # and a 3D ndarray is returned, the first index is the position in the sequence.
+        if isinstance(arg, np.ndarray):
+            arg = arg.flatten()
+
         # arg is hopefully something iterable
         if not hasattr(arg, '__iter__'):
             raise ValueError(' Argument must be iterable: list, tuple, ndarray')
@@ -54,6 +79,9 @@ def rotx(theta, unit="rad"):
     rotx(THETA) is an SO(3) rotation matrix (3x3) representing a rotation
     of THETA radians about the x-axis
     rotx(THETA, "deg") as above but THETA is in degrees
+
+    THETA is a scalar (float or int), a 1D sequence (list, tuple or ndarray) or any
+    other kind of iterable object that returns a sequence of scalars.
     """
     check_args.unit_check(unit)
     if unit == "deg":
