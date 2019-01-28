@@ -256,6 +256,7 @@ class Gtransform(Graphics):
 from . import tb_parseopts as tbpo
 from . import graphics_vtk as gVtk
 from . import graphics_mpl as gMpl
+from . import graphics_ipv as gIpv
 
 gRenderer = None  # the instantiated graphics rendering object
 
@@ -271,7 +272,9 @@ def GraphicsRenderer(renderer):
     if renderer == 'VTK':
         gRenderer = gVtk.VtkPipeline()
     elif renderer == 'MPL':
-        gRenderer = gMpl.Mpl3dArtist(1)
+        gRenderer = gMpl.Mpl3dArtist(0)
+    elif renderer == 'IPV':
+        gRenderer = gIpv.Ipv3dVisual(1)
     else:
         print("The %s renderer is not supported." % renderer)
         print("Renderer must be VTK or MPL (Matplotlib).")
@@ -284,6 +287,8 @@ def rgb_named_colors(colors):
         return gVtk.rgb_named_colors(colors)
     elif type(gRenderer) is type(gMpl.Mpl3dArtist()):
         return gMpl.rgb_named_colors(colors)
+    elif type(gRenderer) is type(gIpv.Ipv3dVisual()):
+        return gIpv.rgb_named_colors(colors)
 
 def plot(obj, **kwargs):
     global gRenderer
@@ -297,7 +302,10 @@ def plot(obj, **kwargs):
     elif type(gRenderer) is type(gMpl.Mpl3dArtist()):
         pobj = gMpl.Mpl3dArtist(1)
         pobj.plot(obj, **kwargs)
-    
+    elif type(gRenderer) is type(gIpv.Ipv3dVisual()):
+        pobj = gIpv.Ipv3dVisual(1)
+        pobj.plot(obj, **kwargs)
+
 def qplot(obj, stance, unit='rad', dispMode='VTK', **kwargs):
     global gRenderer
     if type(gRenderer) is type(gVtk.VtkPipeline()):
@@ -307,8 +315,11 @@ def qplot(obj, stance, unit='rad', dispMode='VTK', **kwargs):
         (opt, args) = tbpo.tb_parseopts(opt, **kwargs)
         gobj = gVtk.VtkPipeline(dispMode=dispMode)
         gobj.qplot(obj, stance, unit='rad', dispMode=dispMode, **kwargs)
-    else:
+    elif type(gRenderer) is type(gMpl.Mpl3dArtist()):
         gobj = gMpl.Mpl3dArtist(1)
+        gobj.qplot(obj, stance, unit='rad', **kwargs)
+    elif type(gRenderer) is type(gIpv.Ipv3dVisual()):
+        gobj = gIpv.Ipv3dVisual(1)
         gobj.qplot(obj, stance, unit='rad', **kwargs)
     
 def tranimate(T):
@@ -331,11 +342,11 @@ def trplot(T, handle=None, dispMode='VTK'):
     pobj = gVtk.VtkPipeline(dispMode=dispMode)
     pobj.trplot(T)
 
-def trplot2(R, handle=None, dispMode='VTk'):
+def trplot2(T, handle=None, dispMode='VTk'):
     global gRenderer
     if handle is not None:
         if type(handle) is type(gVtk.VtkPipeline()):
-            handle.trplot2(R)
+            handle.trplot2(T)
         elif type(handle) is type(super(gVtk).Hgtransform()):
             pass  # do Hgtransform stuff
         else:
@@ -386,12 +397,17 @@ def animate(obj, stances,
         gobj.animate(obj, stances, 
                           unit=opt.unit, frame_rate=opt.frame_rate, gif=opt.gif, 
                           dispMode=opt.dispMode, **args)
-    else:
+    elif type(gRenderer) is type(gMpl.Mpl3dArtist()):
         gobj = gMpl.Mpl3dArtist(1)
         gobj.animate(obj, stances, 
                           unit=opt.unit, frame_rate=opt.frame_rate, gif=opt.gif, 
                           dispMode=opt.dispMode, **args)
-        
+    elif type(gRenderer) is type(gIpv.Ipv3dVisual()):
+        gobj = gIpv.Ipv3dVisual(1)
+        gobj.animate(obj, stances,
+                          unit=opt.unit, frame_rate=opt.frame_rate, gif=opt.gif,
+                          dispMode=opt.dispMode, **args)
+
 def panimate(pose, other=None, duration=5, timer_rate=60, 
                    gif=None, frame_rate=10, **kwargs):
     global gRenderer
@@ -415,8 +431,11 @@ def panimate(pose, other=None, duration=5, timer_rate=60,
                   gif_file=opt.gif, 
                   frame_rate=opt.frame_rate)
         gobj.panimate(pose, other=opt.other, duration=opt.duration, **args)
-    else:
+    elif type(gRenderer) is type(gMpl.Mpl3dArtist()):
         gobj = gMpl.Mpl3dArtist(1)
+        gobj.panimate(pose, other=opt.other, duration=opt.duration, **args)
+    elif type(gRenderer) is type(gIpv.Ipv3dVisual()):
+        gobj = gIpv.Ipv3dVisual(1)
         gobj.panimate(pose, other=opt.other, duration=opt.duration, **args)
 
 def qanimate(obj, stances, unit='rad', dispMode='VTK', frame_rate=25, gif=None, **kwargs):
