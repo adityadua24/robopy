@@ -1,12 +1,12 @@
 # Author: Aditya Dua
 # 28 January, 2018
 from __future__ import print_function
-from .common import isvec
-from .common import ishomog
+from ..common import isvec
+from ..common import ishomog
 from math import sqrt
 from numpy import trace
-from .transforms import *
-from ..tests.test_common import *
+from ..transforms import *
+from ...tests.test_common import *
 
 try:
     from geometry_msgs.msg import Quaternion
@@ -15,7 +15,7 @@ except ImportError:
     ROS_INSTALLED = False
 
 ###from .graphics import *
-from . import graphics
+from .. import graphics
 
 class Quaternion:
     def __init__(self, s=None, v=None):
@@ -234,7 +234,7 @@ class Quaternion:
             return True
 
     def __repr__(self):
-        return "%f <<%f, %f, %f>>" % (self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
+        return "{0} <<{1}, {2}, {3}>>".format(self.s, self.v[0, 0], self.v[0, 1], self.v[0, 2])
 
     def __str__(self):
         return self.__repr__()

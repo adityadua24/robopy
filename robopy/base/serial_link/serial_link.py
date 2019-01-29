@@ -6,13 +6,13 @@ import math
 from math import pi
 import numpy as np
 
-from . import transforms
+from .. import transforms
 
 ###from .graphics import VtkPipeline
 ###from .graphics import axesCube
 ###from .graphics import axesCubeFloor
 ###from .graphics import vtk_named_colors
-from . import graphics
+from .. import graphics
 
 import pkg_resources
 from scipy.optimize import minimize

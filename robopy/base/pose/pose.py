@@ -1,4 +1,4 @@
-# Created by: Aditya Dua
+# Created by: Aditya Dua, Daniel Ingram
 # 13 June, 2017
 # Pose module has class implementations of SO2, SO3, SE2 and SE3 type matrices
 
@@ -6,9 +6,9 @@ import numpy as np
 import math
 from random import uniform, randint
 
-from . import check_args
-from .super_pose import SuperPose
-from . import transforms
+from .. import check_args
+from ..super_pose import SuperPose
+from .. import transforms
 
 try:
     from geometry_msgs.msg import Pose
@@ -20,7 +20,7 @@ except ImportError:
 ###import vtk
 ###from . import graphics
 ###from .graphics import VtkPipeline
-from . import graphics
+from .. import graphics
 
 # TODO Implement argument checking for all poses
 # -----------------------------------------------------------------------------------------
