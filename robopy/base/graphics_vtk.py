@@ -775,7 +775,7 @@ class GraphicsVTK(Graphics):
 ### rendering and user interface toolkits. A specific example would be the
 ### RTB fkine function that should be passed to the VtkPipeline qplot()
 ### and animate() methods for SerialLink objects as a callback routine as
-### one would pass animation update functions to an animator or keypress
+### one would pass animation update functions to an animator, or keypress
 ### and mouse event handlers to a GUI manager.
 
 class VtkPipeline(GraphicsVTK):
@@ -974,7 +974,7 @@ class VtkPipeline(GraphicsVTK):
         Calculates forward kinematics for array of joint angles.
         :param stances: stances is a mxn array of joint angles.
         :param unit: unit of input angles (rad)
-        :param apply_stance: If True, then applied tp actor_list.
+        :param apply_stance: If True, then applied to actor_list.
         :param actor_list: list of actors for given SerialLink object
         :param timer: used only (for animation).
         :return T: list of n+1 homogeneous transformation matrices.

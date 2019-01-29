@@ -16,13 +16,21 @@ from abc import abstractmethod
 from robopy.base.tb_parseopts import *
 from robopy.base.graphics import Graphics
 from robopy.base.display_list import *
+from robopy.base.param_geoms import *
+
 from . import check_args
 from . import transforms
 from . import pose as Pose
 from . import serial_link as SerialLink
 
 # To load and handle STL mesh data
-from stl import mesh
+try:
+    from stl import mesh
+except ImportError:
+    print("* Warning: numpy-stl package required for SerialLink")
+    print("  plotting and animation. Attempts to use robot.plot()")
+    print("  or robot.animate() will fail.")
+
 import copy
 
 # Graphics rendering package
@@ -71,7 +79,8 @@ def rgb_named_colors(colors):
             rgb_colors[i] = mpl.colors.to_rgb(colors[i])
             
         return rgb_colors
-    
+
+
 ###
 ### MODULE CLASS DEFINITIONS
 ###
@@ -113,8 +122,7 @@ class GraphicsMPL(Graphics):
         self.poly_list = []  # list of mpl_toolkit.mplot3d.art3d.Poly3DCollection(Mesh.vectors)
         self.axes_list = []  # list of Poly3DCollection from Axes3D.ax.plot_surface()
 
-        self.shapes = ['frame', 'box', 'beam', 'sphere', 
-                       'cylinder', 'cone', 'disk', 'plane']
+        self.anim = None
     
     def setGraphicsRenderer(self, gRenderer):
         """ Sets graphic renderer for this MPL 3dArtists.
@@ -156,7 +164,7 @@ class GraphicsMPL(Graphics):
     
     def setFigure(self, fign):
         if fign is None:
-           self._fig = plt.figure(figsize=(8,8), dpi=80)
+           self._fig = plt.figure(figsize=(6,6), dpi=80)
         else:
            self._fig = plt.figure(num=fign)
         
@@ -173,13 +181,16 @@ class GraphicsMPL(Graphics):
         return self._ax
     
     def setAxesLimits(self, xlim, *args):
-        if (type(xlim) is list) and len(xlim) == 6:
-            [xmin, xmax, ymin, ymax, zmin, zmax] = xlim[:]
-        elif len(args) == 5:
-            xmin = xlim
-            [xmax, ymin, ymax, zmin, zmax] = args[:]
+        if xlim is not None:
+            if (type(xlim) is list) and len(xlim) == 6:
+                [xmin, xmax, ymin, ymax, zmin, zmax] = xlim[:]
+            elif len(args) == 5:
+                xmin = xlim
+                [xmax, ymin, ymax, zmin, zmax] = args[:]
+            else:
+                return  # no warning given
         else:
-            return  # no warning given
+            [xmin, xmax, ymin, ymax, zmin, zmax] = self.getAxesLimits()
 
         # Assume x and y ranges are equal, but z's range may be less
         self.getFigureAxes().set_aspect('auto')
@@ -237,172 +248,24 @@ class GraphicsMPL(Graphics):
     ### Class methods (presented by functional group)
         
     ## Plot elements methods
-    
-    @staticmethod
-    def parametric_frame(s):
-        """ Parametric Cartesian coordinate frame
-        """
-        x = s * np.asmatrix([[0.0, 0.0, 0.0],[1.0, 0.0, 0.0],[0.0, 0.0, 0.0]])
-        y = s * np.asmatrix([[0.0, 0.0, 0.0],[0.0, 1.0, 0.0],[0.0, 0.0, 0.0]])
-        z = s * np.asmatrix([[0.0, 0.0, 0.0],[0.0, 0.0, 1.0],[0.0, 0.0, 0.0]])
-        return (x, y, z)
-
-    @staticmethod
-    def parametric_box(s):
-        """ Parametric box shape
-        """
-        r = s*np.sqrt(2.0)/2.
-        h = s/2.
-        u = np.linspace(0.25*np.pi, 2.25*np.pi, 5)
-        v = np.linspace(-1.0, 1.0, 5)
-        x = r * np.outer(np.cos(u), np.ones(np.size(v)))
-        y = r * np.outer(np.sin(u), np.ones(np.size(v)))
-        z = h * np.outer(np.ones(np.size(u)), v)
-        return (x, y, z)
-
-    @staticmethod
-    def parametric_beam(d, l):
-        """ Parametric beam shape
-        """
-        r = d*np.sqrt(2.0)/2.
-        h = l/2.
-        u = np.linspace(0.25*np.pi, 2.25*np.pi, 5)
-        v = np.linspace(-1.0, 1.0, 5)
-        x = r * np.outer(np.cos(u), np.ones(np.size(v)))
-        y = r * np.outer(np.sin(u), np.ones(np.size(v)))
-        z = h * np.outer(np.ones(np.size(u)), v)
-        return (x, y, z)
-
-    @staticmethod
-    def parametric_sphere(d, dim):
-        """ Parametric sphere shape
-        """
-        r = d/2.
-        u = np.linspace(0.0, 2*np.pi, dim)
-        v = np.linspace(0.0, np.pi, dim)
-        x = r * np.outer(np.cos(u), np.sin(v))
-        y = r * np.outer(np.sin(u), np.sin(v))
-        z = r * np.outer(np.ones(np.size(u)), np.cos(v))
-        return (x, y, z)
-
-    @staticmethod
-    def parametric_cylinder(d, l, dim):
-        """ Parametric cylinder shape
-        """
-        r = d/2.
-        h = l/2.
-        u = np.linspace(0.0, 2*np.pi, dim)
-        v = np.linspace(-1.0, 1.0, dim)
-        x = r * np.outer(np.cos(u), np.ones(np.size(v)))
-        y = r * np.outer(np.sin(u), np.ones(np.size(v)))
-        z = h * np.outer(np.ones(np.size(u)), v)
-        return (x, y, z)
-
-    @staticmethod
-    def parametric_cone(d0, d1, l, dim):
-        """ Parametric cone shape
-        """
-        r0 = d0/2.
-        r1 = d1/2.
-        f  = (r1-r0)/2.
-        h  = l/2
-        u  = np.linspace(0.0, 2*np.pi, dim)
-        v  = np.linspace(-1.0, 1.0, dim)
-        s  = r0 + f*(v+1.0)
-        x  = s * np.outer(np.cos(u), np.ones(np.size(v)))
-        y  = s * np.outer(np.sin(u), np.ones(np.size(v)))
-        z  = h * np.outer(np.ones(np.size(u)), v)
-        return (x, y, z)
-
-    @staticmethod
-    def parametric_disk(d, h, dim):
-        """ Parametric disk shape
-        """
-        r = d/2.
-        u = np.linspace(0.0, 2*np.pi, dim)
-        v = np.linspace(0.0, 1.0, dim)
-        x = r * np.outer(np.cos(u), v)
-        y = r * np.outer(np.sin(u), v)
-        z = h * np.outer(np.ones(np.size(u)), np.ones(np.size(v)))
-        return (x, y, z)
-
-    @staticmethod
-    def parametric_plane(s, h, dim):
-        """ Parametric plane shape
-        """
-        r = s/2.
-        u = np.linspace(-1.0, 1.0, dim)
-        v = np.linspace(-1.0, 1.0, dim)
-        x = r * np.outer(u, np.ones(np.size(v)))
-        y = r * np.outer(np.ones(np.size(u)), v)
-        z = h * np.outer(np.ones(np.size(u)), np.ones(np.size(v)))
-        return (x, y, z)
 
     def plot_parametric_shape(self, shape, solid=False, Tr=np.eye(4), **opts):
         """ Plot specified parametric shape
         """
-        if shape == 'frame':
-            dim = 3
-        elif shape in ['box', 'beam']:
-            dim = 5
-        elif shape in ['sphere', 'cylinder', 'cone', 'disk', 'plane']:
-            dim = 32
-        else:
-            print("*** error: invalid specified shape %s" % shape)
-            print("           must be %s" % self.shapes)
-            return
 
-        # create parametric shape coordinates
-        if shape == 'frame':
-            s = 1.0
-            if 's' in opts: s = opts['s']
-            (x, y, z) = self.parametric_frame(s)
-        elif shape == 'box':
-            s = 1.0
-            if 's' in opts: s = opts['s']
-            (x, y, z) = self.parametric_box(s)
-        elif shape == 'beam':
-            d = 1.0
-            if 'd' in opts: d = opts['d']
-            l = 1.0
-            if 'l' in opts: l = opts['l']
-            (x, y, z) = self.parametric_beam(d, l)
-        elif shape == 'sphere':
-            d = 1.0
-            if 'd' in opts: d = opts['d']
-            (x, y, z) = self.parametric_sphere(d, dim)
-        elif shape == 'cylinder':
-            d = 1.0
-            if 'd' in opts: d = opts['d']
-            l = 1.0
-            if 'l' in opts: l = opts['l']
-            (x, y, z) = self.parametric_cylinder(d, l, dim)
-        elif shape == 'cone':
-            d0 = 1.0
-            if 'd0' in opts: d0 = opts['d0']
-            d1 = 0.5
-            if 'd1' in opts: d1 = opts['d1']
-            l  = 1.0
-            if 'l' in opts: l = opts['l']
-            (x, y, z) = self.parametric_cone(d0, d1, l, dim)
-        elif shape == 'disk':
-            d = 1.0
-            if 'd' in opts: d = opts['d']
-            h = 0.0
-            if 'h' in opts: h = opts['h']
-            (x, y, z) = self.parametric_disk(d, h, dim)
-        elif shape == 'plane':
-            s = 1.0
-            if 's' in opts: s = opts['s']
-            h = 0.0
-            if 'h' in opts: h = opts['h']
-            (x, y, z) = self.parametric_plane(s, h, dim)
+        # create parametric shape xyz coordinate arrays
 
-        c = 'k'
+        (x, y, z) = param_xyz_coord_arrays(shape, **opts)
+
+        c = 'k'  # black
         if 'c' in opts:
            c = opts['c']
 
+        # apply homogeneous transform to xyz coordinate arrays
+
         (xr, yr, zr) = self.shape_xform(x, y, z, Tr)
+
+        # plot the transformed xyz coordinate arrays as meshes
 
         ax = self.getFigureAxes()
 
@@ -425,9 +288,9 @@ class GraphicsMPL(Graphics):
                ax.plot_wireframe(xr, yr, zr, rstride=1, cstride=5, color=c)
         else:
             if solid:
-               ax.plot_surface(xr, yr, zr, rstride=4, cstride=4, color=c)
+               ax.plot_surface(xr, yr, zr, rstride=1, cstride=1, color=c)
             else:
-               ax.plot_wireframe(xr, yr, zr, rstride=4, cstride=4, color=c)
+               ax.plot_wireframe(xr, yr, zr, rstride=1, cstride=1, color=c)
 
     @staticmethod
     def shape_xform(x, y, z, Tr):
@@ -468,13 +331,13 @@ class GraphicsMPL(Graphics):
         return None
         
     def draw_cube(self):
-        (x, y, z) = self.parametric_box(1.0, 5)
+        (x, y, z) = parametric_box(1.0, 5)
         self.getFigureAxes().plot_surface(x, y, z, rstride=1, cstride=1, color='b')
     
     def draw_sphere(self):
-        (x, y, z) = self.parametric_sphere(1.0, 32)
-        self.getFigureAxes().plot_surface(x, y, z, rstride=4, cstride=4, color='r')
-    
+        (x, y, z) = parametric_sphere(1.0, 32)
+        self.getFigureAxes().plot_surface(x, y, z, rstride=1, cstride=1, color='r')
+
     ### Rendering viewpoint methods
 
     ### ...
@@ -540,43 +403,23 @@ class GraphicsMPL(Graphics):
 
     # DisplayList rendering, plotting and animation methods
 
-    def renderDisplayListItem(self, displayListItem):
+    def renderDisplayListItem(self, item):
         ax = self.getFigureAxes()
-        if displayListItem.type == 'surface':
-            data = displayListItem.xform()  # get the transformed coordinates
+        if item.type == 'surface':
+            data = item.xform()  # get the transformed coordinates
             # plot surface on the same figure axes as in MATLAB with 'hold on'
-            poly3Dc = ax.plot_surface(data[0], data[1], data[2], **displayListItem.args)
-            '''
-            ### vvv Develoment artifact
-            fig = poly3Dc.get_figure()
-            assert (fig == self.getFigure())
-            assert (poly3Dc.axes == self.getFigureAxes())
-            ### ^^^
-            '''
-            displayListItem.poly3Dc = poly3Dc
-            self.axes_list.append(displayListItem.poly3Dc)  # save Poly3DCollection of each plot
-            '''
-            ### vvv Develoment artifact
-            for p in self.axes_list:
-                assert (p in self.getFigureAxes().collections)
-            ### ^^^
-            '''
-        elif displayListItem.type == 'command':
-            eval(displayListItem.command, globals())  # eval the command in global context
-        elif displayListItem.type == 'line':
+            poly3Dc = ax.plot_surface(data[0], data[1], data[2], **item.args)
+            item.gentity = poly3Dc
+            self.axes_list.append(item.gentity)  # save Poly3DCollection of each plot
+        elif item.type == 'command':
+            eval(item.command, globals())  # eval the command in global context
+        elif item.type == 'line':
             # TODO
             pass
 
     def renderDisplayList(self, displayList):
-        ### print("renderDiplayList")
         for item in displayList:
             self.renderDisplayListItem(item)
-        '''
-        ### vvv Development artifact
-        for poly3Dc in self.axes_list:
-            print(poly3Dc)
-        ### ^^^
-        '''
 
     def clearAxes(self):
         self.getFigureAxes().cla()
@@ -648,49 +491,40 @@ class GraphicsMPL(Graphics):
             t = float(nf)/fps
 
             # update display list item's transforms
+            Tr =  np.asarray(transFunc(t))
             for item in displayList:
-                item.transform = transFunc(t)
+                item.transform = np.dot(item.transform, Tr)
+
+            # remove Poly3DCollection entities from figure axes
+            #ax = iaxes_list[0].axes
+            #if ax == self.getFigureAxes():
+            #    for poly3Dc in iaxes_list:
+            #        poly3Dc.remove()
 
             # clear the axes and render display list graphics entities
-            '''
-            ### vvv Development Note:
-            ###
-            ### That this is not working seems to be due to Matplotlib
-            ### mpl_toolkit.mplot3d.Axes3D.plot_surface() method not
-            ### retaining Poly3DCollection artists used in rendering on
-            ### previous invocations as done in the renderDiplayItemList 
-            ### method(). See Mpl3dArtist.animateSerialLink() method for
-            ### recommended technique using 3D artists animation with 
-            ### mplot3d Poly3DCollection artists.
-            ###
-            ax = iaxes_list[0].axes
-            if ax == self.getFigureAxes():
-                for poly3Dc in iaxes_list:
-                    print("remove: %s" % (poly3Dc))
-                    ##poly3Dc.remove()
-                    pass
-            ### ^^^
-            '''
-            ### self.axes_list.clear()
+            self.getFigureAxes().clear()
+            self.setAxesLimits(opt.limits)
+            self.getFigureAxes().set_xlabel('X')
+            self.getFigureAxes().set_ylabel('Y')
+            self.getFigureAxes().set_zlabel('Z')
+            self.axes_list.clear()
             self.renderDisplayList(displayList)
 
             # update list of Poly3D entities to be rendered.
             axes_list = []
-            i = 0
-            for poly3Dc in self.axes_list[-len(iaxes_list):]:
-                '''
-                ### vvv Development artifact
-                poly3Dc.set_figure(self.getFigure())
-                poly3Dc.axes = self.getFigureAxes()
-                self.axes_list[i] = poly3Dc
-                i += 1
-                ### ^^^
-                '''
+            for poly3Dc in self.axes_list:
                 axes_list.append(poly3Dc)
+
+            # define text3D artist for rendered frame time display
+            tx = opt.limits[1] + opt.limits[1] * 0.2
+            ty = opt.limits[2] - opt.limits[2] * 0.2
+            tz = opt.limits[5] + opt.limits[5] * 0.2
 
             # update rendered frame displayed time text
             time_str = 'time = %.3f' % (t)
-            anim_text3d.set_text(time_str)
+            time_text = self.getFigureAxes().text3D(tx, ty, tz, time_str,
+                                                    ha='center', va='bottom')
+            anim_text3d = time_text
 
             return [anim_text3d] + axes_list
 
@@ -700,14 +534,6 @@ class GraphicsMPL(Graphics):
         # get list of Poly3DCollections from last plot for animation
         axes_list = []
         for poly3Dc in self.axes_list:
-            ''' 
-            ### vvv Development artifact
-            poly3Dc.set_figure(self.getFigure())
-            poly3Dc.axes = self.getFigureAxes()
-            ##poly3Dc.set_figure(self.getFigure())
-            ##self.getFigureAxes().add_collection3d(poly3Dc)
-            ### ^^^
-            '''
             axes_list.append(poly3Dc)
 
         # define text3D artist for rendered frame time display
@@ -728,6 +554,7 @@ class GraphicsMPL(Graphics):
                                                    anim_text3d, axes_list),
                                             frames=nframes, blit=False,
                                             interval=frame_step_msec, repeat=False)
+
         # initiate display list animation
         self.show()
 
@@ -740,7 +567,7 @@ class GraphicsMPL(Graphics):
 ### rendering and user interface toolkits. A specific example would be the
 ### RTB fkine function that should be passed to animateSerialLink() method
 ### as a callback routine as one would pass animation update functions to
-### an animator or keypress and mouse event handlers to a GUI manager.
+### an animator, or keypress and mouse event handlers to a GUI manager.
 
 class Mpl3dArtist(GraphicsMPL):
     """
@@ -826,7 +653,7 @@ class Mpl3dArtist(GraphicsMPL):
         Calculates forward kinematics for array of joint angles.
         :param stances: stances is a mxn array of joint angles.
         :param unit: unit of input angles (rad)
-        :param apply_stance: If True, then applied tp actor_list.
+        :param apply_stance: If True, then applied to actor_list.
         :param mesh_list: list of meshes for given SerialLink object
         :param timer: used only (for animation).
         :return T: list of n+1 homogeneous transformation matrices.
@@ -853,7 +680,6 @@ class Mpl3dArtist(GraphicsMPL):
             a_mesh = mesh.Mesh.from_file(loc)
             a_poly = mplot3d.art3d.Poly3DCollection(a_mesh.vectors)
             a_poly.set_facecolor(obj.colors[i])  # (R,G,B)
-            a_poly.set_rasterized(True)
             a_poly.set_zorder(2.0)
             mesh_list[i] = a_mesh
             poly_list[i] = a_poly
@@ -922,7 +748,6 @@ class Mpl3dArtist(GraphicsMPL):
         a_poly = mplot3d.art3d.Poly3DCollection(white_tiles.vectors)
         a_poly.set_facecolor("white")
         a_poly.set_edgecolor("white")
-        a_poly.set_rasterized(True)
         a_poly.set_zorder(1.0)
         self.getFigureAxes().add_collection3d(a_poly)
         
@@ -930,7 +755,6 @@ class Mpl3dArtist(GraphicsMPL):
         a_poly = mplot3d.art3d.Poly3DCollection(green_tiles.vectors)
         a_poly.set_facecolor("green")
         a_poly.set_edgecolor("green")
-        a_poly.set_rasterized(True)
         a_poly.set_zorder(1.0)
         self.getFigureAxes().add_collection3d(a_poly)
     
@@ -973,7 +797,6 @@ class Mpl3dArtist(GraphicsMPL):
             a_mesh.rotate([1.,0.,0.], -np.pi/2)
             a_poly = mplot3d.art3d.Poly3DCollection(a_mesh.vectors)
             a_poly.set_facecolor(obj.colors[i])
-            a_poly.set_rasterized(True)
             a_poly.set_zorder(2.0)
             self.setPolyI(i, a_poly)
             self.getFigureAxes().add_collection3d(a_poly)
@@ -1071,7 +894,6 @@ class Mpl3dArtist(GraphicsMPL):
                     a_mesh.rotate([1.,0.,0.], -np.pi/2)
                     a_poly = mplot3d.art3d.Poly3DCollection(a_mesh.vectors)
                     a_poly.set_facecolor(obj.colors[i])
-                    a_poly.set_rasterized(None)
                     a_poly.set_zorder(2.0)
                     self.setPolyI(i, a_poly)
                     ax.add_collection3d(a_poly)

@@ -10,8 +10,7 @@ def main():
 
     # Puma560 manipulator arm pose plot
     robot = model.Puma560()
-    robot.plot(robot.qn)
     robot.plot(robot.qn, dispMode='VTK', z_up=False, limits=None)
 
 if __name__ == '__main__':
-    main()
+main()
