@@ -13,13 +13,13 @@ def ishomog(tr, dim, rtest=''):
     ISHOMOG(T, 'valid') as above, but also checks the validity of the rotation sub-matrix.
     See Also: isrot, ishomog2, isvec"""
     try:
-        assert type(tr) is np.matrix, "Argument should be a numpy matrix"
+        assert isinstance(tr, (np.matrix,np.ndarray)), "Argument should be a numpy ndarray|matrix"
         assert dim == (3, 3) or dim == (4, 4)
     except AssertionError:
         return False
     is_valid = None
     if rtest == 'valid':
-        is_valid = lambda matrix: abs(np.linalg.det(matrix) - 1) < np.spacing([1])[0]
+        is_valid = lambda matrix: abs(np.linalg.det(matrix) - 1) < 10*np.finfo(tr.dtype).eps
     flag = True
     if check_args.is_mat_list(tr):
         for matrix in tr:
@@ -29,7 +29,7 @@ def ishomog(tr, dim, rtest=''):
         if flag and rtest == 'valid':
             flag = is_valid(tr[0])  # As in matlab code only first matrix is passed for validity test
             # TODO-Do we need to test all matrices in list for validity of rotation submatrix -- Yes
-    elif isinstance(tr, np.matrix):
+    elif isinstance(tr, (np.ndarray,np.matrix)):
         if tr.shape[0] == dim[0] and tr.shape[1] == dim[0]:
             if flag and rtest == 'valid':
                 flag = is_valid(tr)

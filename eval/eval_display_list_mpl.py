@@ -27,7 +27,7 @@ Ry = np.array( [[0,0,1,0],[0,1,0,0],[-1,0,0,0],[0,0,0,1]] )
 dl = dList.DisplayList()
 dl1 = dl.add('surface', 'cyl1', cyl, alpha=0.6, color='blue')
 dl2 = dl.add('surface', 'cyl2', cyl, alpha=0.6, color='red')
-dl3 = dl.add('surface', 'cyl1', cyl, alpha=0.6, color='green')
+dl3 = dl.add('surface', 'cyl3', cyl, alpha=0.6, color='green')
 
 # and 3 generic graphics commands.
 ##dl.add('command', "ax.set_xlabel('X')")
@@ -59,20 +59,8 @@ graphics.gRenderer.getFigure().set_dpi(80)
 graphics.gRenderer.getFigure().set_size_inches((8,8), forward=True)
 
 # Give graphics renderer the DisplayList to plot (gRenderer.plot()).
-graphics.plot(dl, \
-              limits=[-0.5, 0.5, -0.5, 0.5, -0.5, 0.5])
+graphics.plot(dl, limits=[-0.5, 0.5, -0.5, 0.5, -0.5, 0.5])
 
-'''
-### Implementation Note:
-###
-### The following sample illustrates how a DisplayList may be
-### passed to an animation routine. However, technical issues
-### resulting from reliance on Matplotlib's mpl_toolkit.mplot3d.
-### Axes3D.plot_surface() method to render geometrical shapes
-### defined with mesh grid arrays utilizing the robopy.base.
-### graphics_mpl.Mpl3dArtist.renderDisplayListItem() method have
-### yet to be resolved.
- 
 # Define transform function to animate DisplayListItems.
 def transFunc(t):
     """
@@ -81,9 +69,13 @@ def transFunc(t):
     :param t: time (sec)
     :return: a homogeneous transform matrix
     """
-    return tr.trotx(22.5*t, unit="deg")
+    return tr.trotx(2.0*t, unit="deg")
+
+# Get another renderer since the previous figure was closed,
+graphics.GraphicsRenderer('MPL')
+graphics.gRenderer.getFigure().set_dpi(80)
+graphics.gRenderer.getFigure().set_size_inches((8,8), forward=True)
 
 # Give graphics renderer the DisplayList to animate.
-graphics.animate(dl, transFunc, duration=1.0, frame_rate=4, \
-                 limits=[-0.5, 0.5, -0.5, 0.5, -0.5, 0.5])
-'''
+graphics.animate(dl, transFunc, duration=5.0, frame_rate=30, \
+                     limits=[-0.5, 0.5, -0.5, 0.5, -0.5, 0.5])

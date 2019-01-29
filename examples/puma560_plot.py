@@ -13,4 +13,4 @@ def main():
     robot.plot(robot.qn, dispMode='VTK', z_up=False, limits=None)
 
 if __name__ == '__main__':
-    main()
+main()
