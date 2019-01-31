@@ -8,6 +8,7 @@ the called function in test_args returns false"""
 import numpy as np
 from . import pose
 from . import super_pose
+from . import transforms as tr
 
 
 def is_mat_list(list_matrices):
@@ -17,7 +18,7 @@ def is_mat_list(list_matrices):
     flag = True
     if isinstance(list_matrices, list):
         for matrix in list_matrices:
-            if not isinstance(matrix, np.matrix):
+            if not isinstance(matrix, tr.RTBMatrix):
                 flag = False
                 # TODO Check for matrix dimensions?
     else:
@@ -33,7 +34,7 @@ def unit_check(unit):
 
 
 def is_vector(item):
-    assert isinstance(item, np.matrix)
+    assert isinstance(item, tr.RTBMatrix)
     assert (item.shape[0] == 1 and item.shape[1] > 1) \
            or (item.shape[0] > 1 and item.shape[1] == 1)
 
@@ -74,7 +75,7 @@ def super_pose_appenditem(obj, item):
     valid_pose(obj)
     if isinstance(item, super_pose.SuperPose):
         assert type(obj) is type(item)
-    elif isinstance(item, np.matrix):
+    elif isinstance(item, tr.RTBMatrix):
         # TODO valid matrix check ?
         pass
     else:
@@ -88,7 +89,7 @@ def super_pose_multiply_check(obj, other):
         assert (obj.length == other.length) \
                or (obj.length == 1 and other.length > 1) \
                or (obj.length > 1 and other.length == 1)
-    elif isinstance(other, np.matrix):
+    elif isinstance(other, tr.RTBMatrix):
         assert other.shape[1] == 1  # Should be vector
         assert obj.shape[1] == other.shape[0]  # Inner Dimensions must match
 
@@ -128,7 +129,7 @@ def so2_input_matrix(args_in):
 
 
 def so2_input_types_check(args_in):
-    assert isinstance(args_in, np.matrix) \
+    assert isinstance(args_in, tr.RTBMatrix) \
            or isinstance(args_in, list) \
            or isinstance(args_in, int) \
            or isinstance(args_in, float) \
