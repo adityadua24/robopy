@@ -20,14 +20,16 @@ from ..base import transforms
 # rotx | complete
 class TestRotx(unittest.TestCase):
     def test_transforms_3d_rotx_validData_returnDatatype(self):
-        self.assertIsInstance(transforms.rotx(0), np.matrix)
+        self.assertIsInstance(transforms.rotx(0), transforms.RTBMatrix)
 
     def test_transforms_3d_rotx_validData_returnData_dimension(self):
         dimensions = transforms.rotx(0).shape
         self.assertEqual(dimensions, (3, 3))
 
     def test_transforms_3d_rotx_validData_boundaryCondition_0_rad(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 1, 0],
+                                             [0, 0, 1]])
         received_mat = transforms.rotx(0)
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -36,7 +38,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_pi_by2_rad(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 0, -1],
+                                             [0, 1, 0]])
         received_mat = transforms.rotx(pi / 2)
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -45,7 +49,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_pi_rad(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, -1, 0],
+                                             [0, 0, -1]])
         received_mat = transforms.rotx(pi)
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -54,7 +60,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_three_pi_by2_rad(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 0, 1],
+                                             [0, -1, 0]])
         received_mat = transforms.rotx(3 * pi / 2)
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -63,7 +71,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_2pi_rad(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 1, 0],
+                                             [0, 0, 1]])
         received_mat = transforms.rotx(2 * pi)
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -72,7 +82,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_0_deg(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 1, 0],
+                                             [0, 0, 1]])
         received_mat = transforms.rotx(0, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -81,7 +93,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_360_deg(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 1, 0],
+                                             [0, 0, 1]])
         received_mat = transforms.rotx(360, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -90,7 +104,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_90_deg(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 0, -1],
+                                             [0, 1, 0]])
         received_mat = transforms.rotx(90, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -99,7 +115,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_180_deg(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, -1, 0],
+                                             [0, 0, -1]])
         received_mat = transforms.rotx(180, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -108,7 +126,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_270_deg(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 0, 1], [0, -1, 0]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 0, 1],
+                                             [0, -1, 0]])
         received_mat = transforms.rotx(270, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -117,7 +137,9 @@ class TestRotx(unittest.TestCase):
             self.fail(output_str)
 
     def test_transforms_3d_rotx_validData_boundaryCondition_450_deg(self):
-        expected_mat = np.matrix([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
+        expected_mat = transforms.RTBMatrix([[1, 0, 0],
+                                             [0, 0, -1], 
+                                             [0, 1, 0]])
         received_mat = transforms.rotx(450, unit='deg')
 
         if not matrices_equal(received_mat, expected_mat, ):
@@ -752,7 +774,7 @@ class Testtrotz(unittest.TestCase):
 # r2t
 class TestR2t(unittest.TestCase):
     def test_transforms_r2t_validData_returnDatatype(self):  # pass
-        self.assertIsInstance(transforms.r2t(transforms.rotx(0)), np.matrix)
+        self.assertIsInstance(transforms.r2t(transforms.rotx(0)), transforms.RTBMatrix)
 
     def test_transforms_r2t_validData_returnData_dimension(self):  # pass
         dimensions = transforms.r2t(transforms.rotx(0)).shape
@@ -814,7 +836,7 @@ class TestT2r(unittest.TestCase):
 # oa2tr
 class TestOa2tr(unittest.TestCase):
     def test_transforms_oa2tr_validData_returnDatatype(self):  # pass
-        self.assertIsInstance(transforms.oa2tr([[1, 0, 1]], [[1, 1, 1]]), np.matrix)
+        self.assertIsInstance(transforms.oa2tr([[1, 0, 1]], [[1, 1, 1]]), transforms.RTBMatrix)
 
 
 # to test:
