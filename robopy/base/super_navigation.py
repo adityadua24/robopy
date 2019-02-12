@@ -19,31 +19,36 @@ class Navigation(ABC):
         self._goal = goal
         self._ax = ax or plt.gca()
 
-    def query(self, start, animate=False):
+    def query(self, animate=False, dt=1e-3):
         """
         Find a path from start to goal using plan
         :param start: Tuple of form (x, y) representing the starting location for navigation.
         :param animate: Set to visualize plan formation. Defaults to False.
         :return path: Path from start to goal.
         """
+        self._plot()
         if animate:
             plt.ion()
         else:
             plt.ioff()
-        self._start = start
-        robot = start
+        robot = self.start
         path = [robot]
-        while True:
+        while robot:
+            self._ax.plot(robot[1], robot[0], 'r.')
+            if animate:
+                plt.pause(dt)
             robot = self.next(robot)
-            if robot is None:
-                path.append(self.goal)
-                break
-            else:
-                path.append(robot)
+            path.append(robot)
+        plt.show()
         return path
 
-    def plot(self, *args, **kwargs):
-        pass
+    def _plot(self, *args, **kwargs):
+        plt.cla()
+        plt.ion()
+        self._ax.imshow(self._occgrid, cmap='gray_r')
+        if self.goal:
+            self._ax.plot(self.goal[1], self.goal[0], 'g*')
+        plt.pause(1e-3)
 
     @property
     def occgrid(self):
@@ -53,10 +58,26 @@ class Navigation(ABC):
     def goal(self):
         return self._goal
 
+    @goal.setter
+    def goal(self, goal):
+        if goal is not None:
+            assert self._occgrid[goal] == 0, 'Goal must be in free space'
+        self._goal = goal
+
     @property
     def start(self):
         return self._start
-     
+
+    @start.setter
+    def start(self, start):
+        if start is not None:
+            assert self._occgrid[start] == 0, 'Start must be in free space'
+        self._start = start
+
+    @property
+    def path(self):
+        return self._path
+
     @abstractmethod
     def plan(self):
         raise NotImplementedError("Method 'plan' must be implemented in subclass.")
@@ -64,3 +85,19 @@ class Navigation(ABC):
     @abstractmethod
     def next(self):
         raise NotImplementedError("Method 'next' must be implemented in subclass.")
+
+    @staticmethod
+    def calc_heuristic(size, goal, type='cityblock'):
+        m, n = size
+        Y, X = np.meshgrid([i for i in range(m)],
+                           [i for i in range(n)])
+        return abs(X - goal[0]) + abs(Y - goal[1])
+
+    def _neighbors(self, current):
+        moves = ((1, 0), (-1, 0), (0, 1), (0, -1))
+        m, n = self._occgrid.shape
+        for dy, dx in moves:
+            y = current[0] + dy
+            x = current[1] + dx
+            if y < m and y >= 0 and x < n and x >= 0:
+                yield (y, x)
