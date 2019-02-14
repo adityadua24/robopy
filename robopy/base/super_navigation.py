@@ -19,7 +19,7 @@ class Navigation(ABC):
         self._goal = goal
         self._ax = ax or plt.gca()
 
-    def query(self, animate=False, dt=1e-3):
+    def query(self, start=None, animate=False, dt=1e-3):
         """
         Find a path from start to goal using plan
         :param start: Tuple of form (x, y) representing the starting location for navigation.
@@ -31,7 +31,7 @@ class Navigation(ABC):
             plt.ion()
         else:
             plt.ioff()
-        robot = self.start
+        robot = self.start if hasattr(self, 'start') else start
         path = [robot]
         while robot:
             self._ax.plot(robot[1], robot[0], 'r.')
@@ -79,11 +79,11 @@ class Navigation(ABC):
         return self._path
 
     @abstractmethod
-    def plan(self):
+    def plan(self, *args, **kwargs):
         raise NotImplementedError("Method 'plan' must be implemented in subclass.")
 
     @abstractmethod
-    def next(self):
+    def next(self, *args, **kwargs):
         raise NotImplementedError("Method 'next' must be implemented in subclass.")
 
     @staticmethod
