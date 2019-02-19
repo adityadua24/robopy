@@ -7,11 +7,16 @@ class AStar(Navigation):
     def __init__(self, occgrid, *args, **kwargs):
         super().__init__(occgrid, *args, **kwargs)
 
-    def plan(self, goal):
+    def plan(self, goal, costmap=None):
         self.goal = goal
-        self.costmap = Navigation.calc_heuristic(self._occgrid.shape, goal)
-        self.backpointers = np.full(self._occgrid.shape, None)
+        self.g = np.full(self._occgrid.shape, 0)
+        self.h = Navigation.calc_heuristic(self._occgrid.shape, goal)
+        self.b = np.full(self._occgrid.shape, None)
         self.open_list, self.closed_list = [], []
+        if costmap is None:
+            self.costmap = np.ones(self._occgrid.shape) 
+        else:
+            self.costmap = costmap
 
     def path(self, start):
         found = False
@@ -21,21 +26,23 @@ class AStar(Navigation):
             current = hq.heappop(self.open_list)
             if current[1] == self.goal:
                 print("Path found!")
+                print("Total cost: {}".format(self.g[self.goal]))
                 found = True
                 break
             self.closed_list.append(current[1])
-            for neighbor in Navigation.neighbors(current[1]):
+            for neighbor in Navigation.neighbors(self._occgrid.shape, current[1]):
                 if not self._occgrid[neighbor] and neighbor not in self.closed_list:
-                    hq.heappush(self.open_list, (self.costmap[neighbor], neighbor))
-                    self.backpointers[neighbor] = current[1]
+                    self.g[neighbor] = self.g[current[1]] + self.costmap[neighbor]
+                    hq.heappush(self.open_list, (self.h[neighbor], neighbor))
+                    self.b[neighbor] = current[1]
         if not found:
             print("No path found.")
             return False
         self._path = []
-        current = self.backpointers[goal]
+        current = self.b[self.goal]
         while current:
             self._path.append(current)
-            current = backpointers[current]
+            current = self.b[current]
         self._path.reverse()
         self._path.append(None)
         return True
