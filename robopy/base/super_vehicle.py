@@ -1,4 +1,6 @@
-class Vehicle:
+from abc import ABC, abstractmethod
+
+class Vehicle(ABC):
     def __init__(self, x0=None, dt=0.1, L=1.0, max_speed=1.0, rdim=0.2, covar=None):
         """
         Initializes Vehicle object that implements the kinematic mode
