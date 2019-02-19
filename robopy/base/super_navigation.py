@@ -19,7 +19,7 @@ class Navigation(ABC):
         self._goal = goal
         self._ax = ax or plt.gca()
 
-    def query(self, start=None, animate=False, dt=1e-3):
+    def query(self, start, animate=False, dt=1e-3):
         """
         Find a path from start to goal using plan
         :param start: Tuple of form (x, y) representing the starting location for navigation.
@@ -31,7 +31,7 @@ class Navigation(ABC):
             plt.ion()
         else:
             plt.ioff()
-        robot = self.start if hasattr(self, 'start') else start
+        robot = start
         path = [robot]
         while robot:
             self._ax.plot(robot[1], robot[0], 'r.')
