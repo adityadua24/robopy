@@ -93,9 +93,10 @@ class Navigation(ABC):
                            [i for i in range(n)])
         return abs(X - goal[0]) + abs(Y - goal[1])
 
-    def _neighbors(self, current):
+    @staticmethod
+    def neighbors(size, current):
         moves = ((1, 0), (-1, 0), (0, 1), (0, -1))
-        m, n = self._occgrid.shape
+        m, n = size
         for dy, dx in moves:
             y = current[0] + dy
             x = current[1] + dx
