@@ -53,7 +53,7 @@ class Navigation(ABC):
 
     @property
     def occgrid(self):
-        return self._occgrid
+        return self._occgrid.copy()
 
     @property
     def goal(self):
