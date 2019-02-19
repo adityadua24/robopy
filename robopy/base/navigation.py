@@ -8,7 +8,7 @@ class AStar(Navigation):
         super().__init__(occgrid, *args, **kwargs)
 
     def plan(self, goal, costmap=None):
-        self.goal = goal
+        self.goal = goal[:]
         self.g = np.full(self._occgrid.shape, 0)
         self.h = Navigation.calc_heuristic(self._occgrid.shape, goal)
         self.b = np.full(self._occgrid.shape, None)
@@ -18,7 +18,7 @@ class AStar(Navigation):
         else:
             self.costmap = costmap
 
-    def path(self, start):
+    def navigate_from(self, start):
         found = False
         current = (0, start)
         hq.heappush(self.open_list, current)
@@ -48,7 +48,7 @@ class AStar(Navigation):
         return True
 
     def query(self, start, *args, **kwargs):
-        if self.path(start):
+        if self.navigate_from(start):
             return super().query(start, *args, **kwargs)
 
     def next(self, robot):

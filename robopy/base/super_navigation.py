@@ -12,6 +12,7 @@ class Navigation(ABC):
         """
         Initializes Navigation object with an occupancy grid
         :param occgrid: Occupancy grid represented as an np.ndarray.
+        :param goal: Tuple of form (x, y) representing goal
         :param ax: Matplotlib axes on which to plot occgrid. Defaults to current axes.
         :param inflate: Number of cells by which to inflate obstacles. Defaults to 0.
         """
@@ -76,7 +77,7 @@ class Navigation(ABC):
 
     @property
     def path(self):
-        return self._path
+        return self._path[:]
 
     @abstractmethod
     def plan(self, *args, **kwargs):
