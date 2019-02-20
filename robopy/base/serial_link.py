@@ -114,7 +114,7 @@ class SerialLink:
         :param unit: preferred unit for returned joint angles. Allowed values: 'rad' or 'deg'.
         :return: a list of 6 joint angles.
         """
-        assert type(T) is np.matrix and T.shape == (4, 4)
+        assert T.shape == (4, 4)
         bounds = [(link.qlim[0], link.qlim[1]) for link in self]
         reach = 0
         for link in self:
