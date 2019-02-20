@@ -103,3 +103,15 @@ class Navigation(ABC):
             x = current[1] + dx
             if y < m and y >= 0 and x < n and x >= 0:
                 yield (y, x)
+
+    def __repr__(self):
+        output_str = '{} navigation class:\n'.format(type(self).__name__)
+        output_str += '\toccupancy grid: {}x{}\n'.format(*self._occgrid.shape)
+        if self.goal is not None:
+            output_str += '\tgoal: ({}, {})\n'.format(*self._goal)
+        if hasattr(self, 'costmap'):
+            output_str += '\tcostmap: {}, {}\n'.format(*self.costmap.shape)
+        return output_str
+
+    def __str__(self):
+        return self.__repr__()
