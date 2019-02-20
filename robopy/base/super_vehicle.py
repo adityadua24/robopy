@@ -16,6 +16,7 @@ class Vehicle(ABC):
         :param covar: Odometry covariance (2x2). Defaults to [[0, 0], [0, 0]]. 
         """ 
         self.x0 = [0, 0, 0] if x0 is None else x0[:] #  TODO: allow x0 to be SE2
+        self.x = self.x0
         self.dt = dt
         self.L = L
         self.max_speed = max_speed
@@ -122,4 +123,15 @@ class Vehicle(ABC):
                 if animate:
                     self.plot()
         return self.x_hist[:]
-        
+
+    def __repr__(self):
+        output_str = '{} object:\n'.format(type(self).__name__)
+        output_str += '\tL={}, max_steer={:.3}, max_speed={}\n'.format(
+            self.L, self.max_steer, self.max_speed)
+        output_str += '\tnhist={}\n'.format(len(self.x_hist))
+        output_str += '\tdt={}\n'.format(self.dt)
+        output_str += '\tState: x={}, y={}, theta={}\n'.format(*self.x)
+        return output_str
+
+    def __str__(self):
+        return self.__repr__()
