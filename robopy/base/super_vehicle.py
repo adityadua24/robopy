@@ -93,12 +93,33 @@ class Vehicle(ABC):
         steer = max(-self.max_steer, min(self.max_steer, steer))
         return [speed, steer]
 
-    def run(self, *, nsteps=1000, animate=False):
+    def run(self, *, x0=None, u=None, nsteps=1000, animate=False):
         """
         Run the vehicle model for nsteps time steps and plots the
         vehicle pose at each time step.
+        :param x0: State from which to start simulation. Defaults to original
+                   vehicle state.
+        :param u: Control input. If a sequence of control inputs is given, this
+                  will override nsteps and the numbers of steps will equal the
+                  length of the input sequence. If it is a single control input,
+                  it will be applied at every step for nsteps. If None, the
+                  vehicle's driver will be used. Defaults to None.
         :param nsteps: Number of time steps to simulate. Defaults to 1000.
         :param animate: Set to True to plot vehicle. Defaults to False.
         :return P: State history
         """
-        pass
+        if hasattr(self, 'driver') and u is None:
+            self.driver.init()
+        self.init(x0=x0)
+        if u is None or not hasattr(u[0], '__iter__'):
+            for step in range(nsteps):
+                self.step(u=u)
+                if animate:
+                    self.plot()
+        else:
+            for control in u:
+                self.step(u=control)
+                if animate:
+                    self.plot()
+        return self.x_hist[:]
+        
