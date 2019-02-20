@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from math import sqrt, cos, sin, pi
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Vehicle(ABC):
-    def __init__(self, x0=None, dt=0.1, L=1.0, max_speed=1.0, max_steer=pi/2, rdim=0.2, covar=None):
+    def __init__(self, *, x0=None, dt=0.1, L=1.0, max_speed=1.0, max_steer=pi/2, rdim=0.2, covar=None, ax=None):
         """
         Initializes Vehicle object that implements the kinematic mode
         of a wheeled vehicle.
@@ -22,8 +23,9 @@ class Vehicle(ABC):
         self.rdim = rdim
         self.V = [[0, 0], [0, 0]] if covar is None else covar
         self.x_hist = []
+        self._ax = ax or plt.gca()
 
-    def init(self, x0=None):
+    def init(self, *, x0=None):
         """
         Reset vehicle state and clear history.
         :param x0: State to which to set vehicle. Default is the original x0.
@@ -58,7 +60,7 @@ class Vehicle(ABC):
         self.x_hist.append(self.x)
         return odo
 
-    def step(self, u=None):
+    def step(self, *, u=None):
         """
         Advance one time step
         :param u: Control input [speed, steer]
@@ -71,7 +73,7 @@ class Vehicle(ABC):
         odo[1] += rand[0, 0] * self.V[0][1] + rand[1, 0] * self.V[1][1]
         return odo
 
-    def control(self, u=None):
+    def control(self, *, u=None):
         """
         Compute the control input taking into account speed and
         steering limits. If no control input is applied, one will
@@ -90,3 +92,13 @@ class Vehicle(ABC):
         speed = min(self.max_speed, max(-self.max_speed, speed))
         steer = max(-self.max_steer, min(self.max_steer, steer))
         return [speed, steer]
+
+    def run(self, *, nsteps=1000, animate=False):
+        """
+        Run the vehicle model for nsteps time steps and plots the
+        vehicle pose at each time step.
+        :param nsteps: Number of time steps to simulate. Defaults to 1000.
+        :param animate: Set to True to plot vehicle. Defaults to False.
+        :return P: State history
+        """
+        pass
