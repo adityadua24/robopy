@@ -110,7 +110,7 @@ class Navigation(ABC):
         if self.goal is not None:
             output_str += '\tgoal: ({}, {})\n'.format(*self._goal)
         if hasattr(self, 'costmap'):
-            output_str += '\tcostmap: {}, {}\n'.format(*self.costmap.shape)
+            output_str += '\tcostmap: {}x{}\n'.format(*self.costmap.shape)
         return output_str
 
     def __str__(self):
