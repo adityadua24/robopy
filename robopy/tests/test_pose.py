@@ -16,7 +16,7 @@ from random import uniform
 class TestSE2(unittest.TestCase):
     def test_pose_se2_constructor_no_args(self):
         obj = pose.SE2()
-        exp_mat = np.asmatrix(np.eye(3, 3))
+        exp_mat = tr.RTBMatrix(np.eye(3, 3))
         rec_mat = obj.data[0]
         if not matrices_equal(rec_mat, exp_mat, ):
             output_str = matrix_mismatch_string_builder(rec_mat, exp_mat)
@@ -26,7 +26,7 @@ class TestSE2(unittest.TestCase):
 class TestSE3(unittest.TestCase):
     def test_pose_se3_constructor_no_args(self):
         obj = pose.SE3()
-        exp_mat = np.asmatrix(np.eye(4, 4))
+        exp_mat = tr.RTBMatrix(np.eye(4, 4))
         rec_mat = obj.data[0]
         if not matrices_equal(rec_mat, exp_mat, ):
             output_str = matrix_mismatch_string_builder(rec_mat, exp_mat)
@@ -38,7 +38,7 @@ class TestSO3(unittest.TestCase):
 
     def test_pose_so3_constructor_no_args(self):
         obj = pose.SO3()
-        exp_mat = np.asmatrix(np.eye(3, 3))
+        exp_mat = tr.RTBMatrix(np.eye(3, 3))
         rec_mat = obj.data[0]
         if not matrices_equal(rec_mat, exp_mat, ):
             output_str = matrix_mismatch_string_builder(rec_mat, exp_mat)
@@ -258,7 +258,7 @@ class TestSO3(unittest.TestCase):
         r, p, y = uniform(-1, 1), uniform(-1, 1), uniform(-1, 1)
         obj1 = pose.SO3(tr.rotz(r) * tr.roty(p) * tr.rotx(y))
         rpy = obj1.torpy(order='zyx')
-        v = np.matrix([[y, p, r]]) # Reverse angle sequence YPR returned by default
+        v = tr.RTBMatrix([y, p, r]) # Reverse angle sequence YPR returned by default
         if not matrices_equal(rpy, v):
             output_str = matrix_mismatch_string_builder(rpy, v)
             self.fail(output_str)
@@ -267,7 +267,7 @@ class TestSO3(unittest.TestCase):
         r, p, y = uniform(-1, 1), uniform(-1, 1), uniform(-1, 1)
         obj1 = pose.SO3(tr.rotx(r) * tr.roty(p) * tr.rotz(y))
         rpy = obj1.torpy(order='xyz')
-        v = np.matrix([[y, p, r]])
+        v = tr.RTBMatrix([y, p, r])
         if not matrices_equal(rpy, v):
             output_str = matrix_mismatch_string_builder(rpy, v)
             self.fail(output_str)
@@ -276,7 +276,7 @@ class TestSO3(unittest.TestCase):
         r, p, y = uniform(-1, 1), uniform(-1, 1), uniform(-1, 1)
         obj1 = pose.SO3(tr.roty(r) * tr.rotx(p) * tr.rotz(y))
         rpy = obj1.torpy(order='yxz')
-        v = np.matrix([[y, p, r]])
+        v = tr.RTBMatrix([y, p, r])
         if not matrices_equal(rpy, v):
             output_str = matrix_mismatch_string_builder(rpy, v)
             self.fail(output_str)

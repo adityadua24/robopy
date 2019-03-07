@@ -8,7 +8,7 @@ from random import uniform, randint
 
 from . import check_args
 from .super_pose import SuperPose
-from . import transforms
+from . import transforms as tr
 
 try:
     from geometry_msgs.msg import Pose
@@ -57,7 +57,7 @@ class SO2(SuperPose):
                 for each_angle in args_in:
                     angles_deg.append(each_angle * math.pi / 180)
             for each_angle in angles_deg:
-                self._list.append(transforms.rot2(each_angle))
+                self._list.append(tr.rot2(each_angle))
         else:
             raise AttributeError("\nINVALID instantiation. Valid scenarios:-\n"
                                  "SO2(angle)\n"
@@ -178,7 +178,7 @@ class SO2(SuperPose):
         """Returns SE2 object with same rotational component as SO2 and a zero translation component"""
         se2_pose = SE2(null=True)  # Creates empty poses with no data
         for each_matrix in self:
-            se2_pose.append(transforms.r2t(each_matrix))
+            se2_pose.append(tr.r2t(each_matrix))
         return se2_pose
 
     def inv(self):
@@ -238,7 +238,7 @@ class SO2(SuperPose):
                 y.append(each[1])
         pose_se3 = SE3.Rz(theta=angles, x=x, y=y, z=z)
         axes_pose = [graphics.axesActor2d() for each in pose_se3]
-        vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
+        vtk_mat = [tr.np2vtk(each) for each in pose_se3]
         pipeline = VtkPipeline()
         axis_x_y = graphics.axes_x_y(pipeline.ren)
 
@@ -291,12 +291,12 @@ class SE2(SO2):
                         angle = theta[i]
                     else:
                         angle = theta
-                    mat = transforms.rot2(angle)
+                    mat = tr.rot2(angle)
                     mat = SO2.form_trans_matrix(mat, (x[i], y[i]))
                     self._list.append(mat)
             else:
                 self._transl.append((x, y))
-                mat = transforms.rot2(theta)
+                mat = tr.rot2(theta)
                 mat = SO2.form_trans_matrix(mat, (x, y))
                 self._list.append(mat)
         elif x is not None and y is not None and rot is not None and se2 is None and so2 is None:
@@ -331,12 +331,12 @@ class SE2(SO2):
                 self._list.append(mat)
         elif x is None and y is None and rot is None and se2 is None and so2 is None and isinstance(theta, list):
             for i in range(len(theta)):
-                mat = transforms.rot2(theta[i])
+                mat = tr.rot2(theta[i])
                 mat = SO2.form_trans_matrix(mat, (0, 0))
                 self._list.append(mat)
                 self._transl.append((0, 0))
         elif x is None and y is None and rot is None and se2 is None and so2 is None and theta != 0:
-            mat = transforms.rot2(theta)
+            mat = tr.rot2(theta)
             mat = SO2.form_trans_matrix(mat, (0, 0))
             self._list.append(mat)
             self._transl.append((0, 0))
@@ -397,7 +397,7 @@ class SE2(SO2):
         new_rot = []
         for i in range(len(self._list)):
             # Get rotation matrix. Transpose it. Then append in new_rot
-            rot_transposed = np.matrix.transpose(transforms.t2r(self._list[i]))
+            rot_transposed = np.matrix.transpose(tr.t2r(self._list[i]))
             new_rot.append(rot_transposed)
             transl_mat = -rot_transposed * self.transl_vec[i]
             new_transl.append(transl_mat)
@@ -469,14 +469,14 @@ class SO3(SuperPose):
         if args_in is None and null is True:
             pass
         elif args_in is None and null is False:
-            self._list.append(np.asmatrix(np.eye(3, 3)))
+            self._list.append(tr.RTBMatrix(np.eye(3, 3)))
         elif type(args_in) is list:
             self._list = SO3.np(args_in).data
         elif type(args_in) is SE3:
             self._list = SO3.se3(args_in).data
         elif type(args_in) is SO3:
             self._list = SO3.so3(args_in).data
-        elif type(args_in) is np.matrix:
+        elif type(args_in) is tr.RTBMatrix:
             self._list = SO3.np(args_in).data
         else:
             raise AttributeError("\n INVALID instantiation. Valid scenarios:\n"
@@ -490,7 +490,7 @@ class SO3(SuperPose):
         # Round all matrices to 15 decimal places
         # Removes eps values
         for i in range(len(self._list)):
-            self._list[i] = np.asmatrix(self._list[i].round(15))
+            self._list[i] = tr.RTBMatrix(self._list[i].round(15))
 
     @classmethod
     def so3(cls, args_in):
@@ -515,45 +515,45 @@ class SO3(SuperPose):
     @classmethod
     def Rx(cls, theta, unit="rad"):
         theta = cls.__RxRyRz(theta, unit)
-        rot = [transforms.rotx(each) for each in theta]
+        rot = [tr.rotx(each) for each in theta]
         return cls(null=True).__fill(rot)
 
     @classmethod
     def Ry(cls, theta, unit="rad"):
         theta = cls.__RxRyRz(theta, unit)
-        rot = [transforms.roty(each) for each in theta]
+        rot = [tr.roty(each) for each in theta]
         return cls(null=True).__fill(rot)
 
     @classmethod
     def Rz(cls, theta, unit="rad"):
         theta = cls.__RxRyRz(theta, unit)
-        rot = [transforms.rotz(each) for each in theta]
+        rot = [tr.rotz(each) for each in theta]
         return cls(null=True).__fill(rot)
 
     @classmethod
     def rand(cls):
         ran = randint(1, 3)
         if ran == 1:
-            rot = transforms.rotx(uniform(0, 360), unit='deg')
-            return cls(null=True).__fill([transforms.rotx(uniform(0, 360), unit='deg')])
+            rot = tr.rotx(uniform(0, 360), unit='deg')
+            return cls(null=True).__fill([tr.rotx(uniform(0, 360), unit='deg')])
         elif ran == 2:
-            return cls(null=True).__fill([transforms.roty(uniform(0, 360), unit='deg')])
+            return cls(null=True).__fill([tr.roty(uniform(0, 360), unit='deg')])
         elif ran == 3:
-            return cls(null=True).__fill([transforms.rotz(uniform(0, 360), unit='deg')])
+            return cls(null=True).__fill([tr.rotz(uniform(0, 360), unit='deg')])
 
     @classmethod
     def eul(cls, theta, unit="rad"):
         if unit == 'deg':
             theta = [(each * math.pi / 180) for each in theta]
-        z1_rot = transforms.rotz(theta[0])
-        y_rot = transforms.roty(theta[1])
-        z2_rot = transforms.rotz(theta[2])
+        z1_rot = tr.rotz(theta[0])
+        y_rot = tr.roty(theta[1])
+        z2_rot = tr.rotz(theta[2])
         zyz = z1_rot * y_rot * z2_rot
         return cls(null=True).__fill([zyz])
 
     @classmethod
     def rpy(cls, thetas, order='zyx', unit='rad'):
-        return cls(null=True).__fill([transforms.rpy2r(thetas=thetas, order=order, unit=unit)])
+        return cls(null=True).__fill([tr.rpy2r(thetas=thetas, order=order, unit=unit)])
 
     @classmethod
     def oa(cls, o, a):
@@ -586,7 +586,7 @@ class SO3(SuperPose):
     def to_se3(self):
         pose_se3 = SE3(null=True)
         for each in self:
-            pose_se3.append(transforms.r2t(each))
+            pose_se3.append(tr.r2t(each))
         return pose_se3
 
     def plot(self, dispMode='VTK', **kwargs):
@@ -600,7 +600,7 @@ class SO3(SuperPose):
             pose_se3 = self.to_se3()
         pipeline = VtkPipeline()
         axes = [vtk.vtkAxesActor() for i in range(self.length)]
-        vtk_mat = [transforms.np2vtk(each) for each in pose_se3]
+        vtk_mat = [tr.np2vtk(each) for each in pose_se3]
         for i in range(len(axes)):
             axes[i].SetUserMatrix(vtk_mat[i])
             axes[i].SetAxisLabels(0)
@@ -657,7 +657,7 @@ class SO3(SuperPose):
         for i in range(self.length):
             axis_list.append(vtk.vtkAxesActor())
             axis_list[i].SetAxisLabels(0)
-            axis_list[i].SetUserMatrix(transforms.np2vtk(q1[i].q2tr()))
+            axis_list[i].SetUserMatrix(tr.np2vtk(q1[i].q2tr()))
             self.pipeline.add_actor(axis_list[i])
 
         cube_axes = graphics.axesCube(self.pipeline.ren)
@@ -670,7 +670,7 @@ class SO3(SuperPose):
 
             for i in range(len(axis_list)):
                 axis_list[i].SetUserMatrix(
-                    transforms.np2vtk(
+                    tr.np2vtk(
                         q1[i].interp(
                             q2[i], r=1 / self.pipeline.total_time_steps * self.pipeline.timer_count).q2tr()))
             self.pipeline.iren.GetRenderWindow().Render()
@@ -690,7 +690,7 @@ class SO3(SuperPose):
         """
         mat = []
         for each in self:
-            mat.append(transforms.r2t(each))
+            mat.append(tr.r2t(each))
 
         if self.length == 1:
             return mat[0]
@@ -764,7 +764,7 @@ class SO3(SuperPose):
         pass
 
     def torpy(self, unit='rad', order='zyx'):
-        return transforms.tr2rpy(self.rotation(), unit, order)
+        return tr.tr2rpy(self.rotation(), unit, order)
 
     def toeul(self):
         # TODO
@@ -858,7 +858,7 @@ class SE3(SO3):
                 # Assert they are all same length
                 for i in range(len(x)):
                     self._transl.append((x[i], y[i], z[i]))
-                    rot = transforms.rotx(0)
+                    rot = tr.rotx(0)
                     self._list.append(SE3.form_trans_matrix(rot, (x[i], y[i], z[i])))
         elif x is not None and y is not None and z is not None and rot is not None and so3 is None and se3 is None:
             if (type(x) is int or type(x) is float) and \

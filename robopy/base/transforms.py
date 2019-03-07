@@ -255,7 +255,7 @@ def r2t(rmat):
 
     Translational component is zero.
     """
-    assert isinstance(rmat, np.matrix)
+    assert isinstance(rmat, RTBMatrix)
     dim = rmat.shape
     if dim[0] != dim[1]:
         raise ValueError(' Matrix Must be square ')

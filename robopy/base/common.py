@@ -2,6 +2,7 @@
 # 13 June, 2017
 
 """Common Module contains code shared by robotics and machine vision toolboxes"""
+from math import pi
 import numpy as np
 from . import check_args
 import numpy.testing as npt
@@ -83,3 +84,6 @@ def isrot2(rot, dtest=False):
             except AssertionError:
                 return False
     return True
+
+def ang_diff(theta1, theta2):
+    return (theta1 - theta2 + pi) % 2 * pi - pi
