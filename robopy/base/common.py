@@ -86,4 +86,4 @@ def isrot2(rot, dtest=False):
     return True
 
 def ang_diff(theta1, theta2):
-    return (theta1 - theta2 + pi) % 2 * pi - pi
+    return (theta1 - theta2 + pi) % (2 * pi) - pi
