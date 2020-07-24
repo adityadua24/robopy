@@ -106,6 +106,35 @@ class SerialLink:
             actor_list[self.length].SetUserMatrix(transforms.np2vtk(t))
         return t
 
+    def jacobian(self, q, unit='rad'):
+        """
+        Calculates the geometric jacobian of the robot, for specific joint coordinates 'q'.
+        :param q: The joint coordinates for which the jacobian is calculated
+        :param uni: unit of input joint coordinates
+        """
+        if type(q) is np.ndarray:
+            q = np.asmatrix(q)
+        jacobian = np.zeros((6,self.length+1))
+        i = 0
+        t = self.base
+        On = self.fkine(q,unit=unit)[0:3,3].A1
+        zi = t[0:3,2].A1
+        Oi = t[0:3,3].A1
+        jacobian[:3,i] = np.cross(zi,On-Oi)
+        jacobian[3:,i] = zi
+        for link in self:
+            i += 1
+            t = t * link.A(q[:,0])
+            zi = t[0:3,2].A1
+            Oi = t[0:3,3].A1
+            if link.kind == 'r':
+                jacobian[:3,i] = np.cross(zi,On-Oi)
+                jacobian[3:,i] = zi
+            elif link.kind == 'p':
+                jacobian[:3,i] = zi
+                jacobian[3:,i] = np.zeros((3,1))
+        return jacobian[:,:-1]
+
     def ikine(self, T, q0=None, unit='rad'):
         """
         Calculates inverse kinematics for homogeneous transformation matrix using numerical optimisation method.
@@ -122,7 +151,6 @@ class SerialLink:
         omega = np.diag([1, 1, 1, 3 / reach])
         if q0 is None:
             q0 = np.asmatrix(np.zeros((1, self.length)))
-
         def objective(x):
             return (
                 np.square(((np.linalg.lstsq(T, self.fkine(x))[0]) - np.asmatrix(np.eye(4, 4))) * omega)).sum()
